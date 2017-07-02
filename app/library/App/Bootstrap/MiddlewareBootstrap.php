@@ -26,5 +26,6 @@ class MiddlewareBootstrap implements BootstrapInterface
             ->attach(new AuthorizationMiddleware)
             ->attach(new FractalMiddleware)
             ->attach(new UrlQueryMiddleware);
+          
     }
 }

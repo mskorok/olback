@@ -3,6 +3,13 @@
 namespace App\Controllers;
 
 use PhalconRest\Mvc\Controllers\CrudResourceController;
+use App\Constants\Services;
+use PhalconRest\Export\Documentation;
+use PhalconRest\Export\Postman\ApiCollection;
+use PhalconRest\Mvc\Controllers\CollectionController;
+use PhalconRest\Transformers\DocumentationTransformer;
+use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
+
 
 class UserController extends CrudResourceController
 {
@@ -32,6 +39,40 @@ class UserController extends CrudResourceController
 
         return $this->createArrayResponse($response, 'data');
     }
+
+    public function createManager(){
+      // echo 'aaaa';die();
+      // $session = $this->authM
+      // use PhalconRest\Http\Request;anager->getSession();
+      //
+      // $response = [
+      //     'token' => $session->getToken(),
+      //     'expires' => $session->getExpirationTime()
+      // ];
+
+      // $authManager = $this->di->get(AppServices::AUTH_MANAGER);
+      // if ($authManager->loggedIn()) {
+      //
+      //     echo 'dsds';die();
+      //
+      // }
+
+      $response = [
+          'code' => 1,
+          'status' => 'Success',
+          'data' => array(
+            'userid'=>123
+          )
+      ];
+
+      return $this->createArrayResponse($response, 'data');
+
+
+      $query = $this->modelsManager->createQuery('SELECT * FROM User');
+      $users  = $query->execute();
+      print_r($users);die();
+    }
+
 
     public function whitelist()
     {
