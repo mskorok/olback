@@ -8,7 +8,15 @@ use PhalconRest\Export\Documentation;
 use PhalconRest\Export\Postman\ApiCollection;
 use PhalconRest\Mvc\Controllers\CollectionController;
 use PhalconRest\Transformers\DocumentationTransformer;
-use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
+// use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
+use Phalcon\Di;
+use PhalconApi\Auth\Session;
+use PhalconRest\Exception;
+use App\Model\User;
+
+use Phalcon\Http\Request;
+
+
 
 
 class UserController extends CrudResourceController
@@ -41,36 +49,91 @@ class UserController extends CrudResourceController
     }
 
     public function createManager(){
-      // echo 'aaaa';die();
-      // $session = $this->authM
-      // use PhalconRest\Http\Request;anager->getSession();
-      //
-      // $response = [
-      //     'token' => $session->getToken(),
-      //     'expires' => $session->getExpirationTime()
-      // ];
 
-      // $authManager = $this->di->get(AppServices::AUTH_MANAGER);
-      // if ($authManager->loggedIn()) {
-      //
-      //     echo 'dsds';die();
-      //
-      // }
+      $request = new Request();
+      $data = $request->getJsonRawBody();
 
-      $response = [
-          'code' => 1,
-          'status' => 'Success',
-          'data' => array(
-            'userid'=>123
-          )
-      ];
+      //check for required fields
+      $validate = array(
+        'password' => array('mandatory' => true, 'regex' => null),
+        'email' => array('mandatory' => true, 'regex' => null)
+      );
 
+      $missing_input = array();
+
+      foreach($data as $key => $val){
+        $mandatory = isset($validate[$key]) ? $validate[$key] : false;
+        if($mandatory && !trim($val)){
+          $missing_input[] = $key;
+        }
+      }
+
+
+      if(!empty($missing_input)){
+        $response = [
+            'code' => 0,
+            'status' => "Required field: " . implode(", ", $missing_input),
+        ];
+        return $this->createArrayResponse($response, 'data');
+      }
+    
+      //check for duplicates
+      $user = User::findFirst(
+          [
+              'conditions' => 'email = ?1 OR username = ?2',
+              'bind'       => [
+                  1 => $data->email,
+                  2 => $data->username
+              ]
+          ]
+      );
+      if($user){
+        if($user->email == $data->email){
+          $errorText = "Email";
+        }
+        if($user->username == $data->username){
+          $errorText = "Username";
+        }
+        $response = [
+            'code' => 0,
+            'status' => $errorText.' exists!',
+        ];
+        return $this->createArrayResponse($response, 'data');
+      }
+
+
+      //create new manager user
+      $manager = new \App\Model\User();
+      $manager->role = \App\Constants\AclRoles::MANAGER;
+      $manager->email = $data->email;
+      $manager->username = $data->username;
+      $manager->password = $this->security->hash($data->password);
+      $manager->firstName = $data->firstName;
+      $manager->lastName = $data->LastName;
+      $manager->createdAt = "2017-07-06 02:25:00";
+
+      if ($manager->save() == false) {
+        $messagesErrors = array();
+        foreach ($manager->getMessages() as $message) {
+          $messagesErrors[]=$message;
+        }
+        $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => $messagesErrors
+        ];
+       } else {
+         $response = [
+             'code' => 1,
+             'status' => 'Success',
+             'data' => array(
+               'userid'=>123
+             )
+         ];
+       }
+
+      //response
       return $this->createArrayResponse($response, 'data');
-
-
-      $query = $this->modelsManager->createQuery('SELECT * FROM User');
-      $users  = $query->execute();
-      print_r($users);die();
     }
 
 

@@ -14,7 +14,7 @@ class AclBootstrap implements BootstrapInterface
 {
     public function run(Api $api, DiInterface $di, Config $config)
     {
-      
+
         /** @var \PhalconApi\Acl\MountingEnabledAdapterInterface $acl */
         $acl = $di->get(Services::ACL);
 
