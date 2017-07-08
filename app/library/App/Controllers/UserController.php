@@ -74,6 +74,7 @@ class UserController extends CrudResourceController
     }
 
 
+
     public function whitelist()
     {
         return [
