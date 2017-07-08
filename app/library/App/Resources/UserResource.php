@@ -14,6 +14,7 @@ class UserResource extends ApiResource {
     public function initialize()
     {
         $this
+
             ->name('User')
             ->model(User::class)
             ->expectsJsonData()
@@ -32,11 +33,6 @@ class UserResource extends ApiResource {
                 ->deny(AclRoles::AUTHORIZED)
                 ->description('Returns the currently logged in user')
             )
-            ->endpoint(ApiEndpoint::post('/createManager', 'createManager')
-                ->allow(AclRoles::USER)
-                // ->deny(AclRoles::UNAUTHORIZED)
-                ->description('Returns the currently logged in user')
-            )
             ->endpoint(ApiEndpoint::post('/authenticate', 'authenticate')
                 ->allow(AclRoles::UNAUTHORIZED)
                 ->deny(AclRoles::AUTHORIZED)
@@ -45,6 +41,11 @@ class UserResource extends ApiResource {
                     'token' => 'co126bbm40wqp41i3bo7pj1gfsvt9lp6',
                     'expires' => 1451139067
                 ])
+            )
+            ->endpoint(ApiEndpoint::post('/createManager', 'createManager')
+                ->allow(AclRoles::USER)
+                ->deny(AclRoles::UNAUTHORIZED)
+                ->description('Returns the currently logged in user')
             );
     }
 }
