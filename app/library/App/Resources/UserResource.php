@@ -47,7 +47,7 @@ class UserResource extends ApiResource {
                 ->deny(AclRoles::UNAUTHORIZED)
                 ->description('Returns the currently logged in user')
             );
-            ->endpoint(ApiEndpoint::post('/createUser', 'createManager')
+            ->endpoint(ApiEndpoint::post('/createUser', 'createUser')
                 ->allow(AclRoles::MANAGER)
                 ->deny(AclRoles::UNAUTHORIZED)
                 ->description('Returns the currently logged in user')
