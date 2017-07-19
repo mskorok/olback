@@ -9,8 +9,11 @@ $app = null;
 /** @var \PhalconApi\Http\Response $response */
 $response = null;
 
-try {
 
+try {
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  error_reporting(E_ALL);
     define("ROOT_DIR", __DIR__ . '/..');
     define("APP_DIR", ROOT_DIR . '/app');
     define("VENDOR_DIR", ROOT_DIR . '/vendor');
