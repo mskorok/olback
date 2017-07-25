@@ -49,6 +49,7 @@ class UserController extends CrudResourceController
     }
 
     public function createManager(){
+      // error_reporting(E_ERROR | E_PARSE);
 
       $request = new Request();
       $data = $request->getJsonRawBody();
