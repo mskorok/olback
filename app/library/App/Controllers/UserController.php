@@ -53,7 +53,7 @@ class UserController extends CrudResourceController
 
       $request = new Request();
       $data = $request->getJsonRawBody();
-
+      var_dump($data);die();
       //check for required fields
       $validate = array(
         'password' => array('mandatory' => true, 'regex' => null),
