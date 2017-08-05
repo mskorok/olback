@@ -9,6 +9,7 @@ use App\Resources\UserResource;
 use App\Resources\AlbumResource;
 use App\Resources\PhotoResource;
 use App\Resources\OrganizationResource;
+use App\Resources\SystemicMapResource;
 use Phalcon\Config;
 use Phalcon\DiInterface;
 use PhalconRest\Api;
@@ -23,7 +24,8 @@ class CollectionBootstrap implements BootstrapInterface
             ->resource(new UserResource('/users'))
             ->resource(new AlbumResource('/albums'))
             ->resource(new PhotoResource('/photos'))
-            ->resource(new OrganizationResource('/organization'));
+            ->resource(new OrganizationResource('/organization'))
+            ->resource(new SystemicMapResource('/systemicmap'));
     }
 }
 // namespace App\Bootstrap;
