@@ -524,18 +524,117 @@ class SystemicMapController extends CrudResourceController
                   'code' => 1,
                   'status' => 'Success!',
                 ];
-            }else{
-              $response = [
+            } else {
+                $response = [
                 'code' => 0,
                 'status' => 'Systemic map not found!',
               ];
             }
-        }else{
-          $response = [
+        } else {
+            $response = [
             'code' => 0,
             'status' => 'You cannot delete this systemic map!',
           ];
         }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function deleteSystemicItem($id)
+    {
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $userId = $session->getIdentity(); // For example; 1
+        }
+        $creator = \App\Controllers\SystemicMapController::getUserDetails($userId);
+        if ($creator['organization'] == null) {
+            $response = [
+        'code' => 0,
+        'status' => 'Error',
+        'data' => "Manager's organization not found!",
+      ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+        $user = User::findFirst(
+          [
+              'conditions' => 'id = ?1',
+              'bind' => [
+                  1 => $userId,
+              ],
+          ]);
+        if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
+            $systemicChains = SystemicMapChain::find(
+                [
+                    'conditions' => 'from_item =?1 OR to_item =?1',
+                    'bind' => [
+                        1 => $id,
+                    ],
+                ]
+              );
+            foreach ($systemicChains as $systemicChain) {
+                $systemicChain->delete();
+            }
+            $systemicItems = SystemicMapItems::find(
+                    [
+                        'conditions' => 'id =?1',
+                        'bind' => [
+                            1 => $id,
+                        ],
+                    ]
+                  );
+            foreach ($systemicItems as $systemicItem) {
+                $systemicItem->delete();
+            }
+
+            $response = [
+                  'code' => 1,
+                  'status' => 'Success!',
+                ];
+        } else {
+            $systemicItems = SystemicMapItems::find(
+              [
+                  'conditions' => 'userId =?1 AND id =?2',
+                  'bind' => [
+                      1 => $userId,
+                      2 => $id,
+                  ],
+              ]
+            );
+            if ($systemicItems) {
+                foreach ($systemicItems as $systemicItem) {
+                  $systemicChain = SystemicMapChain::find(
+                    [
+                        'conditions' => 'from_item =?1 OR to_item =?1',
+                        'bind' => [
+                            1 => $systemicItem->id
+                        ],
+                    ]
+                  );
+                  if($systemicChain){
+                    $response = [
+                      'code' => 0,
+                      'status' => 'You cannot delete this systemic item!',
+                    ];
+                  }else{
+                    $systemicItem->delete();
+                    $response = [
+                      'code' => 1,
+                      'status' => 'Success',
+                    ];
+                  }
+                }
+            } else {
+                $response = [
+                  'code' => 0,
+                  'status' => 'You cannot delete this systemic item!',
+                ];
+            }
+        }
+
         return $this->createArrayResponse($response, 'data');
     }
 }
