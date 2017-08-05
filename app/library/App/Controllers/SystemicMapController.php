@@ -10,6 +10,7 @@ use App\Model\SystemicMap;
 use App\Model\SystemicMapItems;
 use App\Model\SystemicMapChain;
 use Phalcon\Http\Request;
+use App\Constants\AclRoles;
 
 class SystemicMapController extends CrudResourceController
 {
@@ -62,8 +63,9 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-    public function getSystemicItem($id){
-//echo $id;die();
+    public function getSystemicItem($id)
+    {
+        //echo $id;die();
       $systemicMaps = SystemicMapItems::find(
       [
           'conditions' => '	systemic_map_id = ?1',
@@ -72,11 +74,11 @@ class SystemicMapController extends CrudResourceController
           ],
       ]
     );
-      $systemicMapsArray = array();
-      $linksArray = array();
-      if ($systemicMaps) {
-          foreach ($systemicMaps as $systemicMap) {
-              $systemicMapsArray[] = array(
+        $systemicMapsArray = array();
+        $linksArray = array();
+        if ($systemicMaps) {
+            foreach ($systemicMaps as $systemicMap) {
+                $systemicMapsArray[] = array(
                 'id' => $systemicMap->id,
                 'systemic_map_id' => $systemicMap->systemic_map_id,
                 'question' => $systemicMap->question,
@@ -84,7 +86,7 @@ class SystemicMapController extends CrudResourceController
                 'groupId' => $systemicMap->groupId,
               );
 
-              $chains = SystemicMapChain::find(
+                $chains = SystemicMapChain::find(
               [
                   'conditions' => 'to_item =?1',
                   'bind' => [
@@ -94,28 +96,22 @@ class SystemicMapController extends CrudResourceController
             );
             // echo "dada";die();
             foreach ($chains as $chain) {
-              $linksArray[]=array(
-                'source'=>$chain->from_item,
-                'target'=>$chain->to_item,
-                'value2'=>2
+                $linksArray[] = array(
+                'source' => $chain->from_item,
+                'target' => $chain->to_item,
+                'value2' => 2,
               );
             }
-          }
-      }
-      $response = [
+            }
+        }
+        $response = [
       'code' => 1,
       'status' => 'Success',
-      'data' => array("nodes" =>$systemicMapsArray,"links"=>$linksArray),
+      'data' => array('nodes' => $systemicMapsArray, 'links' => $linksArray),
     ];
 
-      return $this->createArrayResponse($response, 'data');
-
+        return $this->createArrayResponse($response, 'data');
     }
-
-
-
-
-
 
     public function createSystemicMap()
     {
@@ -174,10 +170,9 @@ class SystemicMapController extends CrudResourceController
         if ($systemicMap->save() == false) {
             $messagesErrors = array();
             foreach ($systemicMap->getMessages() as $message) {
-                print_r($message);
+                // print_r($message);
                 $messagesErrors[] = $message;
             }
-            die();
             $response = [
                 'code' => 0,
                 'status' => 'Error',
@@ -280,7 +275,7 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-    public function getUserDetails($userId)
+    public static function getUserDetails($userId)
     {
         $user = User::findFirst(
         [
@@ -308,5 +303,239 @@ class SystemicMapController extends CrudResourceController
         } else {
             return null;
         }
+    }
+
+    public function updateSystemicMap($id)
+    {
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $userId = $session->getIdentity(); // For example; 1
+        }
+        $creator = $this->getUserDetails($userId);
+        if ($creator['organization'] == null) {
+            $response = [
+          'code' => 0,
+          'status' => 'Error',
+          'data' => "Manager's organization not found!",
+        ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+        $user = User::findFirst(
+      [
+          'conditions' => 'id = ?1',
+          'bind' => [
+              1 => $userId,
+          ],
+      ]);
+
+        if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
+            $systemicMap = SystemicMap::findFirst(
+        [
+            'conditions' => 'id = ?1 AND organization = ?2',
+            'bind' => [
+                1 => $id,
+                2 => $organization_id,
+            ],
+        ]);
+        } else {
+            $systemicMap = false;
+        }
+        if ($systemicMap) {
+            if (isset($data->name)) {
+                $systemicMap->name = $data->name;
+            }
+            if (isset($data->isActive)) {
+                $systemicMap->isActive = $data->isActive;
+            }
+            $systemicMap->save();
+            $response = [
+          'code' => 1,
+          'status' => 'Success',
+        ];
+        } else {
+            $response = [
+          'code' => 0,
+          'status' => 'You cannot edit this systemic map!',
+        ];
+        }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function updateSystemicItem($id)
+    {
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $userId = $session->getIdentity(); // For example; 1
+        }
+        $creator = \App\Controllers\SystemicMapController::getUserDetails($userId);
+        if ($creator['organization'] == null) {
+            $response = [
+          'code' => 0,
+          'status' => 'Error',
+          'data' => "Manager's organization not found!",
+        ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+        $user = User::findFirst(
+      [
+          'conditions' => 'id = ?1',
+          'bind' => [
+              1 => $userId,
+          ],
+      ]);
+
+        if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
+            $systemicItems = SystemicMapItems::findFirst(
+        [
+            'conditions' => 'id = ?1',
+            'bind' => [
+                1 => $id,
+            ],
+        ]);
+
+            if ($systemicItems) {
+                if ($userId != $systemicItems->userId) {
+                    $organizationChecked = UserOrganization::findFirst(
+          [
+              'conditions' => 'user_id = ?1 AND organization_id = ?2',
+              'bind' => [
+                  1 => $systemicItems->id,
+                  2 => $organization_id,
+              ],
+          ]);
+
+                    if (!$organizationChecked) {
+                        $response = [
+                      'code' => 0,
+                      'status' => 'You cannot edit this group2!',
+                    ];
+
+                        return $this->createArrayResponse($response, 'data');
+                    }
+                }
+            }
+        } else {
+            $systemicItems = SystemicMapItem::findFirst(
+        [
+            'conditions' => 'id = ?1 AND userId = ?2',
+            'bind' => [
+                1 => $id,
+                2 => $userId,
+            ],
+        ]);
+        }
+        if ($systemicItems) {
+            if (isset($data->question)) {
+                $systemicItems->question = $data->question;
+            }
+            if (isset($data->proposal)) {
+                $systemicItems->proposal = $data->proposal;
+            }
+            if (isset($data->groupId)) {
+                $systemicItems->groupId = $data->groupId;
+            }
+            $systemicItems->save();
+            $response = [
+          'code' => 1,
+          'status' => 'Success',
+        ];
+        } else {
+            $response = [
+          'code' => 0,
+          'status' => 'You cannot edit this group!',
+        ];
+        }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function deleteSystemicMap($id)
+    {
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $userId = $session->getIdentity(); // For example; 1
+        }
+        $creator = \App\Controllers\SystemicMapController::getUserDetails($userId);
+        if ($creator['organization'] == null) {
+            $response = [
+        'code' => 0,
+        'status' => 'Error',
+        'data' => "Manager's organization not found!",
+      ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+        $user = User::findFirst(
+          [
+              'conditions' => 'id = ?1',
+              'bind' => [
+                  1 => $userId,
+              ],
+          ]);
+        if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
+            $systemicMap = SystemicMap::findFirst(
+        [
+            'conditions' => 'id = ?1',
+            'bind' => [
+                1 => $id,
+            ],
+        ]);
+
+            if ($systemicMap) {
+                $systemicChains = SystemicMapChain::find(
+                [
+                    'conditions' => 'from_item =?1 OR to_item =?1',
+                    'bind' => [
+                        1 => $systemicMap->id,
+                    ],
+                ]
+              );
+                foreach ($systemicChains as $systemicChain) {
+                    $systemicChain->delete();
+                }
+                $systemicItems = SystemicMapItems::find(
+                    [
+                        'conditions' => 'systemic_map_id =?1',
+                        'bind' => [
+                            1 => $systemicMap->id,
+                        ],
+                    ]
+                  );
+                foreach ($systemicItems as $systemicItem) {
+                    $systemicItem->delete();
+                }
+
+                $systemicMap->delete();
+                $response = [
+                  'code' => 1,
+                  'status' => 'Success!',
+                ];
+            }else{
+              $response = [
+                'code' => 0,
+                'status' => 'Systemic map not found!',
+              ];
+            }
+        }else{
+          $response = [
+            'code' => 0,
+            'status' => 'You cannot delete this systemic map!',
+          ];
+        }
+        return $this->createArrayResponse($response, 'data');
     }
 }
