@@ -227,7 +227,7 @@ class SystemicMapController extends CrudResourceController
         $systemicItem->systemic_map_id = $data->systemic_map_id;
         $systemicItem->question = $data->question;
         $systemicItem->proposal = $data->proposal;
-        $systemicItem->groupId = 0;
+        $systemicItem->groupId = $data->groupId;
         $systemicItem->userId = $creatorId;
         if ($systemicItem->save() == false) {
             $messagesErrors = array();
