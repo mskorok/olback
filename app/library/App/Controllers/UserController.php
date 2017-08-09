@@ -157,7 +157,7 @@ class UserController extends CrudResourceController
                 }
                 $response = [
               'code' => 0,
-              'status' => 'Error',
+              'status' => 'Error2',
               'data' => $messagesErrors,
           ];
             } else {
