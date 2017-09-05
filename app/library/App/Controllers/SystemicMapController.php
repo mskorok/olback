@@ -677,7 +677,7 @@ class SystemicMapController extends CrudResourceController
                 $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
                 $ids   = $data->fetchAll();
                 $item['items']=array();
-                $this->fillArray($item['items'],$ids);.
+                $this->fillArray($item['items'],$ids);
              }
          }
      }
