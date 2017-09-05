@@ -11,9 +11,15 @@ use App\Model\SystemicMapItems;
 use App\Model\SystemicMapChain;
 use Phalcon\Http\Request;
 use App\Constants\AclRoles;
-
+use Phalcon\Mvc\Model\Query;
+use Phalcon\Mvc\Model\ManagerInterface;
+use Phalcon\Mvc\Model\Resultset\Simple;
 class SystemicMapController extends CrudResourceController
 {
+
+
+
+
     public function getSystemicMap()
     {
         //  echo 'asas';die();
@@ -637,4 +643,43 @@ class SystemicMapController extends CrudResourceController
 
         return $this->createArrayResponse($response, 'data');
     }
+
+    public function getSystemicItemTree($id)
+   {
+
+     // echo "dfssfs";die();
+     $sql = "SELECT sm.id as firstId,sm.question as question,sm.proposal as proposal,sc.* FROM systemic_map_items sm JOIN systemic_map_chain sc ON sm.id = sc.from_item where sm.systemic_map_id = ".$id." and EXISTS (SELECT * from systemic_map_chain WHERE from_item is null and to_item = sm.id)";
+     $connection = $this->db;
+     $data       = $connection->query($sql);
+     $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+     $results    = $data->fetchAll();
+     $array_main = array();
+
+     // foreach ($results as $key => $value_first) {
+       $this->fillArray($results);
+       //print_r($value_first)
+     // }
+
+     die();
+     return $this->createArrayResponse($response, 'data');
+   }
+
+
+  public function fillArray(&$arrayData){
+    //  print_r($arrayData);die();
+
+       foreach ($arrayData as $value_first) {
+        //   print_r($value_first);
+           $sql = "SELECT sm.id as firstId,sm.question as question,sm.proposal as proposal,sc.* FROM systemic_map_items sm JOIN systemic_map_chain sc ON sm.id = sc.from_item where sm.systemic_map_id = ".$id." AND sc.from_item = '".$value_first['to_item']."' ";
+           $connection = $this->db;
+           $data       = $connection->query($sql);
+           $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+           $results    = $data->fetchAll();
+           foreach ($results as $item)
+           {
+              $value_first['items'][]=$item;
+              fillArray($value_first['items']);
+           }
+       }
+   }
 }

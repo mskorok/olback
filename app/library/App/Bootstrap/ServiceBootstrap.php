@@ -113,6 +113,13 @@ class ServiceBootstrap implements BootstrapInterface
             return $fractal;
         });
 
+
+        $di->set(
+      "modelsManager",
+      function() {
+          return new ModelsManager();
+      }
+  );
         /**
          * @description PhalconRest - \PhalconRest\User\Service
          */
