@@ -645,41 +645,40 @@ class SystemicMapController extends CrudResourceController
     }
 
     public function getSystemicItemTree($id)
-   {
+     {
 
-     // echo "dfssfs";die();
-     $sql = "SELECT sm.id as firstId,sm.question as question,sm.proposal as proposal,sc.* FROM systemic_map_items sm JOIN systemic_map_chain sc ON sm.id = sc.from_item where sm.systemic_map_id = ".$id." and EXISTS (SELECT * from systemic_map_chain WHERE from_item is null and to_item = sm.id)";
-     $connection = $this->db;
-     $data       = $connection->query($sql);
-     $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
-     $results    = $data->fetchAll();
-     $array_main = array();
+      $sql="SELECT to_item as id FROM `systemic_map_chain` WHERE from_item Is NULL AND to_item IN (SELECT id FROM systemic_map_items WHERE systemic_map_id=".$id.")";
+       $connection = $this->db;
+       $data       = $connection->query($sql);
+       $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+       $results    = $data->fetchAll();
+       $tree=array();
+       $this->fillArray($tree,$results);
+       return $this->createArrayResponse($tree, 'data');
+     }
 
-     // foreach ($results as $key => $value_first) {
-       $this->fillArray($results);
-       //print_r($value_first)
-     // }
-
-     die();
-     return $this->createArrayResponse($response, 'data');
-   }
-
-
-  public function fillArray(&$arrayData){
-    //  print_r($arrayData);die();
-
-       foreach ($arrayData as $value_first) {
-        //   print_r($value_first);
-           $sql = "SELECT sm.id as firstId,sm.question as question,sm.proposal as proposal,sc.* FROM systemic_map_items sm JOIN systemic_map_chain sc ON sm.id = sc.from_item where sm.systemic_map_id = ".$id." AND sc.from_item = '".$value_first['to_item']."' ";
-           $connection = $this->db;
-           $data       = $connection->query($sql);
-           $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
-           $results    = $data->fetchAll();
-           foreach ($results as $item)
-           {
-              $value_first['items'][]=$item;
-              fillArray($value_first['items']);
-           }
-       }
-   }
+    public function fillArray(&$tree,$arrayData){
+         foreach ($arrayData as $value_first) {
+             $sql="SELECT * FROM systemic_map_items WHERE id=".$value_first['id'];
+             $connection = $this->db;
+             $data       = $connection->query($sql);
+             $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+             $iresults   = $data->fetchAll();
+             foreach ($iresults as &$item)
+             {
+               $tree[]= $item;
+             }
+             foreach ($tree as &$item)
+             {
+                $id=$item['id'];
+                $sql="SELECT to_item as id FROM `systemic_map_chain` WHERE from_item = ".$id;
+                $connection = $this->db;
+                $data       = $connection->query($sql);
+                $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+                $ids   = $data->fetchAll();
+                $item['items']=array();
+                $this->fillArray($item['items'],$ids);.
+             }
+         }
+     }
 }
