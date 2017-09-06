@@ -654,10 +654,32 @@ class SystemicMapController extends CrudResourceController
        $results    = $data->fetchAll();
        $tree=array();
        $this->fillArray($tree,$results);
+       $htmlcontent = "
+        <li class=\"dd-item dd3-item\" ng-repeat=\"sysItems in sysMapItemsData\" data-id=\"".$tree[0]['id']."\">
+                  <div class=\"dd3-content\">
 
-echo $this->array_depth($tree);
-die();
+                    ".$tree[0]['question']."
 
+                    <span class=\"pull-right\">
+                    <a class=\"fa fa-lg fa-trash-o\" ng-click=\"deleteSysMapItem(sysItems.id)\"></a>
+
+                    <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal{{sysItems.id}}\"></a>
+                    <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal{{sysItems.id}}\"></a>
+                    </span>
+                  </div>";
+ // print_r($tree[0]['items']);die();
+// print_r();die();
+ $htmlcontent = $this->array_depth($tree[0]['items'],$htmlcontent)['html'];
+ // $htmlcontent = $htmlcontent2['html']
+ $htmlcontent.="</ol>
+				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(sysmid,question,proposal)\" datasp=\"sysItems.id\"></data-sys-map-items-add>
+
+				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(sysmid,question,proposal)\" datasp=\"sysItems.id\"></data-sys-map-items-add>
+
+</li>";
+ //echo $htmlcontent;
+ die();
+// echo $htmlcontent;die();
 
        return $this->createArrayResponse($tree, 'data');
      }
@@ -688,16 +710,59 @@ die();
      }
 
 
-     public function array_depth(array $array) {
+
+     public function array_depth(array $array,$htmlcontent) {
+      // echo $htmlcontent;
        $max_depth = 1;
+
+
+
        foreach ($array as $value) {
+
+          // echo $value['id'];
+          // die();
            if (is_array($value)) {
-               $depth = array_depth($value) + 1;
+            //print_r($value);
+
+             if(isset($value['id'])){
+              // echo $value['id'];
+
+              //  $htmlcontent.=$value['id']."***";
+
+
+              //  echo $value['id']." <--> ";
+               $htmlcontent.="<ol class=\"dd-list\"> <li class=\"dd-item dd3-item\" data-id=\"".$value['id']."\">
+                          <div class=\"dd3-content\">
+                              ".$value['question']."
+                          </div>";
+                          if($value['id']==98){
+                            $h=98;
+                            echo "**********************";
+                            // die();
+                          }
+              }
+
+
+               $depth = $this->array_depth($value,$htmlcontent)['max'] + 1;
+
+              //  echo $depth;die();
                if ($depth > $max_depth) {
                    $max_depth = $depth;
                }
+
+              //die();
+              $htmlcontent.="</li></ol>";
            }
+
        }
-       return $max_depth;
+       if(isset($h)){
+         echo $htmlcontent;
+
+       }else{}
+        $a = array("max"=>$max_depth,"html"=>$htmlcontent);
+          return $a;
+
+       //die();
+
    }
 }
