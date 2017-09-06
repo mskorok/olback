@@ -654,6 +654,11 @@ class SystemicMapController extends CrudResourceController
        $results    = $data->fetchAll();
        $tree=array();
        $this->fillArray($tree,$results);
+
+echo $this->array_depth($tree);
+die();
+
+
        return $this->createArrayResponse($tree, 'data');
      }
 
@@ -661,7 +666,7 @@ class SystemicMapController extends CrudResourceController
          foreach ($arrayData as $value_first) {
              $sql="SELECT * FROM systemic_map_items WHERE id=".$value_first['id'];
              $connection = $this->db;
-             $data       = $connection->query($sql);
+             $data  = $connection->query($sql);
              $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
              $iresults   = $data->fetchAll();
              foreach ($iresults as &$item)
@@ -681,4 +686,18 @@ class SystemicMapController extends CrudResourceController
              }
          }
      }
+
+
+     public function array_depth(array $array) {
+       $max_depth = 1;
+       foreach ($array as $value) {
+           if (is_array($value)) {
+               $depth = array_depth($value) + 1;
+               if ($depth > $max_depth) {
+                   $max_depth = $depth;
+               }
+           }
+       }
+       return $max_depth;
+   }
 }
