@@ -671,17 +671,20 @@ class SystemicMapController extends CrudResourceController
 // print_r();die();
  $htmlcontent = $this->array_depth($tree[0]['items'],$htmlcontent)['html'];
  // $htmlcontent = $htmlcontent2['html']
- $htmlcontent.="</ol>
+ $htmlcontent.="
 				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(sysmid,question,proposal)\" datasp=\"sysItems.id\"></data-sys-map-items-add>
 
-				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(sysmid,question,proposal)\" datasp=\"sysItems.id\"></data-sys-map-items-add>
+				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(sysmid,question,proposal)\" datasp=\"sysItems.id\"></data-sys-map-items-edit>
 
 </li>";
- //echo $htmlcontent;
- die();
+ // echo $htmlcontent;
+ // die();
 // echo $htmlcontent;die();
-
-       return $this->createArrayResponse($tree, 'data');
+$a = array(
+  "tree"=>$tree,
+  "htmlCode"=>$htmlcontent
+);
+       return $this->createArrayResponse($a, 'data');
      }
 
     public function fillArray(&$tree,$arrayData){
@@ -711,7 +714,7 @@ class SystemicMapController extends CrudResourceController
 
 
 
-     public function array_depth(array $array,$htmlcontent) {
+     public function array_depth(array $array,&$htmlcontent) {
       // echo $htmlcontent;
        $max_depth = 1;
 
@@ -735,15 +738,15 @@ class SystemicMapController extends CrudResourceController
                           <div class=\"dd3-content\">
                               ".$value['question']."
                           </div>";
-                          if($value['id']==98){
-                            $h=98;
-                            echo "**********************";
-                            // die();
-                          }
+                          // if($value['id']==98){
+                          //   $h=98;
+                          //   echo "**********************";
+                          //   // die();
+                          // }
               }
 
 
-               $depth = $this->array_depth($value,$htmlcontent)['max'] + 1;
+               $depth = $this->array_depth($value['items'],$htmlcontent)['max'] + 1;
 
               //  echo $depth;die();
                if ($depth > $max_depth) {
@@ -756,8 +759,8 @@ class SystemicMapController extends CrudResourceController
 
        }
        if(isset($h)){
-         echo $htmlcontent;
-
+    //     echo $htmlcontent;
+      // die();
        }else{}
         $a = array("max"=>$max_depth,"html"=>$htmlcontent);
           return $a;
