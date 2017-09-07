@@ -94,7 +94,7 @@ class SystemicMapController extends CrudResourceController
                           1 => $systemicMap->groupId,
                       ],
                   ]);
-
+                  if($groupColor->color!=''||$groupColor->color!=null)
                   $groupColorValue = $groupColor->color;
               }
 
@@ -757,6 +757,18 @@ $a = array(
                $htmlcontent.="<ol class=\"dd-list\"> <li class=\"dd-item dd3-item\" data-id=\"".$value['id']."\">
                           <div class=\"dd3-content\">
                               ".$value['question']."
+
+                              <span class=\"pull-right\">
+
+
+                              <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal".$value['id']."C\"></a>
+                              <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$value['id']."E\"></a>
+                              </span>
+
+                              <data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$value['id'].",question,proposal)\" datasp=\"".$value['id']."\"></data-sys-map-items-add>
+
+                              <data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$value['id'].",question,proposal)\" datasp=\"".$value['id']."\"></data-sys-map-items-edit>
+
                           </div>";
                           // if($value['id']==98){
                           //   $h=98;
