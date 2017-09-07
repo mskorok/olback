@@ -45,6 +45,7 @@ class GroupController extends CrudResourceController
                 $groupArray[] = array(
         'id' => $group->id,
         'title' => $group->title,
+        'color' =>  $group->color,
       );
             }
         }
@@ -82,6 +83,7 @@ class GroupController extends CrudResourceController
         $group->title = $data->title;
         $group->organization = $organization_id;
         $group->creatorId = $userId;
+        $group->color = $data->color;
         if ($group->save() == false) {
             $messagesErrors = array();
             foreach ($group->getMessages() as $message) {
@@ -154,6 +156,10 @@ class GroupController extends CrudResourceController
         }
         if ($group) {
             $group->title = $data->title;
+            if(isset($data->color)){
+              $group->color = $data->color;
+            }
+
             $group->save();
             $response = [
           'code' => 1,
