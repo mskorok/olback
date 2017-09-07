@@ -85,7 +85,7 @@ class SystemicMapController extends CrudResourceController
         $linksArray = array();
         if ($systemicMaps) {
             foreach ($systemicMaps as $systemicMap) {
-$groupColorValue = NULL;
+              $groupColorValue = NULL;
               if(isset($systemicMap->groupId)){
                 $groupColor = Group::findFirst(
                   [
@@ -673,7 +673,7 @@ $groupColorValue = NULL;
        $tree=array();
        $this->fillArray($tree,$results);
        $htmlcontent = "
-        <li class=\"dd-item dd3-item\" ng-repeat=\"sysItems in sysMapItemsData\" data-id=\"".$tree[0]['id']."\">
+        <li class=\"dd-item dd3-item\"  data-id=\"".$tree[0]['id']."\">
                   <div class=\"dd3-content\">
 
                     ".$tree[0]['question']."
