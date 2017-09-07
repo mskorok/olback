@@ -94,8 +94,10 @@ class SystemicMapController extends CrudResourceController
                           1 => $systemicMap->groupId,
                       ],
                   ]);
-                  if($groupColor->color!=''||$groupColor->color!=null)
-                  $groupColorValue = $groupColor->color;
+                  if($groupColor->color){
+                      $groupColorValue = $groupColor->color;
+                  }
+
               }
 
 
