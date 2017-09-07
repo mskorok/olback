@@ -94,6 +94,7 @@ class SystemicMapController extends CrudResourceController
                           1 => $systemicMap->groupId,
                       ],
                   ]);
+                  var_dump($groupColorValue = $groupColor->color);die();
                   if($groupColor->color){
                       $groupColorValue = $groupColor->color;
                   }
@@ -682,7 +683,7 @@ class SystemicMapController extends CrudResourceController
                     ".$tree[0]['question']."
 
                     <span class=\"pull-right\">
-                    <a class=\"fa fa-lg fa-trash-o\" ng-click=\"deleteSysMapItem(".$tree[0]['id'].")\"></a>
+
 
                     <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."C\"></a>
                     <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."E\"></a>
@@ -762,7 +763,7 @@ $a = array(
 
                               <span class=\"pull-right\">
 
-
+                                <a class=\"fa fa-lg fa-trash-o\" ng-click=\"deleteSysMapItem(".$value['id'].")\"></a>
                               <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal".$value['id']."C\"></a>
                               <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$value['id']."E\"></a>
                               </span>
