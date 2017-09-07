@@ -673,7 +673,8 @@ class SystemicMapController extends CrudResourceController
        $tree=array();
        $this->fillArray($tree,$results);
        $htmlcontent = "
-        <li class=\"dd-item dd3-item\"  data-id=\"".$tree[0]['id']."\">
+       <div>
+        <li class=\"dd-item dd3-item\" ng-repeat=\"sysItems in sysMapItemsData track by $index\" data-id=\"".$tree[0]['id']."\">
                   <div class=\"dd3-content\">
 
                     ".$tree[0]['question']."
@@ -694,7 +695,8 @@ class SystemicMapController extends CrudResourceController
 
 				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(sysmid,question,proposal)\" datasp=\"sysItems.id\"></data-sys-map-items-edit>
 
-</li>";
+</li>
+</div>";
  // echo $htmlcontent;
  // die();
 // echo $htmlcontent;die();
