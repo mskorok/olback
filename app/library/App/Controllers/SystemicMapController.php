@@ -691,9 +691,9 @@ class SystemicMapController extends CrudResourceController
  $htmlcontent = $this->array_depth($tree[0]['items'],$htmlcontent)['html'];
  // $htmlcontent = $htmlcontent2['html']
  $htmlcontent.="
-				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(sysmid,question,proposal)\" datasp=\"sysItems.id\"></data-sys-map-items-add>
+				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$tree[0]['id']."\,question,proposal)\" datasp=\"".$tree[0]['id']."\\"></data-sys-map-items-add>
 
-				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(sysmid,question,proposal)\" datasp=\"sysItems.id\"></data-sys-map-items-edit>
+				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$tree[0]['id']."\,question,proposal)\" datasp=\"".$tree[0]['id']."\\"></data-sys-map-items-edit>
 
 </li>
 ";
