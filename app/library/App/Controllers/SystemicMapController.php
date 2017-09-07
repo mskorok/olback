@@ -14,6 +14,7 @@ use App\Constants\AclRoles;
 use Phalcon\Mvc\Model\Query;
 use Phalcon\Mvc\Model\ManagerInterface;
 use Phalcon\Mvc\Model\Resultset\Simple;
+use App\Model\Group;
 class SystemicMapController extends CrudResourceController
 {
 
@@ -84,12 +85,29 @@ class SystemicMapController extends CrudResourceController
         $linksArray = array();
         if ($systemicMaps) {
             foreach ($systemicMaps as $systemicMap) {
+$groupColorValue = NULL;
+              if(isset($systemicMap->groupId)){
+                $groupColor = Group::findFirst(
+                  [
+                      'conditions' => 'id = ?1',
+                      'bind' => [
+                          1 => $systemicMap->groupId,
+                      ],
+                  ]);
+
+                  $groupColorValue = $groupColor->color;
+              }
+
+
+
+
                 $systemicMapsArray[] = array(
                 'id' => $systemicMap->id,
                 'systemic_map_id' => $systemicMap->systemic_map_id,
                 'question' => $systemicMap->question,
                 'proposal' => $systemicMap->proposal,
                 'groupId' => $systemicMap->groupId,
+                'groupColor' => $groupColorValue
               );
 
                 $chains = SystemicMapChain::find(
