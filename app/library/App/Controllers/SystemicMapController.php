@@ -674,7 +674,7 @@ class SystemicMapController extends CrudResourceController
        $this->fillArray($tree,$results);
        $htmlcontent = "
        <div>
-        <li class=\"dd-item dd3-item\" ng-repeat=\"sysItems in sysMapItemsData track by $index\" data-id=\"".$tree[0]['id']."\">
+        <li class=\"dd-item dd3-item\" ng-repeat=\"sysItems in sysMapItemsData track by sysItems.id\" data-id=\"".$tree[0]['id']."\">
                   <div class=\"dd3-content\">
 
                     ".$tree[0]['question']."
