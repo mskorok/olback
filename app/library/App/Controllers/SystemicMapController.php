@@ -682,8 +682,8 @@ class SystemicMapController extends CrudResourceController
                     <span class=\"pull-right\">
                     <a class=\"fa fa-lg fa-trash-o\" ng-click=\"deleteSysMapItem(".$tree[0]['id'].")\"></a>
 
-                    <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."\C"></a>
-                    <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."\E"></a>
+                    <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."C\"></a>
+                    <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."E\"></a>
                     </span>
                   </div>";
  // print_r($tree[0]['items']);die();
