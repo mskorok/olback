@@ -8,6 +8,7 @@ class Group extends \App\Mvc\DateTrackingModel
     public $title;
     public $organization;
     public $creatorId;
+    public $color;
 
     public function getSource()
     {
@@ -20,7 +21,8 @@ class Group extends \App\Mvc\DateTrackingModel
             'id' => 'id',
             'title' => 'title',
             'organization' => 'organization',
-            'creatorId'=>'creatorId'
+            'creatorId'=>'creatorId',
+            'color'=>'color'
         ];
     }
 }
