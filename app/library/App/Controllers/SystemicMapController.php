@@ -719,10 +719,32 @@ $a = array(
              $iresults   = $data->fetchAll();
              foreach ($iresults as &$item)
              {
+
+                              $groupColorValue = NULL;
+                              if(isset($item['groupId'])){
+                                $groupColor = Group::findFirst(
+                                  [
+                                      'conditions' => 'id = ?1',
+                                      'bind' => [
+                                          1 => $item['groupId'],
+                                      ],
+                                  ]);
+                                  // var_dump($groupColorValue = $groupColor->color);die();
+                                  if($groupColor->color!=NULL){
+                                      $groupColorValue = $groupColor->color;
+                                  }
+
+                              }
+                            //  $color = array();
+                              $item['color']=$groupColorValue;
+                            //  array_push($item,$color);
                $tree[]= $item;
              }
              foreach ($tree as &$item)
              {
+
+
+
                 $id=$item['id'];
                 $sql="SELECT to_item as id FROM `systemic_map_chain` WHERE from_item = ".$id;
                 $connection = $this->db;
@@ -757,7 +779,7 @@ $a = array(
 
 
               //  echo $value['id']." <--> ";
-               $htmlcontent.="<ol class=\"dd-list\"> <li class=\"dd-item dd3-item\" data-id=\"".$value['id']."\">
+               $htmlcontent.="<ol class=\"dd-list\"> <li class=\"dd-item dd3-item\" style=\“color:".$value['color'].";\” data-id=\"".$value['id']."\">
                           <div class=\"dd3-content\">
                               ".$value['question']."
 
