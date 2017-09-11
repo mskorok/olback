@@ -261,10 +261,16 @@ class SystemicMapController extends CrudResourceController
             return $this->createArrayResponse($response, 'data');
         }
 
+        if($data->proposal == ''){
+          $dp = "-";
+        }else{
+          $dp=$data->proposal;
+        }
+
         $systemicItem = new \App\Model\SystemicMapItems();
         $systemicItem->systemic_map_id = $data->systemic_map_id;
         $systemicItem->question = $data->question;
-        $systemicItem->proposal = $data->proposal;
+        $systemicItem->proposal = $dp;
         $systemicItem->groupId = $data->groupId;
         $systemicItem->userId = $creatorId;
         if ($systemicItem->save() == false) {
