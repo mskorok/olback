@@ -42,6 +42,17 @@ class UserResource extends ApiResource {
                     'expires' => 1451139067
                 ])
             )
+
+            ->endpoint(ApiEndpoint::post('/createManagerPublic', 'createManagerPublic')
+            ->allow(AclRoles::UNAUTHORIZED)
+            ->deny(AclRoles::AUTHORIZED)
+                ->description('Returns the currently logged in user')
+            )
+            ->endpoint(ApiEndpoint::post('/createUserPublic', 'createUserPublic')
+            ->allow(AclRoles::UNAUTHORIZED)
+            ->deny(AclRoles::AUTHORIZED)
+                ->description('Returns the currently logged in user')
+            )
             ->endpoint(ApiEndpoint::post('/createManager', 'createManager')
                 ->allow(AclRoles::ADMINISTRATOR)
                 ->deny(AclRoles::UNAUTHORIZED)

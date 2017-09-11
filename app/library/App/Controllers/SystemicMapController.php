@@ -113,7 +113,7 @@ class SystemicMapController extends CrudResourceController
               }
 
 
-                
+
 
                 $systemicMapsArray[] = array(
                 'id' => $systemicMap->id,
@@ -678,6 +678,17 @@ class SystemicMapController extends CrudResourceController
 
     public function getSystemicItemTree($id)
      {
+       if ($this->authManager->loggedIn()) {
+           $session = $this->authManager->getSession();
+           $creatorId = $session->getIdentity();
+          //  echo $creatorId;die();
+       }
+
+         $creator = $this->getUserDetails($creatorId);
+         $creatorInfo = array($creatorId,$creator['account']->role);
+        //  var_dump($creator['account']->role);die();
+
+
 
       $sql="SELECT to_item as id FROM `systemic_map_chain` WHERE from_item Is NULL AND to_item IN (SELECT id FROM systemic_map_items WHERE systemic_map_id=".$id.")";
        $connection = $this->db;
@@ -702,7 +713,7 @@ class SystemicMapController extends CrudResourceController
                   </div>";
  // print_r($tree[0]['items']);die();
 // print_r();die();
- $htmlcontent = $this->array_depth($tree[0]['items'],$htmlcontent)['html'];
+ $htmlcontent = $this->array_depth($tree[0]['items'],$htmlcontent,$creatorInfo)['html'];
  // $htmlcontent = $htmlcontent2['html']
  $htmlcontent.="
 				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$tree[0]['id'].",question,proposal)\" datasp=\"".$tree[0]['id']."\"></data-sys-map-items-add>
@@ -770,7 +781,7 @@ $a = array(
 
 
 
-     public function array_depth(array $array,&$htmlcontent) {
+     public function array_depth(array $array,&$htmlcontent,$creatorInfo) {
       // echo $htmlcontent;
        $max_depth = 1;
 
@@ -787,16 +798,26 @@ $a = array(
               // echo $value['id'];
 
               //  $htmlcontent.=$value['id']."***";
+              if(AclRoles::ADMINISTRATOR === $creatorInfo[1]){
+                $delete_raw = "<a class=\"fa fa-lg fa-trash-o\" ng-click=\"deleteSysMapItem(".$value['id'].")\"></a>";
+              }else{
 
 
+
+              if($creatorInfo[0]==$value['userId']){
+                $delete_raw = "<a class=\"fa fa-lg fa-trash-o\" ng-click=\"deleteSysMapItem(".$value['id'].")\"></a>";
+              }else{
+                $delete_raw = "";
+              }
+}
               //  echo $value['id']." <--> ";
                $htmlcontent.="<ol class=\"dd-list\"> <li class=\"dd-item dd3-item\" style=\“color:".$value['color'].";\” data-id=\"".$value['id']."\">
                           <div class=\"dd3-content\">
                               ".$value['question']."
 
-                              <span class=\"pull-right\">
+                              <span class=\"pull-right\">".$delete_raw."
 
-                                <a class=\"fa fa-lg fa-trash-o\" ng-click=\"deleteSysMapItem(".$value['id'].")\"></a>
+
                               <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal".$value['id']."C\"></a>
                               <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$value['id']."E\"></a>
                               </span>
@@ -814,7 +835,7 @@ $a = array(
               }
 
 
-               $depth = $this->array_depth($value['items'],$htmlcontent)['max'] + 1;
+               $depth = $this->array_depth($value['items'],$htmlcontent,$creatorInfo)['max'] + 1;
 
               //  echo $depth;die();
                if ($depth > $max_depth) {
