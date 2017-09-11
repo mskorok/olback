@@ -70,6 +70,17 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    private function findItemIndexForId($arr,$id)
+    {
+       $index=0;
+       foreach($arr as $item)
+       {
+           if ($item['id']==$id) break;
+           $index++;
+       }
+       return $index;
+    }
+
     public function getSystemicItem($id)
     {
         //echo $id;die();
@@ -102,14 +113,14 @@ class SystemicMapController extends CrudResourceController
               }
 
 
-
+                
 
                 $systemicMapsArray[] = array(
                 'id' => $systemicMap->id,
                 'systemic_map_id' => $systemicMap->systemic_map_id,
-                'question' => $systemicMap->question,
+                'name' => $systemicMap->question,
                 'proposal' => $systemicMap->proposal,
-                'groupId' => $systemicMap->groupId,
+                'group' => intval($systemicMap->groupId),
                 'groupColor' => $groupColorValue
               );
 
@@ -124,9 +135,9 @@ class SystemicMapController extends CrudResourceController
             // echo "dada";die();
             foreach ($chains as $chain) {
                 $linksArray[] = array(
-                'source' => $chain->from_item,
-                'target' => $chain->to_item,
-                'value2' => 2,
+                'source' => $this->findItemIndexForId($systemicMapsArray,intval($chain->from_item)),
+                'target' => $this->findItemIndexForId($systemicMapsArray,intval($chain->to_item)),
+                'value' => 2,
               );
             }
             }
