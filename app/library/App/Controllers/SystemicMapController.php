@@ -740,7 +740,8 @@ $a = array(
 
     public function fillArray(&$tree,$arrayData){
          foreach ($arrayData as $value_first) {
-             $sql="SELECT * FROM systemic_map_items WHERE id=".$value_first['id'];
+             $sql="SELECT sm.*,u.first_name,u.last_name FROM systemic_map_items sm JOIN user u ON sm.userId = u.id WHERE sm.id=".$value_first['id'];
+
              $connection = $this->db;
              $data  = $connection->query($sql);
              $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
@@ -831,7 +832,7 @@ $a = array(
                               <data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$value['id'].",question,proposal)\" datasp=\"".$value['id']."\"></data-sys-map-items-add>
 
                               <data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$value['id'].",question,proposal)\" datasp=\"".$value['id']."\"></data-sys-map-items-edit>
-
+<p><strong>".$value['last_name']." ".$value['first_name']."</strong></p>
                           </div>";
                           // if($value['id']==98){
                           //   $h=98;
