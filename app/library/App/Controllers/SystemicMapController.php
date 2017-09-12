@@ -454,7 +454,7 @@ class SystemicMapController extends CrudResourceController
           [
               'conditions' => 'user_id = ?1 AND organization_id = ?2',
               'bind' => [
-                  1 => $systemicItems->id,
+                  1 => $userId,
                   2 => $organization_id,
               ],
           ]);
