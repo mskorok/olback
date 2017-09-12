@@ -829,9 +829,9 @@ $a = array(
                               <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$value['id']."E\"></a>
                               </span>
 
-                              <data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$value['id'].",'".$value['question']."','".$value['question']."','".$value['groupId']."','".$value['color']."')\" datasp=\"".$value['id']."\"></data-sys-map-items-add>
+                              <data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$value['id'].",question,proposal,group,color)\" datasp=\"".$value['id']."\"></data-sys-map-items-add>
 
-                              <data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$value['id'].",'".$value['question']."','".$value['question']."','".$value['groupId']."','".$value['color']."')\" datasp=\"".$value['id']."\"></data-sys-map-items-edit>
+                              <data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$value['id'].",question,proposal,group,color)\" datasp=\"".$value['id']."\"></data-sys-map-items-edit>
 <div style=\"color: #3276b1;font-size: 12px;\"><strong>by: </strong>".$value['first_name']." ".$value['last_name']."</div>
                           </div>";
                           // if($value['id']==98){
