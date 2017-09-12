@@ -805,7 +805,7 @@ $a = array(
               // echo $value['id'];
 
               //  $htmlcontent.=$value['id']."***";
-              if(AclRoles::ADMINISTRATOR === $creatorInfo[1]){
+              if((AclRoles::ADMINISTRATOR === $creatorInfo[1])||(AclRoles::MANAGER === $creatorInfo[1])){
                 $delete_raw = "<a class=\"fa fa-lg fa-trash-o\" ng-click=\"deleteSysMapItem(".$value['id'].")\"></a>";
               }else{
 
