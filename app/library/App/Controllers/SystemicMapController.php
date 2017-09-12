@@ -693,11 +693,24 @@ class SystemicMapController extends CrudResourceController
          $creator = $this->getUserDetails($creatorId);
          $creatorInfo = array($creatorId,$creator['account']->role);
         //  var_dump($creator['account']->role);die();
+ $connection = $this->db;
+$sql_dist = "SELECT id FROM `systemic_map_items` s1 WHERE s1.id NOT IN (SELECT distinct s2.from_item as id FROM `systemic_map_chain` s2 WHERE s2.from_item IS NOT NULL ) AND s1.systemic_map_id=".$id."";
+$data_dist       = $connection->query($sql_dist );
+$data_dist ->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+$results_dist     = $data_dist ->fetchAll();
 
 
-
+$non_ch = array();
+foreach ($results_dist as $key => $value) {
+  $non_ch[]=$value['id'];
+}
+// print_r($non_ch);die();
       $sql="SELECT to_item as id FROM `systemic_map_chain` WHERE from_item Is NULL AND to_item IN (SELECT id FROM systemic_map_items WHERE systemic_map_id=".$id.")";
-       $connection = $this->db;
+
+
+
+
+
        $data       = $connection->query($sql);
        $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
        $results    = $data->fetchAll();
@@ -719,7 +732,7 @@ class SystemicMapController extends CrudResourceController
                   </div>";
  // print_r($tree[0]['items']);die();
 // print_r();die();
- $htmlcontent = $this->array_depth($tree[0]['items'],$htmlcontent,$creatorInfo)['html'];
+ $htmlcontent = $this->array_depth($tree[0]['items'],$htmlcontent,$creatorInfo,$non_ch)['html'];
  // $htmlcontent = $htmlcontent2['html']
  $htmlcontent.="
 				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$tree[0]['id'].",question,proposal)\" datasp=\"".$tree[0]['id']."\"></data-sys-map-items-add>
@@ -788,7 +801,7 @@ $a = array(
 
 
 
-     public function array_depth(array $array,&$htmlcontent,$creatorInfo) {
+     public function array_depth(array $array,&$htmlcontent,$creatorInfo,$non_ch) {
       // echo $htmlcontent;
        $max_depth = 1;
 
@@ -817,6 +830,10 @@ $a = array(
                 $delete_raw = "";
               }
 }
+
+if(!in_array($value['id'],$non_ch)){
+  $delete_raw = "";
+}
               //  echo $value['id']." <--> ";
                $htmlcontent.="<ol class=\"dd-list\"> <li class=\"dd-item dd3-item item".$value['id']." generals-item\" style=\“color:".$value['color'].";\” data-id=\"".$value['id']."\">
                           <div class=\"dd3-content\">
@@ -842,7 +859,7 @@ $a = array(
               }
 
 
-               $depth = $this->array_depth($value['items'],$htmlcontent,$creatorInfo)['max'] + 1;
+               $depth = $this->array_depth($value['items'],$htmlcontent,$creatorInfo,$non_ch)['max'] + 1;
 
               //  echo $depth;die();
                if ($depth > $max_depth) {
