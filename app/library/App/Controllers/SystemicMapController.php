@@ -735,9 +735,9 @@ foreach ($results_dist as $key => $value) {
  $htmlcontent = $this->array_depth($tree[0]['items'],$htmlcontent,$creatorInfo,$non_ch)['html'];
  // $htmlcontent = $htmlcontent2['html']
  $htmlcontent.="
-				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$tree[0]['id'].",question,proposal)\" datasp=\"".$tree[0]['id']."\"></data-sys-map-items-add>
+				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']."\"></data-sys-map-items-add>
 
-				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$tree[0]['id'].",question,proposal)\" datasp=\"".$tree[0]['id']."\"></data-sys-map-items-edit>
+				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']." dataprop=\"".$tree[0]['proposal']."\" dataque=\"".$tree[0]['question']."\" datagrp=\"".$tree[0]['groupId']."\" dataclr=\"".$tree[0]['color']."\"></data-sys-map-items-edit>
 
 </li>
 ";
@@ -849,7 +849,7 @@ if(!in_array($value['id'],$non_ch)){
                               <data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$value['id'].",question,proposal,group,color)\" datasp=\"".$value['id']."\"></data-sys-map-items-add>
 
                               <data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$value['id'].",question,proposal,group,color)\" datasp=\"".$value['id']."\" dataprop=\"".$value['proposal']."\" dataque=\"".$value['question']."\" datagrp=\"".$value['groupId']."\" dataclr=\"".$value['color']."\"></data-sys-map-items-edit>
-<div style=\"color: #3276b1;font-size: 12px;\"><strong>by: </strong>".$value['first_name']." ".$value['last_name']."</div>
+                              <div style=\"color: #3276b1;font-size: 12px;\"><strong>by: </strong>".$value['first_name']." ".$value['last_name']."</div>
                           </div>";
                           // if($value['id']==98){
                           //   $h=98;
