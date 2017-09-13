@@ -836,7 +836,7 @@ if(!in_array($value['id'],$non_ch)){
 }
               //  echo $value['id']." <--> ";
                $htmlcontent.="<ol class=\"dd-list\"> <li class=\"dd-item dd3-item item".$value['id']." generals-item\" style=\“color:".$value['color'].";\” data-id=\"".$value['id']."\">
-                          <div class=\"dd3-content\" style=\"background-color:".$this->color_luminance($value['color'],0.7)."\">
+                          <div class=\"dd3-content\" style=\"background:".$this->color_luminance($value['color'],0.2)."\">
                               ".$value['question']."
 
                               <span class=\"pull-right\">".$delete_raw."
