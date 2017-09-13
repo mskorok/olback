@@ -731,6 +731,8 @@ foreach ($results_dist as $key => $value) {
 
                     <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."C\"></a>
                     <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."E\"></a>
+                    <div style=\"color: #3276b1;font-size: 12px;\" class=\"item-infos \"><strong>by: </strong>".$first_name_f." ".$last_name_f."</div>
+
                     </span>
                   </div>";
  // print_r($tree[0]['items']);die();
@@ -740,7 +742,7 @@ foreach ($results_dist as $key => $value) {
  $htmlcontent.="
 				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']."\"></data-sys-map-items-add>
 
-				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']."\" dataprop=\"".$tree[0]['proposal']."\" dataque=\"".$tree[0]['question']."\" datagrp=\"".$tree[0]['groupId']."\" dataclr=\"".$tree[0]['color']."\"></data-sys-map-items-edit><div style=\"color: #3276b1;font-size: 12px;\" class=\"item-infos \"><strong>by: </strong>".$first_name_f." ".$last_name_f."</div>
+				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']."\" dataprop=\"".$tree[0]['proposal']."\" dataque=\"".$tree[0]['question']."\" datagrp=\"".$tree[0]['groupId']."\" dataclr=\"".$tree[0]['color']."\"></data-sys-map-items-edit>
 
 </li>
 ";
