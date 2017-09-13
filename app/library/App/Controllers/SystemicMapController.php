@@ -719,8 +719,8 @@ foreach ($results_dist as $key => $value) {
        $htmlcontent = "
 
         <li class=\"dd-item dd3-item item".$tree[0]['id']." generals-item \" style=\“color:".$tree[0]['color'].";\”  data-id=\"".$tree[0]['id']."\">
-                  <div class=\"dd3-content\">
-
+                  <div class=\"dd3-content\" >
+<div class=\"itemscolor\" style=\"background-color:".$this->color_luminance($tree[0]['color'],0.1)."\"></div>
                     ".$tree[0]['question']."
 
                     <span class=\"pull-right\">
@@ -836,7 +836,8 @@ if(!in_array($value['id'],$non_ch)){
 }
               //  echo $value['id']." <--> ";
                $htmlcontent.="<ol class=\"dd-list\"> <li class=\"dd-item dd3-item item".$value['id']." generals-item\" style=\“color:".$value['color'].";\” data-id=\"".$value['id']."\">
-                          <div class=\"dd3-content\" style=\"background:".$this->color_luminance($value['color'],0.2)."\">
+                          <div class=\"dd3-content\" >
+                          <div class=\"itemscolor\" style=\"background-color:".$this->color_luminance($tree[0]['color'],0.1)."\"></div>
                               ".$value['question']."
 
                               <span class=\"pull-right\">".$delete_raw."
