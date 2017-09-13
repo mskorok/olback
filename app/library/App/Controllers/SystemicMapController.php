@@ -774,11 +774,13 @@ $a = array(
                                   // var_dump($groupColorValue = $groupColor->color);die();
                                   if($groupColor->color!=NULL){
                                       $groupColorValue = $groupColor->color;
+                                        $groupTitle = $groupColor->title;
                                   }
 
                               }
                             //  $color = array();
                               $item['color']=$groupColorValue;
+                              $item['groupTitle'] = $groupTitle;
                             //  array_push($item,$color);
                $tree[]= $item;
              }
@@ -850,7 +852,8 @@ if(!in_array($value['id'],$non_ch)){
                               <data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$value['id'].",question,proposal,group,color)\" datasp=\"".$value['id']."\"></data-sys-map-items-add>
 
                               <data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$value['id'].",question,proposal,group,color)\" datasp=\"".$value['id']."\" dataprop=\"".$value['proposal']."\" dataque=\"".$value['question']."\" datagrp=\"".$value['groupId']."\" dataclr=\"".$value['color']."\"></data-sys-map-items-edit>
-                              <div style=\"color: #3276b1;font-size: 12px;\"><strong>by: </strong>".$value['first_name']." ".$value['last_name']."</div>
+                              <div style=\"color: #3276b1;font-size: 12px;\" class=\"item-infos \"><strong>by: </strong>".$value['first_name']." ".$value['last_name']."</div>
+                              <div class=\"item-groupname\">".$item['groupTitle']."</div>
                           </div>";
                           // if($value['id']==98){
                           //   $h=98;
