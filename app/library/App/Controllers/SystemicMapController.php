@@ -694,7 +694,7 @@ class SystemicMapController extends CrudResourceController
          $creatorInfo = array($creatorId,$creator['account']->role);
         //  var_dump($creator['account']->role);die();
  $connection = $this->db;
-$sql_dist = "SELECT id FROM `systemic_map_items` s1 WHERE s1.id NOT IN (SELECT distinct s2.from_item as id FROM `systemic_map_chain` s2 WHERE s2.from_item IS NOT NULL ) AND s1.systemic_map_id=".$id."";
+$sql_dist = "SELECT s1.id,u.first_name,u.last_name FROM `systemic_map_items` s1 JOIN user u ON s1.userId = u.id WHERE s1.id NOT IN (SELECT distinct s2.from_item as id FROM `systemic_map_chain` s2 WHERE s2.from_item IS NOT NULL ) AND s1.systemic_map_id=".$id."";
 $data_dist       = $connection->query($sql_dist );
 $data_dist ->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
 $results_dist     = $data_dist ->fetchAll();
@@ -702,6 +702,9 @@ $results_dist     = $data_dist ->fetchAll();
 
 $non_ch = array();
 foreach ($results_dist as $key => $value) {
+//  print_r($value);die();
+  $first_name_f = $value['first_name'];
+  $last_name_f = $value['last_name'];
   $non_ch[]=$value['id'];
 }
 // print_r($non_ch);die();
@@ -738,7 +741,8 @@ foreach ($results_dist as $key => $value) {
 				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']."\"></data-sys-map-items-add>
 
 				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']."\" dataprop=\"".$tree[0]['proposal']."\" dataque=\"".$tree[0]['question']."\" datagrp=\"".$tree[0]['groupId']."\" dataclr=\"".$tree[0]['color']."\"></data-sys-map-items-edit>
-
+        <div style=\"color: #3276b1;font-size: 12px;\" class=\"item-infos \"><strong>by: </strong>".$first_name_f." ".$last_name_f."</div>
+        // <div class=\"item-groupname\">".$value['groupTitle']."</div>
 </li>
 ";
  // echo $htmlcontent;
@@ -891,7 +895,7 @@ if(!in_array($value['id'],$non_ch)){
    }
 
    public function color_luminance( $hex, $percent ) {
-
+     return $hex;
     	// validate hex string
 
     	$hex = preg_replace( '/[^0-9a-f]/i', '', $hex );
