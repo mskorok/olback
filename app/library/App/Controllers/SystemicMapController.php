@@ -737,7 +737,7 @@ foreach ($results_dist as $key => $value) {
  $htmlcontent.="
 				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']."\"></data-sys-map-items-add>
 
-				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']." dataprop=\"".$tree[0]['proposal']."\" dataque=\"".$tree[0]['question']."\" datagrp=\"".$tree[0]['groupId']."\" dataclr=\"".$tree[0]['color']."\"></data-sys-map-items-edit>
+				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']."\" dataprop=\"".$tree[0]['proposal']."\" dataque=\"".$tree[0]['question']."\" datagrp=\"".$tree[0]['groupId']."\" dataclr=\"".$tree[0]['color']."\"></data-sys-map-items-edit>
 
 </li>
 ";
