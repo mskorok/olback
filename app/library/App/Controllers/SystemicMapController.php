@@ -761,7 +761,7 @@ $a = array(
              $iresults   = $data->fetchAll();
              foreach ($iresults as &$item)
              {
-
+                              $groupTitle = '';
                               $groupColorValue = NULL;
                               if(isset($item['groupId'])){
                                 $groupColor = Group::findFirst(
@@ -774,9 +774,9 @@ $a = array(
                                   // var_dump($groupColorValue = $groupColor->color);die();
                                   if($groupColor->color!=NULL){
                                       $groupColorValue = $groupColor->color;
-                                        $groupTitle = $groupColor->title;
-                                  }
 
+                                  }
+                                    $groupTitle = $groupColor->title;
                               }
                             //  $color = array();
                               $item['color']=$groupColorValue;
