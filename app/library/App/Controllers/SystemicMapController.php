@@ -731,7 +731,7 @@ foreach ($results_dist as $key => $value) {
 
                     <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."C\"></a>
                     <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."E\"></a>
-                    <div style=\"color: #3276b1;font-size: 12px;\" class=\"item-infos \"><strong>by: </strong>".$first_name_f." ".$last_name_f."</div>
+
 
                     </span>
                   </div>";
