@@ -776,13 +776,16 @@ $a = array(
                                       $groupColorValue = $groupColor->color;
 
                                   }
+
                                     $groupTitle = $groupColor->title;
                               }
                             //  $color = array();
                               $item['color']=$groupColorValue;
                               $item['groupTitle'] = $groupTitle;
+
                             //  array_push($item,$color);
                $tree[]= $item;
+            //   print_r($tree);die();
              }
              foreach ($tree as &$item)
              {
@@ -810,7 +813,7 @@ $a = array(
 
 
        foreach ($array as $value) {
-
+// print_r($value);die();
           // echo $value['id'];
           // die();
            if (is_array($value)) {
@@ -836,6 +839,7 @@ $a = array(
 if(!in_array($value['id'],$non_ch)){
   $delete_raw = "";
 }
+
               //  echo $value['id']." <--> ";
                $htmlcontent.="<ol class=\"dd-list\"> <li class=\"dd-item dd3-item item".$value['id']." generals-item\" style=\“color:".$value['color'].";\” data-id=\"".$value['id']."\">
                           <div class=\"dd3-content\" >
@@ -853,7 +857,7 @@ if(!in_array($value['id'],$non_ch)){
 
                               <data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$value['id'].",question,proposal,group,color)\" datasp=\"".$value['id']."\" dataprop=\"".$value['proposal']."\" dataque=\"".$value['question']."\" datagrp=\"".$value['groupId']."\" dataclr=\"".$value['color']."\"></data-sys-map-items-edit>
                               <div style=\"color: #3276b1;font-size: 12px;\" class=\"item-infos \"><strong>by: </strong>".$value['first_name']." ".$value['last_name']."</div>
-                              <div class=\"item-groupname\">".$item['groupTitle']."</div>
+                              <div class=\"item-groupname\">".$value['groupTitle']."</div>
                           </div>";
                           // if($value['id']==98){
                           //   $h=98;
