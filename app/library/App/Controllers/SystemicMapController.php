@@ -9,18 +9,14 @@ use App\Model\User;
 use App\Model\SystemicMap;
 use App\Model\SystemicMapItems;
 use App\Model\SystemicMapChain;
+use App\Model\ActionListGroup;
 use Phalcon\Http\Request;
 use App\Constants\AclRoles;
 use Phalcon\Mvc\Model\Query;
-use Phalcon\Mvc\Model\ManagerInterface;
-use Phalcon\Mvc\Model\Resultset\Simple;
 use App\Model\Group;
+
 class SystemicMapController extends CrudResourceController
 {
-
-
-
-
     public function getSystemicMap()
     {
         //  echo 'asas';die();
@@ -70,15 +66,17 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-    private function findItemIndexForId($arr,$id)
+    private function findItemIndexForId($arr, $id)
     {
-       $index=0;
-       foreach($arr as $item)
-       {
-           if ($item['id']==$id) break;
-           $index++;
-       }
-       return $index;
+        $index = 0;
+        foreach ($arr as $item) {
+            if ($item['id'] == $id) {
+                break;
+            }
+            ++$index;
+        }
+
+        return $index;
     }
 
     public function getSystemicItem($id)
@@ -96,9 +94,9 @@ class SystemicMapController extends CrudResourceController
         $linksArray = array();
         if ($systemicMaps) {
             foreach ($systemicMaps as $systemicMap) {
-              $groupColorValue = NULL;
-              if(isset($systemicMap->groupId)){
-                $groupColor = Group::findFirst(
+                $groupColorValue = null;
+                if (isset($systemicMap->groupId)) {
+                    $groupColor = Group::findFirst(
                   [
                       'conditions' => 'id = ?1',
                       'bind' => [
@@ -106,14 +104,10 @@ class SystemicMapController extends CrudResourceController
                       ],
                   ]);
                   // var_dump($groupColorValue = $groupColor->color);die();
-                  if($groupColor->color!=NULL){
+                  if ($groupColor->color != null) {
                       $groupColorValue = $groupColor->color;
                   }
-
-              }
-
-
-
+                }
 
                 $systemicMapsArray[] = array(
                 'id' => $systemicMap->id,
@@ -121,7 +115,7 @@ class SystemicMapController extends CrudResourceController
                 'name' => $systemicMap->question,
                 'proposal' => $systemicMap->proposal,
                 'group' => intval($systemicMap->groupId),
-                'groupColor' => $groupColorValue
+                'groupColor' => $groupColorValue,
               );
 
                 $chains = SystemicMapChain::find(
@@ -135,8 +129,8 @@ class SystemicMapController extends CrudResourceController
             // echo "dada";die();
             foreach ($chains as $chain) {
                 $linksArray[] = array(
-                'source' => $this->findItemIndexForId($systemicMapsArray,intval($chain->from_item)),
-                'target' => $this->findItemIndexForId($systemicMapsArray,intval($chain->to_item)),
+                'source' => $this->findItemIndexForId($systemicMapsArray, intval($chain->from_item)),
+                'target' => $this->findItemIndexForId($systemicMapsArray, intval($chain->to_item)),
                 'value' => 2,
               );
             }
@@ -261,10 +255,10 @@ class SystemicMapController extends CrudResourceController
             return $this->createArrayResponse($response, 'data');
         }
 
-        if($data->proposal == ''){
-          $dp = "-";
-        }else{
-          $dp=$data->proposal;
+        if ($data->proposal == '') {
+            $dp = '-';
+        } else {
+            $dp = $data->proposal;
         }
 
         $systemicItem = new \App\Model\SystemicMapItems();
@@ -650,26 +644,26 @@ class SystemicMapController extends CrudResourceController
             );
             if ($systemicItems) {
                 foreach ($systemicItems as $systemicItem) {
-                  $systemicChain = SystemicMapChain::find(
+                    $systemicChain = SystemicMapChain::find(
                     [
                         'conditions' => 'from_item =?1 OR to_item =?1',
                         'bind' => [
-                            1 => $systemicItem->id
+                            1 => $systemicItem->id,
                         ],
                     ]
                   );
-                  if($systemicChain){
-                    $response = [
+                    if ($systemicChain) {
+                        $response = [
                       'code' => 0,
                       'status' => 'You cannot delete this systemic item!',
                     ];
-                  }else{
-                    $systemicItem->delete();
-                    $response = [
+                    } else {
+                        $systemicItem->delete();
+                        $response = [
                       'code' => 1,
                       'status' => 'Success',
                     ];
-                  }
+                    }
                 }
             } else {
                 $response = [
@@ -683,93 +677,107 @@ class SystemicMapController extends CrudResourceController
     }
 
     public function getSystemicItemTree($id)
-     {
-       if ($this->authManager->loggedIn()) {
-           $session = $this->authManager->getSession();
-           $creatorId = $session->getIdentity();
+    {
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
           //  echo $creatorId;die();
-       }
+        }
 
-         $creator = $this->getUserDetails($creatorId);
-         $creatorInfo = array($creatorId,$creator['account']->role);
+
+        $systemicMapsR = SystemicMap::find(
+        [
+            'conditions' => '	id = ?1',
+            'bind' => [
+                1 => $id,
+            ],
+        ]
+        );
+
+        if ($systemicMapsR) {
+            foreach ($systemicMapsR as $systemicMapR) {
+                  $systemicR = $systemicMapR->name;
+            }
+        }
+
+
+        $creator = $this->getUserDetails($creatorId);
+        $creatorInfo = array($creatorId, $creator['account']->role);
         //  var_dump($creator['account']->role);die();
- $connection = $this->db;
-$sql_dist = "SELECT s1.id,u.first_name,u.last_name FROM `systemic_map_items` s1 JOIN user u ON s1.userId = u.id WHERE s1.id NOT IN (SELECT distinct s2.from_item as id FROM `systemic_map_chain` s2 WHERE s2.from_item IS NOT NULL ) AND s1.systemic_map_id=".$id."";
-$data_dist       = $connection->query($sql_dist );
-$data_dist ->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
-$results_dist     = $data_dist ->fetchAll();
+        $connection = $this->db;
+        $sql_dist = 'SELECT s1.id,u.first_name,u.last_name FROM `systemic_map_items` s1 JOIN user u ON s1.userId = u.id WHERE s1.id NOT IN (SELECT distinct s2.from_item as id FROM `systemic_map_chain` s2 WHERE s2.from_item IS NOT NULL ) AND s1.systemic_map_id='.$id.'';
+        $data_dist = $connection->query($sql_dist);
+        $data_dist->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $results_dist = $data_dist->fetchAll();
 
-
-$non_ch = array();
-foreach ($results_dist as $key => $value) {
-//  print_r($value);die();
+        $non_ch = array();
+        foreach ($results_dist as $key => $value) {
+            //  print_r($value);die();
   $first_name_f = $value['first_name'];
-  $last_name_f = $value['last_name'];
-  $non_ch[]=$value['id'];
-}
+            $last_name_f = $value['last_name'];
+            $non_ch[] = $value['id'];
+        }
 // print_r($non_ch);die();
-      $sql="SELECT to_item as id FROM `systemic_map_chain` WHERE from_item Is NULL AND to_item IN (SELECT id FROM systemic_map_items WHERE systemic_map_id=".$id.")";
+      $sql = 'SELECT to_item as id FROM `systemic_map_chain` WHERE from_item Is NULL AND to_item IN (SELECT id FROM systemic_map_items WHERE systemic_map_id='.$id.')';
+
+        $data = $connection->query($sql);
+        $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $results = $data->fetchAll();
+        $tree = array();
+        $this->fillArray($tree, $results);
+        $htmlcontent = '
+
+        <li class="dd-item dd3-item item'.$tree[0]['id']." generals-item \" style=\“color:".$tree[0]['color'].";\”  data-id=\"".$tree[0]['id'].'">
+                  <div class="dd3-content" >
+<div class="itemscolor" style="background-color:'.$this->color_luminance($tree[0]['color'], 0.1).'"></div>
+                    '.$tree[0]['question'].'
+
+                    <span class="pull-right">
 
 
-
-
-
-       $data       = $connection->query($sql);
-       $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
-       $results    = $data->fetchAll();
-       $tree=array();
-       $this->fillArray($tree,$results);
-       $htmlcontent = "
-
-        <li class=\"dd-item dd3-item item".$tree[0]['id']." generals-item \" style=\“color:".$tree[0]['color'].";\”  data-id=\"".$tree[0]['id']."\">
-                  <div class=\"dd3-content\" >
-<div class=\"itemscolor\" style=\"background-color:".$this->color_luminance($tree[0]['color'],0.1)."\"></div>
-                    ".$tree[0]['question']."
-
-                    <span class=\"pull-right\">
-
-
-                    <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."C\"></a>
-                    <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$tree[0]['id']."E\"></a>
+                    <a class="fa fa-lg fa-plus" data-toggle="modal" data-target="#myModal'.$tree[0]['id'].'C"></a>
+                    <a class="fa fa-lg fa-pencil-square-o" data-toggle="modal" data-target="#myModal'.$tree[0]['id'].'E"></a>
 
 
                     </span>
-                  </div>";
+                  </div>';
  // print_r($tree[0]['items']);die();
 // print_r();die();
- $htmlcontent = $this->array_depth($tree[0]['items'],$htmlcontent,$creatorInfo,$non_ch)['html'];
+ $htmlcontent = $this->array_depth($tree[0]['items'], $htmlcontent, $creatorInfo, $non_ch)['html'];
  // $htmlcontent = $htmlcontent2['html']
- $htmlcontent.="
-				<data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']."\"></data-sys-map-items-add>
+ $htmlcontent .= '
+				<data-sys-map-items-add lolo="myModal" add-func="addSysMapItem('.$tree[0]['id'].',question,proposal,group,color)" datasp="'.$tree[0]['id'].'"></data-sys-map-items-add>
 
-				<data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$tree[0]['id'].",question,proposal,group,color)\" datasp=\"".$tree[0]['id']."\" dataprop=\"".$tree[0]['proposal']."\" dataque=\"".$tree[0]['question']."\" datagrp=\"".$tree[0]['groupId']."\" dataclr=\"".$tree[0]['color']."\"></data-sys-map-items-edit>
+				<data-sys-map-items-edit lolo="myModal" edit-func="editSysMapItem('.$tree[0]['id'].',question,proposal,group,color)" datasp="'.$tree[0]['id'].'" dataprop="'.$tree[0]['proposal'].'" dataque="'.$tree[0]['question'].'" datagrp="'.$tree[0]['groupId'].'" dataclr="'.$tree[0]['color'].'"></data-sys-map-items-edit>
 
 </li>
-";
+';
  // echo $htmlcontent;
  // die();
 // echo $htmlcontent;die();
 $a = array(
-  "tree"=>$tree,
-  "htmlCode"=>$htmlcontent
+  'tree' => $tree,
+  'htmlCode' => $htmlcontent,
+  'systemic_map_title'=> $systemicR
 );
-       return $this->createArrayResponse($a, 'data');
-     }
 
-    public function fillArray(&$tree,$arrayData){
-         foreach ($arrayData as $value_first) {
-             $sql="SELECT sm.*,u.first_name,u.last_name FROM systemic_map_items sm JOIN user u ON sm.userId = u.id WHERE sm.id=".$value_first['id'];
+        return $this->createArrayResponse($a, 'data');
+    }
 
-             $connection = $this->db;
-             $data  = $connection->query($sql);
-             $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
-             $iresults   = $data->fetchAll();
-             foreach ($iresults as &$item)
-             {
-                              $groupTitle = '';
-                              $groupColorValue = NULL;
-                              if(isset($item['groupId'])){
-                                $groupColor = Group::findFirst(
+    public function fillArray(&$tree, $arrayData)
+    {
+        foreach ($arrayData as $value_first) {
+            $sql = 'SELECT sm.*,u.first_name,u.last_name FROM systemic_map_items sm JOIN user u ON sm.userId = u.id WHERE sm.id='.$value_first['id'];
+
+            $connection = $this->db;
+            $data = $connection->query($sql);
+            $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+            $iresults = $data->fetchAll();
+            foreach ($iresults as &$item) {
+                $groupTitle = '';
+                $groupColorValue = null;
+                if (isset($item['groupId'])) {
+                    $groupColor = Group::findFirst(
                                   [
                                       'conditions' => 'id = ?1',
                                       'bind' => [
@@ -777,102 +785,90 @@ $a = array(
                                       ],
                                   ]);
                                   // var_dump($groupColorValue = $groupColor->color);die();
-                                  if($groupColor->color!=NULL){
+                                  if ($groupColor->color != null) {
                                       $groupColorValue = $groupColor->color;
-
                                   }
 
-                                    $groupTitle = $groupColor->title;
-                              }
+                    $groupTitle = $groupColor->title;
+                }
                             //  $color = array();
-                              $item['color']=$groupColorValue;
-                              $item['groupTitle'] = $groupTitle;
+                              $item['color'] = $groupColorValue;
+                $item['groupTitle'] = $groupTitle;
 
                             //  array_push($item,$color);
-               $tree[]= $item;
+               $tree[] = $item;
             //   print_r($tree);die();
-             }
-             foreach ($tree as &$item)
-             {
-
-
-
-                $id=$item['id'];
-                $sql="SELECT to_item as id FROM `systemic_map_chain` WHERE from_item = ".$id;
+            }
+            foreach ($tree as &$item) {
+                $id = $item['id'];
+                $sql = 'SELECT to_item as id FROM `systemic_map_chain` WHERE from_item = '.$id;
                 $connection = $this->db;
-                $data       = $connection->query($sql);
+                $data = $connection->query($sql);
                 $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
-                $ids   = $data->fetchAll();
-                $item['items']=array();
-                $this->fillArray($item['items'],$ids);
-             }
-         }
-     }
+                $ids = $data->fetchAll();
+                $item['items'] = array();
+                $this->fillArray($item['items'], $ids);
+            }
+        }
+    }
 
-
-
-     public function array_depth(array $array,&$htmlcontent,$creatorInfo,$non_ch) {
-      // echo $htmlcontent;
+    public function array_depth(array $array, &$htmlcontent, $creatorInfo, $non_ch)
+    {
+        // echo $htmlcontent;
        $max_depth = 1;
 
-
-
-       foreach ($array as $value) {
-// print_r($value);die();
+        foreach ($array as $value) {
+            // print_r($value);die();
           // echo $value['id'];
           // die();
            if (is_array($value)) {
-            //print_r($value);
+               //print_r($value);
 
-             if(isset($value['id'])){
-              // echo $value['id'];
+             if (isset($value['id'])) {
+                 // echo $value['id'];
 
               //  $htmlcontent.=$value['id']."***";
-              if((AclRoles::ADMINISTRATOR === $creatorInfo[1])||(AclRoles::MANAGER === $creatorInfo[1])){
-                $delete_raw = "<a class=\"fa fa-lg fa-trash-o\" ng-click=\"deleteSysMapItem(".$value['id'].")\"></a>";
-              }else{
-
-
-
-              if($creatorInfo[0]==$value['userId']){
-                $delete_raw = "<a class=\"fa fa-lg fa-trash-o\" ng-click=\"deleteSysMapItem(".$value['id'].")\"></a>";
-              }else{
-                $delete_raw = "";
+              if ((AclRoles::ADMINISTRATOR === $creatorInfo[1]) || (AclRoles::MANAGER === $creatorInfo[1])) {
+                  $delete_raw = '<a class="fa fa-lg fa-trash-o" ng-click="deleteSysMapItem('.$value['id'].')"></a>';
+              } else {
+                  if ($creatorInfo[0] == $value['userId']) {
+                      $delete_raw = '<a class="fa fa-lg fa-trash-o" ng-click="deleteSysMapItem('.$value['id'].')"></a>';
+                  } else {
+                      $delete_raw = '';
+                  }
               }
-}
 
-if(!in_array($value['id'],$non_ch)){
-  $delete_raw = "";
-}
+                 if (!in_array($value['id'], $non_ch)) {
+                     $delete_raw = '';
+                 }
 
               //  echo $value['id']." <--> ";
-               $htmlcontent.="<ol class=\"dd-list\"> <li class=\"dd-item dd3-item item".$value['id']." generals-item\" style=\“color:".$value['color'].";\” data-id=\"".$value['id']."\">
-                          <div class=\"dd3-content\" >
-                          <div class=\"itemscolor\" style=\"background-color:".$this->color_luminance($value['color'],0.1)."\"></div>
-                              ".$value['question']."
+               $htmlcontent .= '<ol class="dd-list"> <li class="dd-item dd3-item item'.$value['id']." generals-item\" style=\“color:".$value['color'].";\” data-id=\"".$value['id'].'">
+                          <div class="dd3-content" >
+                          <div class="itemscolor" style="background-color:'.$this->color_luminance($value['color'], 0.1).'"></div>
+                              '.$value['question'].'
 
-                              <span class=\"pull-right\">".$delete_raw."
+                              <span class="pull-right">'.$delete_raw.'
 
 
-                              <a class=\"fa fa-lg fa-plus\" data-toggle=\"modal\" data-target=\"#myModal".$value['id']."C\"></a>
-                              <a class=\"fa fa-lg fa-pencil-square-o\" data-toggle=\"modal\" data-target=\"#myModal".$value['id']."E\"></a>
+                              <a class="fa fa-lg fa-plus" data-toggle="modal" data-target="#myModal'.$value['id'].'C"></a>
+                              <a class="fa fa-lg fa-pencil-square-o" data-toggle="modal" data-target="#myModal'.$value['id'].'E"></a>
                               </span>
 
-                              <data-sys-map-items-add lolo=\"myModal\" add-func=\"addSysMapItem(".$value['id'].",question,proposal,group,color)\" datasp=\"".$value['id']."\"></data-sys-map-items-add>
+                              <data-sys-map-items-add lolo="myModal" add-func="addSysMapItem('.$value['id'].',question,proposal,group,color)" datasp="'.$value['id'].'"></data-sys-map-items-add>
 
-                              <data-sys-map-items-edit lolo=\"myModal\" edit-func=\"editSysMapItem(".$value['id'].",question,proposal,group,color)\" datasp=\"".$value['id']."\" dataprop=\"".$value['proposal']."\" dataque=\"".$value['question']."\" datagrp=\"".$value['groupId']."\" dataclr=\"".$value['color']."\"></data-sys-map-items-edit>
-                              <div style=\"color: #3276b1;font-size: 12px;\" class=\"item-infos \"><strong>by: </strong>".$value['first_name']." ".$value['last_name']."</div>
-                              <div class=\"item-groupname\">".$value['groupTitle']."</div>
-                          </div>";
+                              <data-sys-map-items-edit lolo="myModal" edit-func="editSysMapItem('.$value['id'].',question,proposal,group,color)" datasp="'.$value['id'].'" dataprop="'.$value['proposal'].'" dataque="'.$value['question'].'" datagrp="'.$value['groupId'].'" dataclr="'.$value['color'].'"></data-sys-map-items-edit>
+                              <div style="color: #3276b1;font-size: 12px;" class="item-infos "><strong>by: </strong>'.$value['first_name'].' '.$value['last_name'].'</div>
+                              <div class="item-groupname">'.$value['groupTitle'].'</div>
+                          </div>';
                           // if($value['id']==98){
                           //   $h=98;
                           //   echo "**********************";
                           //   // die();
                           // }
-              }
+             }
 
-
-               $depth = $this->array_depth($value['items'],$htmlcontent,$creatorInfo,$non_ch)['max'] + 1;
+               $depth = $this->array_depth($value['items'], $htmlcontent, $creatorInfo, $non_ch)['max'] + 1;
 
               //  echo $depth;die();
                if ($depth > $max_depth) {
@@ -880,40 +876,155 @@ if(!in_array($value['id'],$non_ch)){
                }
 
               //die();
-              $htmlcontent.="</li></ol>";
+              $htmlcontent .= '</li></ol>';
            }
-
-       }
-       if(isset($h)){
-    //     echo $htmlcontent;
+        }
+        if (isset($h)) {
+            //     echo $htmlcontent;
       // die();
-       }else{}
-        $a = array("max"=>$max_depth,"html"=>$htmlcontent);
-          return $a;
+        } else {
+        }
+        $a = array('max' => $max_depth, 'html' => $htmlcontent);
+
+        return $a;
 
        //die();
+    }
 
-   }
+    public function color_luminance($hex, $percent)
+    {
+        return $hex;
+        // validate hex string
 
-   public function color_luminance( $hex, $percent ) {
-     return $hex;
-    	// validate hex string
+        $hex = preg_replace('/[^0-9a-f]/i', '', $hex);
+        $new_hex = '#';
 
-    	$hex = preg_replace( '/[^0-9a-f]/i', '', $hex );
-    	$new_hex = '#';
+        if (strlen($hex) < 6) {
+            $hex = $hex[0] + $hex[0] + $hex[1] + $hex[1] + $hex[2] + $hex[2];
+        }
 
-    	if ( strlen( $hex ) < 6 ) {
-    		$hex = $hex[0] + $hex[0] + $hex[1] + $hex[1] + $hex[2] + $hex[2];
-    	}
+        // convert to decimal and change luminosity
+        for ($i = 0; $i < 3; ++$i) {
+            $dec = hexdec(substr($hex, $i * 2, 2));
+            $dec = min(max(0, $dec + $dec * $percent), 255);
+            $new_hex .= str_pad(dechex($dec), 2, 0, STR_PAD_LEFT);
+        }
 
-    	// convert to decimal and change luminosity
-    	for ($i = 0; $i < 3; $i++) {
-    		$dec = hexdec( substr( $hex, $i*2, 2 ) );
-    		$dec = min( max( 0, $dec + $dec * $percent ), 255 );
-    		$new_hex .= str_pad( dechex( $dec ) , 2, 0, STR_PAD_LEFT );
-    	}
+        return $new_hex;
+    }
 
-    	return $new_hex;
-  }
+    public function createActionListGroup()
+    {
 
+      if ($this->authManager->loggedIn()) {
+          $session = $this->authManager->getSession();
+          $creatorId = $session->getIdentity();
+      }
+
+      $creator = $this->getUserDetails($creatorId);
+      $creatorInfo = array($creatorId, $creator['account']->role);
+      if($creatorInfo[1]!=AclRoles::MANAGER){
+        $response = [
+          'code' => 0,
+          'status' => 'You cannot delete this systemic item!',
+        ];
+      }else{
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+
+        if ($creator['organization'] == null) {
+            $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => "Manager's organization not found!",
+          ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+        $systemicMaps = SystemicMap::findFirst(
+          [
+              'conditions' => 'id = ?2 AND	organization = ?1',
+              'bind' => [
+                  1 => $organization_id,
+                  2 => $data->systemicMapId
+              ],
+          ]
+        );
+        $systemicMapsArray = array();
+
+        if ($systemicMaps->id) {
+
+          //1.save group details
+          $action_grp_list = new \App\Model\ActionListGroup();
+          $action_grp_list->systemic_map_id = $systemicMaps->id;
+          $action_grp_list->title = $data->title;
+          $action_grp_list->created_by = $creatorId;
+          if(isset($data->description)){
+            $action_grp_list->description = $data->description;
+          }
+          if ($action_grp_list->save() == false) {
+              $messagesErrors = array();
+              foreach ($action_grp_list->getMessages() as $message) {
+                  // print_r($message);
+                  $messagesErrors[] = $message;
+              }
+              $response = [
+                  'code' => 0,
+                  'status' => 'Error',
+                  'data' => $messagesErrors,
+              ];
+          } else {
+              $action_grp_list_id = $action_grp_list->getWriteConnection()->lastInsertId();
+
+            //  2.copy sam as action list
+            $connection = $this->db;
+            $sql_dist = 'SELECT s1.id,u.first_name,u.last_name FROM `systemic_map_items` s1 JOIN user u ON s1.userId = u.id WHERE s1.id NOT IN (SELECT distinct s2.from_item as id FROM `systemic_map_chain` s2 WHERE s2.from_item IS NOT NULL ) AND s1.systemic_map_id='.$systemicMaps->id.'';
+            $data_dist = $connection->query($sql_dist);
+            $data_dist->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+            $results_dist = $data_dist->fetchAll();
+
+            $non_ch = array();
+            foreach ($results_dist as $key => $value) {
+                //  print_r($value);die();
+      $first_name_f = $value['first_name'];
+                $last_name_f = $value['last_name'];
+                $non_ch[] = $value['id'];
+            }
+    // print_r($non_ch);die();
+          $sql = 'SELECT to_item as id FROM `systemic_map_chain` WHERE from_item Is NULL AND to_item IN (SELECT id FROM systemic_map_items WHERE systemic_map_id='.$systemicMaps->id.')';
+
+            $data = $connection->query($sql);
+            $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+            $results = $data->fetchAll();
+            $tree = array();
+            $this->fillArray($tree, $results);
+            print_r($tree);
+            // print_r(array_reverse($tree));
+
+
+die();
+
+
+              // $response = [
+              //   'code' => 1,
+              //   'status' => 'Success',
+              //   'data' => array('systemicMapId' => $action_grp_list_id),
+              // ];
+          }
+        }else{
+          $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => "Systemic Map not found",
+          ];
+        }
+
+
+
+
+      }
+      return $this->createArrayResponse($response, 'data');
+    }
 }

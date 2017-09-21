@@ -66,6 +66,10 @@ class SystemicMapResource extends ApiResource
               ->allow(AclRoles::MANAGER)
               ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
               ->description('delete systemicmapsItem')
-          );
+          )
+          ->endpoint(ApiEndpoint::post('/createActionListGroup', 'createActionListGroup')
+              ->allow(AclRoles::MANAGER)
+              ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+              ->description('create Action List Group'));
     }
 }
