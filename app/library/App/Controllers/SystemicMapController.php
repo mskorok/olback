@@ -1070,9 +1070,10 @@ die();
     {
 
         foreach ($arrayData as $value_first) {
+          if(($value_first['id'] !='')){
             $sql = 'SELECT sm.*,u.first_name,u.last_name FROM systemic_map_items sm JOIN user u ON sm.userId = u.id WHERE sm.id='.$value_first['id'];
-  // echo $sql;die();
-            $connection = $this->db;
+
+        $connection = $this->db;
             $data = $connection->query($sql);
             $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
             $iresults = $data->fetchAll();
@@ -1112,9 +1113,10 @@ die();
                 $item['items'] = array();
 
                 // if (!empty($ids)) {
-                  $this->fillArray($item['items'], $ids);
+                  $this->fillArray2($item['items'], $ids);
                 // }
               //  }
+            }
             }
         }
     }
