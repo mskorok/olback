@@ -1058,7 +1058,7 @@ die();
         $out_nodes = array();
         $tree = array();
 
-          $this->fillArray2($tree[], $results_dist);
+          $this->fillArray2($tree, $results_dist);
 
         // print_r($tree);
         $a = array(
