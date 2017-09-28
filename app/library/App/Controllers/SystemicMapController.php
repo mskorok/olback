@@ -766,9 +766,10 @@ $a = array(
 
     public function fillArray(&$tree, $arrayData)
     {
+
         foreach ($arrayData as $value_first) {
             $sql = 'SELECT sm.*,u.first_name,u.last_name FROM systemic_map_items sm JOIN user u ON sm.userId = u.id WHERE sm.id='.$value_first['id'];
-
+// echo $sql;die();
             $connection = $this->db;
             $data = $connection->query($sql);
             $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
@@ -792,7 +793,7 @@ $a = array(
                     $groupTitle = $groupColor->title;
                 }
                             //  $color = array();
-                              $item['color'] = $groupColorValue;
+                $item['color'] = $groupColorValue;
                 $item['groupTitle'] = $groupTitle;
 
                             //  array_push($item,$color);
@@ -913,7 +914,7 @@ $a = array(
         return $new_hex;
     }
 
-    public function createActionListGroup()
+    public function createActionListGroup2()
     {
 
       if ($this->authManager->loggedIn()) {
@@ -1027,4 +1028,95 @@ die();
       }
       return $this->createArrayResponse($response, 'data');
     }
+
+
+
+    public function createActionListGroup()
+    {
+      if ($this->authManager->loggedIn()) {
+          $session = $this->authManager->getSession();
+          $creatorId = $session->getIdentity();
+      }
+
+      $creator = $this->getUserDetails($creatorId);
+      $creatorInfo = array($creatorId, $creator['account']->role);
+      if($creatorInfo[1]!=AclRoles::MANAGER){
+        $response = [
+          'code' => 0,
+          'status' => 'You cannot delete this systemic item!',
+        ];
+      }else{
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+        $creator = $this->getUserDetails($creatorId);
+        $creatorInfo = array($creatorId, $creator['account']->role);
+        $connection = $this->db;
+        $sql_dist = 'SELECT SM.to_item as id FROM `systemic_map_chain` SM JOIN systemic_map_items SI ON SI.id = SM.to_item WHERE NOT EXISTS (SELECT * FROM systemic_map_chain sm2 WHERE sm2.from_item = SM.to_item) AND SI.systemic_map_id = '.$data->systemicMapId.' ';
+        $data_dist = $connection->query($sql_dist);
+        $data_dist->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $results_dist = $data_dist->fetchAll();
+        $out_nodes = array();
+        $tree = array();
+
+          $this->fillArray2($tree[], $results_dist);
+
+        print_r($tree);
+      }
+    }
+
+
+
+    public function fillArray2(&$tree, $arrayData)
+    {
+
+        foreach ($arrayData as $value_first) {
+            $sql = 'SELECT sm.*,u.first_name,u.last_name FROM systemic_map_items sm JOIN user u ON sm.userId = u.id WHERE sm.id='.$value_first['id'];
+  // echo $sql;die();
+            $connection = $this->db;
+            $data = $connection->query($sql);
+            $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+            $iresults = $data->fetchAll();
+            foreach ($iresults as &$item) {
+                $groupTitle = '';
+                $groupColorValue = null;
+                if (isset($item['groupId'])) {
+                    $groupColor = Group::findFirst(
+                                  [
+                                      'conditions' => 'id = ?1',
+                                      'bind' => [
+                                          1 => $item['groupId'],
+                                      ],
+                                  ]);
+                                  // var_dump($groupColorValue = $groupColor->color);die();
+                                  if ($groupColor->color != null) {
+                                      $groupColorValue = $groupColor->color;
+                                  }
+
+                    $groupTitle = $groupColor->title;
+                }
+                            //  $color = array();
+                $item['color'] = $groupColorValue;
+                $item['groupTitle'] = $groupTitle;
+
+                            //  array_push($item,$color);
+               $tree[] = $item;
+            //   print_r($tree);die();
+            }
+            foreach ($tree as &$item) {
+                $id = $item['id'];
+                $sql = 'SELECT from_item as id FROM `systemic_map_chain` WHERE to_item = '.$id;
+                $connection = $this->db;
+                $data = $connection->query($sql);
+                $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+                $ids = $data->fetchAll();
+                $item['items'] = array();
+                // if (!empty($ids)) {
+                  $this->fillArray2($item['items'], $ids);
+                // }
+              //  }
+            }
+        }
+    }
+
+
 }
