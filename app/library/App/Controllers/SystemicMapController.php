@@ -1110,8 +1110,9 @@ die();
                 $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
                 $ids = $data->fetchAll();
                 $item['items'] = array();
+
                 // if (!empty($ids)) {
-                  $this->fillArray2($item['items'], $ids);
+                  $this->fillArray($item['items'], $ids);
                 // }
               //  }
             }
