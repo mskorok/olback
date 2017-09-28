@@ -1060,7 +1060,13 @@ die();
 
           $this->fillArray2($tree[], $results_dist);
 
-        print_r($tree);
+        // print_r($tree);
+        $a = array(
+          'tree' => $tree,
+        );
+
+                return $this->createArrayResponse($a, 'data');
+
       }
     }
 
