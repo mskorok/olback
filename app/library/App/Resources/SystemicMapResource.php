@@ -70,6 +70,10 @@ class SystemicMapResource extends ApiResource
           ->endpoint(ApiEndpoint::post('/createActionListGroup', 'createActionListGroup')
               ->allow(AclRoles::MANAGER)
               ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+              ->description('create Action List Group'))
+          ->endpoint(ApiEndpoint::post('/importActionListGroup', 'createActionListGroup4')
+              ->allow(AclRoles::MANAGER)
+              ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
               ->description('create Action List Group'));
     }
 }

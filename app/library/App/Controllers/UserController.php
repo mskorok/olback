@@ -15,6 +15,23 @@ class UserController extends CrudResourceController
         return $this->createResourceResponse($this->userService->getDetails());
     }
 
+    public function refreshToken(){
+      if ($this->authManager->loggedIn()) {
+        $response = [
+            'status' => 0,
+            'msg' => "you are logged in"
+        ];
+      }else{
+        $response = [
+            'status' => 1,
+            'msg' => "you are not logged in"
+        ];
+      }
+
+      return $this->createArrayResponse($response, 'data');
+    }
+
+
     public function authenticate()
     {
         $username = $this->request->getUsername();
