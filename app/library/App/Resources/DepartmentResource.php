@@ -29,6 +29,10 @@ class DepartmentResource extends ApiResource
           ->endpoint(ApiEndpoint::get('/', 'getDepartment')
               ->allow(AclRoles::MANAGER)
               ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-              ->description('get department'));
+              ->description('get department'))
+          ->endpoint(ApiEndpoint::put('/{id}', 'updateDepartment')
+              ->allow(AclRoles::MANAGER)
+              ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+              ->description('update department'));
     }
 }

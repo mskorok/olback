@@ -7,25 +7,17 @@ use PhalconRest\Mvc\Controllers\CrudResourceController;
 // use App\Model\Group;
 use App\Model\UserOrganization;
 use App\Model\User;
-use App\Model\SystemicMap;
-use App\Model\SystemicMapItems;
-use App\Model\SystemicMapChain;
-use App\Model\ActionListGroup;
 use App\Model\Department;
 use Phalcon\Http\Request;
-use App\Constants\AclRoles;
-use Phalcon\Mvc\Model\Query;
-use App\Model\Group;
-
 
 class DepartmentController extends CrudResourceController
 {
     public function createDepartment()
     {
-      if ($this->authManager->loggedIn()) {
-          $session = $this->authManager->getSession();
-          $creatorId = $session->getIdentity();
-      }
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
 
         $creator = $this->getUserDetails($creatorId);
         $organization = $creator['organization']->organization_id;
@@ -58,32 +50,95 @@ class DepartmentController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
-    public function getDepartment(){
-      if ($this->authManager->loggedIn()) {
-          $session = $this->authManager->getSession();
-          $creatorId = $session->getIdentity();
-      }
+    public function getDepartment()
+    {
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
 
         $creator = $this->getUserDetails($creatorId);
         $organization = $creator['organization']->organization_id;
         $departments = Department::find(
-        [
-            'conditions' => '	organization_id = ?1',
-            'bind' => [
-                1 => $organization,
-            ],
-        ]
-      );
+          [
+              'conditions' => '	organization_id = ?1',
+              'bind' => [
+                  1 => $organization,
+              ],
+          ]
+        );
+
+        $response = [
+          'code' => 1,
+          'status' => 'Success',
+          'data' => $departments,
+        ];
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function updateDepartment($id){
+      if ($this->authManager->loggedIn()) {
+          $session = $this->authManager->getSession();
+          $creatorId = $session->getIdentity();
+      }
+      $request = new Request();
+      $data = $request->getJsonRawBody();
+      $creator = $this->getUserDetails($creatorId);
+      $organization = $creator['organization']->organization_id;
+      if ($creator['organization'] == null) {
+          $response = [
+        'code' => 0,
+        'status' => 'Error',
+        'data' => "Manager's organization not found!",
+      ];
+
+          return $this->createArrayResponse($response, 'data');
+      }
 
 
-      $response = [
-    'code' => 1,
-    'status' => 'Success',
-    'data' => $departments,
-  ];
+          $department = Department::findFirst(
+      [
+          'conditions' => 'id = ?1 AND organization_id = ?2',
+          'bind' => [
+              1 => $id,
+              2 => $organization,
+          ],
+      ]);
 
-      return $this->createArrayResponse($response, 'data');
+      if ($department->id) {
+      //  echo $department->id;die();
+          if (isset($data->title)) {
+              $department->title = $data->title;
+          }
+          if (isset($data->description)) {
+              $department->description = $data->description;
+          }
+          if ($department->save() == false) {
+              $messagesErrors = array();
+              foreach ($department->getMessages() as $message) {
+                  // print_r($message);
+                  $messagesErrors[] = $message;
+              }
+              $response = [
+                  'code' => 0,
+                  'status' => 'Error',
+                  'data' => $messagesErrors,
+              ];
+          } else {
+            $response = [
+                'code' => 1,
+                'status' => 'Success'
+            ];
+          }
+      } else {
+          $response = [
+            'code' => 0,
+            'status' => 'You cannot edit this department!',
+          ];
+      }
+
+        return $this->createArrayResponse($response, 'data');
     }
 
 
