@@ -22,9 +22,13 @@ class SurveyResource extends ApiResource
           ->itemKey('survey')
           ->collectionKey('survey')
           ->deny(AclRoles::UNAUTHORIZED, AclRoles::USER)
-          ->endpoint(ApiEndpoint::post('/survey', 'createSurvey')
+          ->endpoint(ApiEndpoint::post('/', 'createSurveyDefinition')
               ->allow(AclRoles::MANAGER)
               ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-              ->description('create survey'));
+              ->description('create survey'))
+          ->endpoint(ApiEndpoint::get('/', 'getSurveyDefinition')
+              ->allow(AclRoles::MANAGER)
+              ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+              ->description('get survey'));
     }
 }

@@ -9,6 +9,8 @@ class Survey extends \App\Mvc\DateTrackingModel
     public $description;
     public $isEditable;
     public $isOlset;
+    public $creator;
+    public $organization_id;
 
     public function getSource()
     {
@@ -22,7 +24,9 @@ class Survey extends \App\Mvc\DateTrackingModel
             'title' => 'title',
             'description' => 'description',
             'isEditable'=>'isEditable',
-            'isOlset' => 'isOlset'
+            'isOlset' => 'isOlset',
+            'creator' => 'creator',
+            'organization_id' => 'organization_id'
         ];
     }
 }
