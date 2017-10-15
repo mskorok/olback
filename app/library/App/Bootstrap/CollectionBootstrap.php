@@ -11,6 +11,7 @@ use App\Resources\PhotoResource;
 use App\Resources\OrganizationResource;
 use App\Resources\SystemicMapResource;
 use App\Resources\GroupResource;
+use App\Resources\DepartmentResource;
 use Phalcon\Config;
 use Phalcon\DiInterface;
 use PhalconRest\Api;
@@ -19,6 +20,7 @@ class CollectionBootstrap implements BootstrapInterface
 {
     public function run(Api $api, DiInterface $di, Config $config)
     {
+      // echo "Fds";die();
         $api
             ->collection(new ExportCollection('/export'))
             // ->collection(new UserCollection('/user'))
@@ -27,7 +29,8 @@ class CollectionBootstrap implements BootstrapInterface
             ->resource(new PhotoResource('/photos'))
             ->resource(new OrganizationResource('/organization'))
             ->resource(new SystemicMapResource('/systemicmap'))
-            ->resource(new GroupResource('/group'));
+            ->resource(new GroupResource('/group'))
+            ->resource(new DepartmentResource('/department'));
     }
 }
 // namespace App\Bootstrap;
