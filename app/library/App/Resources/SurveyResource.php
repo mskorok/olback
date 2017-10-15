@@ -5,6 +5,7 @@ namespace App\Resources;
 use PhalconRest\Api\ApiResource;
 use PhalconRest\Api\ApiEndpoint;
 use App\Model\Survey;
+use App\Model\SurveyQuestion;
 use App\Controllers\SurveyController;
 use App\Constants\AclRoles;
 
@@ -33,6 +34,14 @@ class SurveyResource extends ApiResource
           ->endpoint(ApiEndpoint::put('/{id}', 'updateSurveyDefinition')
               ->allow(AclRoles::MANAGER)
               ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-              ->description('update survey'));
+              ->description('update survey'))
+         ->endpoint(ApiEndpoint::post('/addQuestion/{id}', 'createQuestion')
+              ->allow(AclRoles::MANAGER)
+              ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+              ->description('add survey question'))
+         ->endpoint(ApiEndpoint::get('/getQuestions/{id}', 'getQuestion')
+              ->allow(AclRoles::MANAGER)
+              ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+              ->description('get survey question'));
     }
 }
