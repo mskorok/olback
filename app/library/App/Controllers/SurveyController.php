@@ -80,7 +80,7 @@ class SurveyController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-    public function updateDepartment($id){
+    public function updateSurveyDefinition($id){
       if ($this->authManager->loggedIn()) {
           $session = $this->authManager->getSession();
           $creatorId = $session->getIdentity();
@@ -100,26 +100,33 @@ class SurveyController extends CrudResourceController
       }
 
 
-          $department = Department::findFirst(
-      [
-          'conditions' => 'id = ?1 AND organization_id = ?2',
+      $survey = Survey::findFirst(
+          [
+          'conditions' => 'id = ?1 AND organization_id = ?2 AND creator = ?3',
           'bind' => [
               1 => $id,
               2 => $organization,
+              3 => $creator['account']->id
           ],
       ]);
 
-      if ($department->id) {
+      if ($survey->id) {
       //  echo $department->id;die();
           if (isset($data->title)) {
-              $department->title = $data->title;
+              $survey->title = $data->title;
           }
           if (isset($data->description)) {
-              $department->description = $data->description;
+              $survey->description = $data->description;
           }
-          if ($department->save() == false) {
+          if (isset($data->isEditable)) {
+              $survey->isEditable = $data->isEditable;
+          }
+          if (isset($data->isOlset)) {
+              $survey->isOlset = $data->isOlset;
+          }
+          if ($survey->save() == false) {
               $messagesErrors = array();
-              foreach ($department->getMessages() as $message) {
+              foreach ($survey->getMessages() as $message) {
                   // print_r($message);
                   $messagesErrors[] = $message;
               }
@@ -137,7 +144,7 @@ class SurveyController extends CrudResourceController
       } else {
           $response = [
             'code' => 0,
-            'status' => 'You cannot edit this department!',
+            'status' => 'You cannot edit this survey!',
           ];
       }
 
