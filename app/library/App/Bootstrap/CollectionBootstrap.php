@@ -8,6 +8,7 @@ use App\Collections\ExportCollection;
 use App\Resources\UserResource;
 use App\Resources\AlbumResource;
 use App\Resources\PhotoResource;
+use App\Resources\ProcessResource;
 use App\Resources\OrganizationResource;
 use App\Resources\SystemicMapResource;
 use App\Resources\GroupResource;
@@ -28,6 +29,7 @@ class CollectionBootstrap implements BootstrapInterface
             ->resource(new UserResource('/users'))
             ->resource(new AlbumResource('/albums'))
             ->resource(new PhotoResource('/photos'))
+            ->resource(new ProcessResource('/process'))
             ->resource(new OrganizationResource('/organization'))
             ->resource(new SystemicMapResource('/systemicmap'))
             ->resource(new GroupResource('/group'))

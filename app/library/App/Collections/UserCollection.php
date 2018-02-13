@@ -14,7 +14,7 @@ class UserCollection extends ApiCollection
             ->name('User')
             ->handler(UserController::class)
 
-            ->endpoint(ApiEndpoint::get('/createManager', 'createManager'))
+            ->endpoint(ApiEndpoint::get('/createManager', 'createManager'));
             // ->endpoint(ApiEndpoint::get('/postman.json', 'postman'));
     }
 }
