@@ -7,6 +7,7 @@ use PhalconRest\Mvc\Controllers\CrudResourceController;
 use App\Model\User;
 use App\Model\Organization;
 use Phalcon\Http\Request;
+use App\Model\ProcessDepartments;
 
 class UserController extends CrudResourceController
 {
@@ -506,4 +507,53 @@ $organization_id = $data->organization;
       //response
       return $this->createArrayResponse($response, 'data');
     }
+
+    public function setProcessPermissions()
+    {
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+        $processId = $data->processId;
+
+        $connection = $this->db;
+        $sqlDepartment = 'DELETE FROM `process_departments` WHERE `processId` = '.$processId;
+        $connection->query($sqlDepartment);
+
+        $sqlUsers = 'DELETE FROM `process_users` WHERE `processId` = '.$processId;
+        $connection->query($sqlUsers);
+
+        $sqlOrg = 'DELETE FROM `process_organizations` WHERE `processId` = '.$processId;
+        $connection->query($sqlOrg);
+
+        //organization
+        foreach ($data->organization as $valueOrganization){
+            $processOrganizations = new \App\Model\ProcessOrganizations();
+            $processOrganizations->processId = $processId;
+            $processOrganizations->organizationId = $valueOrganization;
+            $processOrganizations->save();
+        }
+
+        //departments
+        foreach ($data->department as $valueDepartment){
+            $processDepartments = new ProcessDepartments();
+            $processDepartments->processId = $processId;
+            $processDepartments->departmentId = $valueDepartment;
+            $processDepartments->save();
+        }
+        //persons
+        foreach ($data->persons as $valuePersons){
+            $processUsers = new \App\Model\ProcessUsers();
+            $processUsers->processId = $processId;
+            $processUsers->userId = $valuePersons;
+            $processUsers->save();
+        }
+
+        $response = [
+            'code' => 1,
+            'status' => 'Success'
+        ];
+
+        return $this->createResponse($response);
+    }
+
+
 }

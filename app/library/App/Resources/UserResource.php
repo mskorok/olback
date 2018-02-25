@@ -62,6 +62,11 @@ class UserResource extends ApiResource {
                 ->allow(AclRoles::MANAGER,AclRoles::ADMINISTRATOR)
                 ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
                 ->description('Returns the currently logged in user')
+            )
+            ->endpoint(ApiEndpoint::post('/setProcessPermissions', 'setProcessPermissions')
+                ->allow(AclRoles::MANAGER,AclRoles::ADMINISTRATOR)
+                ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
+                ->description('Returns the currently logged in user')
             );
     }
 }
