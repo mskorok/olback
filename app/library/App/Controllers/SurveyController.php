@@ -323,7 +323,7 @@ class SurveyController extends CrudResourceController
 
         $organization = $creator['organization']->organization_id;
 
-
+        echo $organization;die();
 
         //create step0
         $step0 = new \App\Model\Survey();
