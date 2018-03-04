@@ -43,11 +43,7 @@ class SystemicMapResource extends ApiResource
               ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
               ->description('get systemicmaps')
           )
-            ->endpoint(ApiEndpoint::post('/answers', 'createAnswer')
-                ->allow(AclRoles::MANAGER)
-                ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                ->description('create answer')
-            )
+
           ->endpoint(ApiEndpoint::post('/create', 'createSystemicMap')
               ->allow(AclRoles::MANAGER)
               ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)

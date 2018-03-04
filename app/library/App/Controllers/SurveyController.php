@@ -285,4 +285,31 @@ class SurveyController extends CrudResourceController
             return null;
         }
     }
+
+    public function createAnswer(){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $creator = $this->getUserDetails($creatorId);
+
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+
+        foreach ($data as $answer) {
+            $answerModel = new \App\Model\Answer();
+            $answerModel->answer = $answer->answer;
+            $answerModel->userId = $creator['account']->id;
+            $answerModel->questionId = $answer->questionId;
+            $answerModel->save() ;
+            }
+
+
+        $response = [
+        'code' => 1,
+        'status' => 'Success'];
+
+        return $this->createArrayResponse($response, 'data');
+    }
 }
