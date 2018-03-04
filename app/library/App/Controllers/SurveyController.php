@@ -333,7 +333,17 @@ class SurveyController extends CrudResourceController
         $step0->isOlset = 1;
         $step0->creator = $creator['account']->id;
         $step0->organization_id = $organization;
-        $step0->save();
+
+        if ($step0->save() == false) {
+            $messagesErrors = array();
+            foreach ($step0->getMessages() as $message) {
+                // print_r($message);
+                $messagesErrors[] = $message;
+            }
+            var_dump($messagesErrors);die();
+
+        }
+
         $step0_ID = $step0->getWriteConnection()->lastInsertId();
 
         //create step3_0
