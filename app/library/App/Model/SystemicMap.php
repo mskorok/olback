@@ -10,6 +10,7 @@ class SystemicMap extends \App\Mvc\DateTrackingModel
     public $organization;
     public $isActive;
     public $lang;
+    public $processId;
 
     public function getSource()
     {
@@ -24,7 +25,8 @@ class SystemicMap extends \App\Mvc\DateTrackingModel
             'department' => 'department',
             'organization'=>'organization',
             'lang' => 'lang',
-            'isActive'=>'isActive'
+            'isActive'=>'isActive',
+                'processId'=>'processId'
         ];
     }
 }

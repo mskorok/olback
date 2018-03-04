@@ -200,6 +200,7 @@ class SystemicMapController extends CrudResourceController
         $systemicMap->organization = $organization_id;
         $systemicMap->lang = $data->lang;
         $systemicMap->isActive = $data->isActive;
+        $systemicMap->processId = $data->processId;
         if ($systemicMap->save() == false) {
             $messagesErrors = array();
             foreach ($systemicMap->getMessages() as $message) {
