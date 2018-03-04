@@ -18,7 +18,7 @@ use App\Model\Group;
 // include '/var/www/html/Classes/PHPExcel.php';
 class SystemicMapController extends CrudResourceController
 {
-    public function getSystemicMap()
+    public function getSystemicMap($id)
     {
         //  echo 'asas';die();
       if ($this->authManager->loggedIn()) {
@@ -40,9 +40,10 @@ class SystemicMapController extends CrudResourceController
 
         $systemicMaps = SystemicMap::find(
         [
-            'conditions' => '	organization = ?1',
+            'conditions' => '	organization = ?1 AND processId = ?2',
             'bind' => [
                 1 => $organization_id,
+                2 => $id,
             ],
         ]
       );
