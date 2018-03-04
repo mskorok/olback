@@ -324,7 +324,7 @@ class SurveyController extends CrudResourceController
         $organization = $creator['organization']->organization_id;
 
 
-        $connection = $this->db;
+
         //create step0
         $step0 = new \App\Model\Survey();
         $step0->title = "The self-evaluation questionnaire";
@@ -361,7 +361,7 @@ practically enacting and forcing double-loop learning. The four questions are:
         $step3_1->save();
         $step3_1_ID = $step3_1->getWriteConnection()->lastInsertId();
 
-
+        $connection = $this->db;
         //create questions
         $sqlStep0 = "INSERT INTO `survey_questions` (`id`, `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
 (NULL, '1. Co-operation agreements with other companies, universities, technical colleges, experts, etc. are promoted.', NULL, 2, 1, $step0_ID),
