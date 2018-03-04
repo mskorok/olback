@@ -9,6 +9,9 @@ class Process extends \App\Mvc\DateTrackingModel
     public $title;
     public $CurrentReality;
     public $InitialIntentions;
+    public $step0;
+    public $step3_0;
+    public $step3_1;
 
 
     public function getSource()
@@ -22,7 +25,10 @@ class Process extends \App\Mvc\DateTrackingModel
                 'id' => 'id',
                 'title' => 'title',
                 'CurrentReality' => 'CurrentReality',
-                'InitialIntentions' => 'InitialIntentions'
+                'InitialIntentions' => 'InitialIntentions',
+                'step0'=>'step0',
+                'step3_0'=>'step3_0',
+                'step3_1'=>'step3_1'
             ];
     }
 
