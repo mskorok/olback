@@ -18,7 +18,58 @@ use App\Model\Group;
 // include '/var/www/html/Classes/PHPExcel.php';
 class SystemicMapController extends CrudResourceController
 {
-    public function getSystemicMap($id)
+
+    public function getSystemicMap()
+    {
+        //  echo 'asas';die();
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $creator = $this->getUserDetails($creatorId);
+        if ($creator['organization'] == null) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+        $systemicMaps = SystemicMap::find(
+            [
+                'conditions' => '	organization = ?1',
+                'bind' => [
+                    1 => $organization_id,
+                ],
+            ]
+        );
+        $systemicMapsArray = array();
+        if ($systemicMaps) {
+            foreach ($systemicMaps as $systemicMap) {
+                $systemicMapsArray[] = array(
+                    'id' => $systemicMap->id,
+                    'name' => $systemicMap->name,
+                    'department' => $systemicMap->department,
+                    'organization' => $systemicMap->organization,
+                    'isActive' => $systemicMap->isActive,
+                );
+            }
+        }
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => $systemicMapsArray,
+        ];
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
+
+    public function getSystemicMapByProcess($id)
     {
         //  echo 'asas';die();
       if ($this->authManager->loggedIn()) {
