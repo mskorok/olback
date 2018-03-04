@@ -323,7 +323,7 @@ class SurveyController extends CrudResourceController
 
         $organization = $creator['organization']->organization_id;
 
-        echo $organization;die();
+
 
         //create step0
         $step0 = new \App\Model\Survey();
@@ -334,15 +334,7 @@ class SurveyController extends CrudResourceController
         $step0->creator = $creator['account']->id;
         $step0->organization_id = $organization;
 
-        if ($step0->save() == false) {
-            $messagesErrors = array();
-            foreach ($step0->getMessages() as $message) {
-                // print_r($message);
-                $messagesErrors[] = $message;
-            }
-            var_dump($messagesErrors);die();
-
-        }
+        $step0->save();
 
         $step0_ID = $step0->getWriteConnection()->lastInsertId();
 
