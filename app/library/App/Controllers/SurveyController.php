@@ -347,7 +347,7 @@ class SurveyController extends CrudResourceController
         $step0->organization_id = $organization;
         $step0->save();
         $step0_ID = $step0->getWriteConnection()->lastInsertId();
-        $process->step0 = $step3_0_ID;
+        $process->step0 = $step0->id;
 
 
 
