@@ -323,6 +323,18 @@ class SurveyController extends CrudResourceController
 
         $organization = $creator['organization']->organization_id;
 
+        $process = Process::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $id,
+                ],
+            ]);
+
+
+
+
+
 
         $connection = $this->db;
         //create step0
@@ -335,6 +347,9 @@ class SurveyController extends CrudResourceController
         $step0->organization_id = $organization;
         $step0->save();
         $step0_ID = $step0->getWriteConnection()->lastInsertId();
+        $process->step0 = $step3_0_ID;
+
+
 
         //create step3_0
         $step3_0 = new \App\Model\Survey();
@@ -346,6 +361,9 @@ class SurveyController extends CrudResourceController
         $step3_0->organization_id = $organization;
         $step3_0->save();
         $step3_0_ID = $step3_0->getWriteConnection()->lastInsertId();
+        $process->step3_0 = $step3_0_ID;
+
+
 
         //create step3_1
         $step3_1 = new \App\Model\Survey();
@@ -360,7 +378,7 @@ practically enacting and forcing double-loop learning. The four questions are:
         $step3_1->organization_id = $organization;
         $step3_1->save();
         $step3_1_ID = $step3_1->getWriteConnection()->lastInsertId();
-
+        $process->step3_1 = $step3_1_ID;
 
         //create questions
         $sqlStep0 = "INSERT INTO `survey_questions` (`id`, `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
@@ -435,17 +453,7 @@ practically enacting and forcing double-loop learning. The four questions are:
         $connection->query($sqlStep3_1);
 
 
-        $process = Process::findFirst(
-            [
-                'conditions' => 'id = ?1',
-                'bind' => [
-                    1 => $id,
-                ],
-            ]);
 
-        $process->step0 = $step0_ID;
-        $process->step3_0 = $step3_0_ID;
-        $process->step3_1 = $step3_1_ID;
         $process->save();
 
         $response = [
