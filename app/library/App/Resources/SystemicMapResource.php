@@ -7,7 +7,7 @@ use PhalconRest\Api\ApiEndpoint;
 use App\Model\SystemicMap;
 use App\Controllers\SystemicMapController;
 use App\Constants\AclRoles;
-
+//a
 class SystemicMapResource extends ApiResource
 {
     public function initialize()
