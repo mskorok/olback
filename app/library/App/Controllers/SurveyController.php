@@ -323,15 +323,14 @@ class SurveyController extends CrudResourceController
 
         $organization = $creator['organization']->organization_id;
 
-        $survey = Survey::findFirst(
+        $proc = Process::findFirst(
             [
-                'conditions' => 'id = ?1 AND step0 = ?2',
+                'conditions' => 'id = ?1 AND step0 IS NULL',
                 'bind' => [
-                    1 => $id,
-                    2 => null
+                    1 => $id
                 ],
             ]);
-        if($survey->id) {
+        if($proc->id) {
             //create step0
             $step0 = new \App\Model\Survey();
             $step0->title = "The self-evaluation questionnaire";
