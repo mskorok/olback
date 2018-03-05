@@ -323,49 +323,55 @@ class SurveyController extends CrudResourceController
 
         $organization = $creator['organization']->organization_id;
 
+        $survey = Survey::findFirst(
+            [
+                'conditions' => 'id = ?1 AND step0 IS NOT NULL',
+                'bind' => [
+                    1 => $id
+                ],
+            ]);
+        if($survey->id) {
+            //create step0
+            $step0 = new \App\Model\Survey();
+            $step0->title = "The self-evaluation questionnaire";
+            $step0->description = "";
+            $step0->isEditable = 0;
+            $step0->isOlset = 1;
+            $step0->creator = $creator['account']->id;
+            $step0->organization_id = $organization;
 
+            $step0->save();
 
-        //create step0
-        $step0 = new \App\Model\Survey();
-        $step0->title = "The self-evaluation questionnaire";
-        $step0->description = "";
-        $step0->isEditable = 0;
-        $step0->isOlset = 1;
-        $step0->creator = $creator['account']->id;
-        $step0->organization_id = $organization;
+            $step0_ID = $step0->getWriteConnection()->lastInsertId();
 
-        $step0->save();
+            //create step3_0
+            $step3_0 = new \App\Model\Survey();
+            $step3_0->title = "The self-evaluation questionnaire";
+            $step3_0->description = "";
+            $step3_0->isEditable = 0;
+            $step3_0->isOlset = 1;
+            $step3_0->creator = $creator['account']->id;
+            $step3_0->organization_id = $organization;
+            $step3_0->save();
+            $step3_0_ID = $step3_0->getWriteConnection()->lastInsertId();
 
-        $step0_ID = $step0->getWriteConnection()->lastInsertId();
-
-        //create step3_0
-        $step3_0 = new \App\Model\Survey();
-        $step3_0->title = "The self-evaluation questionnaire";
-        $step3_0->description = "";
-        $step3_0->isEditable = 0;
-        $step3_0->isOlset = 1;
-        $step3_0->creator = $creator['account']->id;
-        $step3_0->organization_id = $organization;
-        $step3_0->save();
-        $step3_0_ID = $step3_0->getWriteConnection()->lastInsertId();
-
-        //create step3_1
-        $step3_1 = new \App\Model\Survey();
-        $step3_1->title = "Micro tool/guidelines";
-        $step3_1->description = "On a daily basis Step 3 is performed through the tool named After Action Review (AAR)15. AAR is a
+            //create step3_1
+            $step3_1 = new \App\Model\Survey();
+            $step3_1->title = "Micro tool/guidelines";
+            $step3_1->description = "On a daily basis Step 3 is performed through the tool named After Action Review (AAR)15. AAR is a
 sequence of four questions intended for use right after the conclusion of each individual action/project,
 practically enacting and forcing double-loop learning. The four questions are:
 ";
-        $step3_1->isEditable = 0;
-        $step3_1->isOlset = 1;
-        $step3_1->creator = $creator['account']->id;
-        $step3_1->organization_id = $organization;
-        $step3_1->save();
-        $step3_1_ID = $step3_1->getWriteConnection()->lastInsertId();
+            $step3_1->isEditable = 0;
+            $step3_1->isOlset = 1;
+            $step3_1->creator = $creator['account']->id;
+            $step3_1->organization_id = $organization;
+            $step3_1->save();
+            $step3_1_ID = $step3_1->getWriteConnection()->lastInsertId();
 
-        $connection = $this->db;
-        //create questions
-        $sqlStep0 = "INSERT INTO `survey_questions` (`id`, `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
+            $connection = $this->db;
+            //create questions
+            $sqlStep0 = "INSERT INTO `survey_questions` (`id`, `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
 (NULL, '1. Co-operation agreements with other companies, universities, technical colleges, experts, etc. are promoted.', NULL, 2, 1, $step0_ID),
 (NULL, '2. The organization encourages its employees in various practical ways to join formal or informal networks.', NULL, 2, 2, $step0_ID),
 (NULL, '3. New ideas and approaches on work performance are experimented with continually.', NULL, 2, 3, $step0_ID),
@@ -394,11 +400,11 @@ practically enacting and forcing double-loop learning. The four questions are:
 (NULL, '26. My organization gives people control over the resources they need to accomplish their work.', NULL, 2, 26, $step0_ID),
 (NULL, '27. In my organization, leaders generally support requests for learning opportunities.', NULL, 2, 27, $step0_ID),
 (NULL, '28. In my organization, investment in workers’ skills and professional development is greater than last year.', NULL, 2, 28, $step0_ID)";
-        $connection->query($sqlStep0);
+            $connection->query($sqlStep0);
 
 
-        //create questions
-        $sqlStep3_0 = "INSERT INTO `survey_questions` (`id`, `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
+            //create questions
+            $sqlStep3_0 = "INSERT INTO `survey_questions` (`id`, `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
 (NULL, '1. Co-operation agreements with other companies, universities, technical colleges, experts, etc. are promoted.', NULL, 2, 1, $step3_0_ID),
 (NULL, '2. The organization encourages its employees in various practical ways to join formal or informal networks.', NULL, 2, 2, $step3_0_ID),
 (NULL, '3. New ideas and approaches on work performance are experimented with continually.', NULL, 2, 3, $step3_0_ID),
@@ -427,29 +433,29 @@ practically enacting and forcing double-loop learning. The four questions are:
 (NULL, '26. My organization gives people control over the resources they need to accomplish their work.', NULL, 2, 26, $step3_0_ID),
 (NULL, '27. In my organization, leaders generally support requests for learning opportunities.', NULL, 2, 27, $step3_0_ID),
 (NULL, '28. In my organization, investment in workers’ skills and professional development is greater than last year.', NULL, 2, 28, $step3_0_ID)";
-        $connection->query($sqlStep3_0);
+            $connection->query($sqlStep3_0);
 
 
-        $sqlStep3_1 = "INSERT INTO `survey_questions` ( `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
+            $sqlStep3_1 = "INSERT INTO `survey_questions` ( `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
 ( 'What was the purpose(s) of doing this action/project?', NULL, 1, 1, $step3_1_ID),
 ( 'Did we achieve it and how can we tell/know? (what are the observable facts indicating clearly\r\nthat we achieved or not the purpose(s) identified through the previous question?)', NULL, 1, 1, $step3_1_ID),
 ( 'If we were to repeat the same action/project now, what would we do the same? Why?', NULL, 1, 1, $step3_1_ID)";
-        $connection->query($sqlStep3_1);
+            $connection->query($sqlStep3_1);
 
 
-        $process = Process::findFirst(
-            [
-                'conditions' => 'id = ?1',
-                'bind' => [
-                    1 => $id,
-                ],
-            ]);
+            $process = Process::findFirst(
+                [
+                    'conditions' => 'id = ?1',
+                    'bind' => [
+                        1 => $id,
+                    ],
+                ]);
 
-        $process->step0 = (int) $step0_ID;
-        $process->step3_0 = (int) $step3_0_ID;
-        $process->step3_1 = (int) $step3_1_ID;
-        $process->save();
-
+            $process->step0 = (int)$step0_ID;
+            $process->step3_0 = (int)$step3_0_ID;
+            $process->step3_1 = (int)$step3_1_ID;
+            $process->save();
+        }
         $response = [
             'code' => 1,
             'status' => 'Success'
