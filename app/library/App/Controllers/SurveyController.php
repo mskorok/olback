@@ -325,7 +325,7 @@ class SurveyController extends CrudResourceController
 
         $survey = Survey::findFirst(
             [
-                'conditions' => 'id = ?1 AND step0 IS NOT NULL',
+                'conditions' => 'id = ?1 AND step0 IS NULL',
                 'bind' => [
                     1 => $id
                 ],
