@@ -50,8 +50,13 @@ class OrganizationController extends CrudResourceController
         );
       }
     }
+      $response = [
+          'code' => 1,
+          'status' => 'Success',
+          'data' => $orgs
+      ];
 
-    print_r($orgs);die();
+      return $this->createArrayResponse($response, 'data');
   }
 
 
