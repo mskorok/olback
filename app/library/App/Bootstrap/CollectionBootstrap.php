@@ -14,6 +14,7 @@ use App\Resources\SystemicMapResource;
 use App\Resources\GroupResource;
 use App\Resources\DepartmentResource;
 use App\Resources\SurveyResource;
+use App\Resources\StatisticsResource;
 use Phalcon\Config;
 use Phalcon\DiInterface;
 use PhalconRest\Api;
@@ -34,7 +35,8 @@ class CollectionBootstrap implements BootstrapInterface
             ->resource(new SystemicMapResource('/systemicmap'))
             ->resource(new GroupResource('/group'))
             ->resource(new DepartmentResource('/department'))
-            ->resource(new SurveyResource('/survey'));
+            ->resource(new SurveyResource('/survey'))
+            ->resource(new StatisticsResource('/statistics'));
     }
 }
 // namespace App\Bootstrap;

@@ -454,6 +454,7 @@ practically enacting and forcing double-loop learning. The four questions are:
             $process->step0 = (int)$step0_ID;
             $process->step3_0 = (int)$step3_0_ID;
             $process->step3_1 = (int)$step3_1_ID;
+            $process->organizationId  = $organization;
             $process->save();
         }
         $response = [

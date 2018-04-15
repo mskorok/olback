@@ -13,6 +13,7 @@ class Process extends \App\Mvc\DateTrackingModel
     public $step3_0;
     public $step3_1;
     public $status;
+    public $organizationId;
 
     public function getSource()
     {
@@ -29,7 +30,8 @@ class Process extends \App\Mvc\DateTrackingModel
                 'step0'=>'step0',
                 'step3_0'=>'step3_0',
                 'step3_1'=>'step3_1',
-                'status'=>'status'
+                'status'=>'status',
+                'organizationId'=>'organizationId'
             ];
     }
 
