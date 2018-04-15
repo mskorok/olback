@@ -463,4 +463,32 @@ practically enacting and forcing double-loop learning. The four questions are:
 
         return $this->createArrayResponse($response, 'data');
     }
+
+    public function changeProcessStatus($id){
+        $proc = Process::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $id
+                ],
+            ]);
+        if($proc->status == 1){
+            $proc->status = 0; //set stop
+            $statusDesc = "stopped";
+        }else{
+            $proc->status = 1; //set running
+            $statusDesc = "running";
+        }
+
+
+        $proc->save();
+
+        $response = [
+            'current_status' => $statusDesc,
+            'status' => 'Success'
+        ];
+
+        return $this->createArrayResponse($response, 'data');
+
+    }
 }
