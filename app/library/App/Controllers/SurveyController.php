@@ -492,4 +492,24 @@ practically enacting and forcing double-loop learning. The four questions are:
         return $this->createArrayResponse($response, 'data');
 
     }
+
+    public function getUserSurveyAnswers(){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+        $creator = $this->getUserDetails($creatorId);
+        $sql = 'SELECT questionId,question,answer,question_order,survey_id FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id WHERE A.userId = '.$creator.' ';
+        $connection = $this->db;
+        $data = $connection->query($sql);
+        $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $iresults = $data->fetchAll();
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => $iresults,
+        ];
+
+        return $this->createArrayResponse($response, 'data');
+    }
 }
