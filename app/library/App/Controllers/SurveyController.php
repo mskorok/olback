@@ -514,7 +514,7 @@ practically enacting and forcing double-loop learning. The four questions are:
     }
 
 
-    public function getSurveyAnswers(){
+    public function getSurveyAnswers($id){
         if ($this->authManager->loggedIn()) {
             $session = $this->authManager->getSession();
             $creatorId = $session->getIdentity();
