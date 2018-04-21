@@ -522,7 +522,7 @@ practically enacting and forcing double-loop learning. The four questions are:
         $creator = $this->getUserDetails($creatorId);
 
         $organization = $creator['organization']->organization_id;
-        $sql = 'SELECT questionId,question,answer,question_order,survey_id,userId FROM survey S INNER JOIN survey_questions SQ ON S.id = SQ.survey_id INNER JOIN answers A ON SQ.id = A.questionId WHERE S.organization_id = '.$organization.' AND S.id = '.$id.'  ';
+        $sql = 'SELECT questionId,question,answer,question_order,survey_id,userId FROM survey S INNER JOIN survey_questions SQ ON S.id = SQ.survey_id  LEFT JOIN answers A ON SQ.id = A.questionId WHERE S.organization_id = '.$organization.' AND S.id = '.$id.'  ';
         $connection = $this->db;
         $data = $connection->query($sql);
         $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
