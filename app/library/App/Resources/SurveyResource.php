@@ -35,6 +35,11 @@ class SurveyResource extends ApiResource
                 ->allow(AclRoles::MANAGER)
                 ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                 ->description('init process'))
+            ->endpoint(ApiEndpoint::get('/getSurveyAnswers/{id}', 'getSurveyAnswers')
+                ->allow(AclRoles::MANAGER)
+                ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                ->description('get Survey Answers'))
+
             ->endpoint(ApiEndpoint::get('/changeProcessStatus/{id}', 'changeProcessStatus')
                 ->allow(AclRoles::MANAGER)
                 ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
