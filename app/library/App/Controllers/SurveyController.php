@@ -535,4 +535,48 @@ practically enacting and forcing double-loop learning. The four questions are:
 
         return $this->createArrayResponse($response, 'data');
     }
+
+
+    public function helpPage(){
+
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+
+        $to_slug = $data->slug;
+        $find_help_post = array(
+            'name'        => $to_slug,
+            'post_type'   => 'help',
+            'post_status' => 'publish'
+        );
+
+        $help_post_result = get_posts($find_help_post);
+
+        if ($help_post_result.isEmpty) {
+
+            $help_post = array(
+                'post_title'    => 'O titlos',
+                'post_name'		=> $to_slug,
+                'post_type'		=> 'help',
+                'post_status'   => 'publish'
+            );
+
+            $help_post_id = wp_insert_post( $help_post );
+
+            $response = [
+                'code' => 0,
+                'status' => 'Success',
+                'msg' => 'page not exists created just now with id: ' . $help_post_id,
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        } else {
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+                'data' => $help_post_result[0]->post_content,
+            ];
+            return $this->createArrayResponse($response, 'data');
+
+        }
+    }
 }

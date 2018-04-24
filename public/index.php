@@ -1,5 +1,5 @@
 <?php
-
+require_once("/var/www/wp-load.php");
 /** @var \Phalcon\Config $config */
 $config = null;
 
