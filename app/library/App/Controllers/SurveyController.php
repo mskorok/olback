@@ -554,7 +554,7 @@ practically enacting and forcing double-loop learning. The four questions are:
         if (empty($help_post_result)) {
 
             $help_post = array(
-                'post_title'    => 'O titlos',
+                'post_title'    => $to_slug,
                 'post_name'		=> $to_slug,
                 'post_type'		=> 'help',
                 'post_status'   => 'publish'
