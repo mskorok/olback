@@ -551,7 +551,7 @@ practically enacting and forcing double-loop learning. The four questions are:
 
         $help_post_result = get_posts($find_help_post);
 
-        if ($help_post_result.isEmpty) {
+        if (empty($help_post_result)) {
 
             $help_post = array(
                 'post_title'    => 'O titlos',
