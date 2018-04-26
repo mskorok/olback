@@ -600,28 +600,34 @@ practically enacting and forcing double-loop learning. The four questions are:
         $iresults = $data->fetchAll();
         $processes = array();
         foreach ($iresults as $val) {
-            $sql_isCompleted_step0 = "SELECT count(A.id) as countAnswers FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id WHERE A.userId = 37 AND SQ.survey_id = ".$val['step0']." ";
+            //SELECT count(A.id) as countAnswers,S.title FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON SQ.survey_id = S.id WHERE A.userId = 37 AND SQ.survey_id = 20
+            $sql_isCompleted_step0 = "SELECT count(A.id) as countAnswers,S.title FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON SQ.survey_id = S.id  WHERE A.userId = 37 AND SQ.survey_id = ".$val['step0']." ";
             $data_isCompleted_step0 = $connection->query($sql_isCompleted_step0);
             $data_isCompleted_step0->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
             $iresults_isCompleted_step0 = $data_isCompleted_step0->fetchAll();
 
-            $sql_isCompleted_step3_0 = "SELECT count(A.id) as countAnswers FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id WHERE A.userId = 37 AND SQ.survey_id = ".$val['step3_0']." ";
+            $sql_isCompleted_step3_0 = "SELECT count(A.id) as countAnswers,S.title FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON SQ.survey_id = S.id  WHERE A.userId = 37 AND SQ.survey_id = ".$val['step3_0']." ";
             $data_isCompleted_step3_0 = $connection->query($sql_isCompleted_step3_0);
             $data_isCompleted_step3_0->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
             $iresults_isCompleted_step3_0 = $data_isCompleted_step3_0->fetchAll();
 
-            $sql_isCompleted_step3_1 = "SELECT count(A.id) as countAnswers FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id WHERE A.userId = 37 AND SQ.survey_id = ".$val['step3_1']." ";
+            $sql_isCompleted_step3_1 = "SELECT count(A.id) as countAnswers,S.title FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON SQ.survey_id = S.id  WHERE A.userId = 37 AND SQ.survey_id = ".$val['step3_1']." ";
             $data_isCompleted_step3_1 = $connection->query($sql_isCompleted_step3_1);
             $data_isCompleted_step3_1->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
             $iresults_isCompleted_step3_1 = $data_isCompleted_step3_1->fetchAll();
 
 
             $processes[$val['id']] = array(
-                "step0" => array("id"=>$val['step0'], "isCompleted"=>$iresults_isCompleted_step0[0]["countAnswers"]),
-                "step3_0" => array("id"=>$val['step3_0'], "isCompleted"=>$iresults_isCompleted_step3_0[0]["countAnswers"]),
-                "step3_1" => array("id"=>$val['step3_1'], "isCompleted"=>$iresults_isCompleted_step3_1[0]["countAnswers"]));
+                "step0" => array("id"=>$val['step0'],"title"=>$iresults_isCompleted_step0[0]["title"], "isCompleted"=> ($iresults_isCompleted_step0[0]["countAnswers"]>0 ? 1 : 0 ),
+                "step3_0" => array("id"=>$val['step3_0'],"title"=>$iresults_isCompleted_step3_0[0]["title"], "isCompleted"=>($iresults_isCompleted_step3_0[0]["countAnswers"]>0 ? 1 : 0 )),
+                "step3_1" => array("id"=>$val['step3_1'],"title"=>$iresults_isCompleted_step3_1[0]["title"], "isCompleted"=>($iresults_isCompleted_step3_1[0]["countAnswers"]>0 ? 1 : 0 ))));
         }
-print_r($processes);die();
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => $processes,
+        ];
+        return $this->createArrayResponse($response, 'data');
 
     }
 }
