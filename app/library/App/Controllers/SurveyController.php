@@ -579,4 +579,27 @@ practically enacting and forcing double-loop learning. The four questions are:
 
         }
     }
+
+
+    public function availableUserSurveys(){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+        $user = $this->getUserDetails($creatorId);
+        $sql_getProcesses = 'SELECT PR.id,PR.`step0`, PR.`step3_0`, PR.`step3_1`
+                FROM `process` PR
+                INNER JOIN survey S ON PR.`step0`= S.id OR PR.`step3_0`= S.id OR PR.`step3_1`= S.id
+                WHERE PR.id IN (SELECT  `processId` FROM `process_departments` WHERE `departmentId` IN (SELECT department_id FROM user_department WHERE user_id =  '.$user.' )) OR
+                PR.id IN (SELECT  `processId` FROM `process_organizations` WHERE `organizationId` IN (SELECT organization_id FROM user_organization WHERE user_id =  '.$user.' )) OR
+                PR.id IN (SELECT `processId` FROM `process_users` WHERE userId = '.$user.' ) GROUP BY PR.`step0`, PR.`step3_0`, PR.`step3_1`';
+        $connection = $this->db;
+        $data = $connection->query($sql_getProcesses);
+        $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        foreach ($data as $val) {
+            echo $val['id'];
+        }
+die();
+
+    }
 }
