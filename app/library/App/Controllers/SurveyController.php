@@ -593,6 +593,7 @@ practically enacting and forcing double-loop learning. The four questions are:
                 WHERE PR.id IN (SELECT  `processId` FROM `process_departments` WHERE `departmentId` IN (SELECT department_id FROM user_department WHERE user_id =  '.$creatorId.' )) OR
                 PR.id IN (SELECT  `processId` FROM `process_organizations` WHERE `organizationId` IN (SELECT organization_id FROM user_organization WHERE user_id =  '.$creatorId.' )) OR
                 PR.id IN (SELECT `processId` FROM `process_users` WHERE userId = '.$creatorId.' ) GROUP BY PR.`step0`, PR.`step3_0`, PR.`step3_1`,PR.`id`';
+        echo $sql_getProcesses;die();
         $connection = $this->db;
         $data = $connection->query($sql_getProcesses);
         $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
