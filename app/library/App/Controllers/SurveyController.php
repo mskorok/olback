@@ -597,6 +597,7 @@ practically enacting and forcing double-loop learning. The four questions are:
         $connection = $this->db;
         $data = $connection->query($sql_getProcesses);
         $data->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        var_dump($data);die();
         foreach ($data as $val) {
             var_dump($val);
         }
