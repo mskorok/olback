@@ -625,7 +625,7 @@ practically enacting and forcing double-loop learning. The four questions are:
         $response = [
             'code' => 1,
             'status' => 'Success',
-            'data' => $processes,
+            'data' => array($processes)
         ];
         return $this->createArrayResponse($response, 'data');
 
