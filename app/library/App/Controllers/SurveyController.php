@@ -618,9 +618,9 @@ practically enacting and forcing double-loop learning. The four questions are:
 
 
             $processes[$val['id']] = array(
-                "step0" => array("id"=>$val['step0'],"title"=>$iresults_isCompleted_step0[0]["title"], "isCompleted"=> ($iresults_isCompleted_step0[0]["countAnswers"]>0 ? 1 : 0 ),
+                "step0" => array("id"=>$val['step0'],"title"=>$iresults_isCompleted_step0[0]["title"], "isCompleted"=> ($iresults_isCompleted_step0[0]["countAnswers"]>0 ? 1 : 0 )),
                 "step3_0" => array("id"=>$val['step3_0'],"title"=>$iresults_isCompleted_step3_0[0]["title"], "isCompleted"=>($iresults_isCompleted_step3_0[0]["countAnswers"]>0 ? 1 : 0 )),
-                "step3_1" => array("id"=>$val['step3_1'],"title"=>$iresults_isCompleted_step3_1[0]["title"], "isCompleted"=>($iresults_isCompleted_step3_1[0]["countAnswers"]>0 ? 1 : 0 ))));
+                "step3_1" => array("id"=>$val['step3_1'],"title"=>$iresults_isCompleted_step3_1[0]["title"], "isCompleted"=>($iresults_isCompleted_step3_1[0]["countAnswers"]>0 ? 1 : 0 )));
         }
         $response = [
             'code' => 1,
