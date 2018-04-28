@@ -556,4 +556,84 @@ $organization_id = $data->organization;
     }
 
 
+    public function updateUser(){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+
+
+        $user = User::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $creatorId
+                ],
+            ]);
+
+        if($user) {
+            $user->firstName = $data->firstName;
+            $user->lastName = $data->lastName;
+            $user->location = $data->location;
+            if ($user->save() == false) {
+                $messagesErrors = array();
+                foreach ($user->getMessages() as $message) {
+                    // print_r($message);
+                    $messagesErrors[] = $message;
+                }
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => $messagesErrors,
+                ];
+            } else {
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success'
+                ];
+            }
+        }else{
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "User not found",
+            ];
+        }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public static function getUserDetails($userId)
+    {
+        $user = User::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $userId,
+                ],
+            ]
+        );
+        if ($user) {
+            $organization = UserOrganization::findFirst(
+                [
+                    'conditions' => 'user_id = ?1',
+                    'bind' => [
+                        1 => $userId,
+                    ],
+                ]
+            );
+
+            if ($organization) {
+                return array('account' => $user, 'organization' => $organization);
+            } else {
+                return array('account' => $user, 'organization' => null);
+            }
+        } else {
+            return null;
+        }
+    }
+
 }
