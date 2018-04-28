@@ -587,7 +587,7 @@ practically enacting and forcing double-loop learning. The four questions are:
             $creatorId = $session->getIdentity();
         }
         $user = $this->getUserDetails($creatorId);
-        $sql_getProcesses = 'SELECT PR.id,PR.`step0`, PR.`step3_0`, PR.`step3_1`
+        $sql_getProcesses = 'SELECT PR.id,PR.title, PR.`step0`, PR.`step3_0`, PR.`step3_1`
                 FROM `process` PR
                 INNER JOIN survey S ON PR.`step0`= S.id OR PR.`step3_0`= S.id OR PR.`step3_1`= S.id
                 WHERE PR.id IN (SELECT  `processId` FROM `process_departments` WHERE `departmentId` IN (SELECT department_id FROM user_department WHERE user_id =  '.$creatorId.' )) OR
@@ -619,6 +619,7 @@ practically enacting and forcing double-loop learning. The four questions are:
 
             $processes[] = array(
                 "processId"=>$val['id'],
+                "process_title"=>$val['title'],
                 "surveys"=>array(
                 "step0" => array("id"=>$val['step0'],"title"=>$iresults_isCompleted_step0[0]["title"], "isCompleted"=> ($iresults_isCompleted_step0[0]["countAnswers"]>0 ? 1 : 0 )),
                 "step3_0" => array("id"=>$val['step3_0'],"title"=>$iresults_isCompleted_step3_0[0]["title"], "isCompleted"=>($iresults_isCompleted_step3_0[0]["countAnswers"]>0 ? 1 : 0 )),
