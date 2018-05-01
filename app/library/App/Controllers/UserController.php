@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Model\ProcessUsers;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 // use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
 use App\Model\User;
@@ -636,4 +637,35 @@ $organization_id = $data->organization;
         }
     }
 
+    public function getProcessPermissions($permissionId){
+        $processDepartments =  ProcessDepartments::find(
+            [
+                'conditions' => 'processId = ?1',
+                'bind' => [
+                    1 =>$permissionId
+                ],
+            ]
+        );
+
+        $processUsers =  ProcessUsers::find(
+            [
+                'conditions' => 'processId = ?1',
+                'bind' => [
+                    1 =>$permissionId
+                ],
+            ]
+        );
+
+        $permissions = array();
+        $permissions['departments'] = $processDepartments;
+        $permissions['users'] = $processUsers;
+
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => $permissions
+        ];
+
+        return $this->createArrayResponse($response, 'data');
+    }
 }
