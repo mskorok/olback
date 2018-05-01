@@ -638,6 +638,10 @@ $organization_id = $data->organization;
     }
 
     public function getProcessPermissions($permissionId){
+
+        $permissions = array();
+//        $permissions['departments'] = $processDepartments;
+//        $permissions['users'] = $processUsers;
         $processDepartments =  ProcessDepartments::find(
             [
                 'conditions' => 'processId = ?1',
@@ -646,6 +650,7 @@ $organization_id = $data->organization;
                 ],
             ]
         );
+
 
         $processUsers =  ProcessUsers::find(
             [
@@ -656,16 +661,21 @@ $organization_id = $data->organization;
             ]
         );
 
-        $permissions = array();
-        $permissions['departments'] = $processDepartments;
-        $permissions['users'] = $processUsers;
+        foreach ($processDepartments as $dep) {
+            $permissions['departments'][] = $dep->departmentId;
+        }
+
+
+
+        foreach ($processUsers as $depU) {
+            $permissions['users'][] = $depU->userId;
+        }
 
         $response = [
             'code' => 1,
             'status' => 'Success',
             'data' => $permissions
         ];
-
         return $this->createArrayResponse($response, 'data');
     }
 }
