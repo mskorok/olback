@@ -662,13 +662,13 @@ $organization_id = $data->organization;
         );
 
         foreach ($processDepartments as $dep) {
-            $permissions['departments'][] = $dep->departmentId;
+            $permissions['departments'][] = (int) $dep->departmentId;
         }
 
 
 
         foreach ($processUsers as $depU) {
-            $permissions['users'][] = $depU->userId;
+            $permissions['users'][] = (int) $depU->userId;
         }
 
         $response = [
