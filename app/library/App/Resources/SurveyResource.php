@@ -70,6 +70,8 @@ class SurveyResource extends ApiResource
                 ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                 ->description('help Page'))
          ->endpoint(ApiEndpoint::get('/getQuestions/{id}', 'getQuestion')
+              ->allow(AclRoles::USER,AclRoles::MANAGER, AclRoles::AUTHORIZED)
+              ->deny(AclRoles::UNAUTHORIZED)
               ->description('get survey question'));
     }
 }
