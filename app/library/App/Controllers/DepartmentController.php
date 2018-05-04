@@ -68,10 +68,20 @@ class DepartmentController extends CrudResourceController
           ]
         );
 
+        $deps = array();
+        foreach ($departments as $d){
+            $deps[] = array(
+                "id"=>(int)$d->id,
+                "title"=>$d->title,
+                "description"=>$d->description,
+                "organization_id"=>$d->organization_id
+            );
+        }
+
         $response = [
           'code' => 1,
           'status' => 'Success',
-          'data' => $departments,
+          'data' => $deps,
         ];
 
         return $this->createArrayResponse($response, 'data');
