@@ -1509,7 +1509,7 @@ $action_grp_list = new ActionListGroup();
             ]);
 
         if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
-            $systemicStructureMap = SystemicSructureMap::findFirst(
+            $systemicStructureMap = SystemicStructureMap::findFirst(
                 [
                     'conditions' => 'id = ?1 AND organization = ?2',
                     'bind' => [
