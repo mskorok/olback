@@ -302,4 +302,92 @@ class DepartmentController extends CrudResourceController
         }
         return $this->createArrayResponse($response, 'data');
     }
+
+
+    public function getUserDepartments($userId){
+
+        $userDepartments = UserDepartment::find(
+            [
+                'conditions' => 'user_id = ?1',
+                'bind' => [
+                    1 => $userId,
+                ],
+            ]);
+
+        $departmentIds = array();
+        foreach ($userDepartments as $d){
+            $departmentIds[] = $d->departmentId;
+        }
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => $departmentIds
+        ];
+        return $this->createArrayResponse($response, 'data');
+    }
+
+
+    public function updateUserDepartments($userId){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+
+        //check for user
+        $user = User::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $userId,
+                ],
+            ]
+        );
+        if ($user) {
+            $userDepartments = UserDepartment::find(
+                [
+                    'conditions' => 'user_id = ?1',
+                    'bind' => [
+                        1 => $userId,
+                    ],
+                ]);
+
+
+            foreach ($userDepartments as $d){
+                $d->delete();
+            }
+
+            foreach($data->departments as $departmentId){
+                $department = new UserDepartment();
+                $department->user_id = $userId;
+                $department->department_id = $departmentId;
+                if ($department->save() == false) {
+                    $messagesErrors = array();
+                    foreach ($department->getMessages() as $message) {
+                        // print_r($message);
+                        $messagesErrors[] = $message;
+                    }
+                    $response = [
+                        'code' => 0,
+                        'status' => 'Error',
+                        'data' => $messagesErrors,
+                    ];
+                    return $this->createArrayResponse($response, 'data');
+                }
+            }
+
+            $response = [
+                'code' => 1,
+                'status' => 'Success'
+            ];
+        }else{
+            $response = [
+                'code' => 0,
+                'status' => 'You are not authorized to update departments'
+            ];
+        }
+        return $this->createArrayResponse($response, 'data');
+    }
 }
