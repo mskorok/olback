@@ -7,6 +7,7 @@ use PhalconRest\Mvc\Controllers\CrudResourceController;
 use App\Model\UserOrganization;
 use App\Model\User;
 use App\Model\SystemicMap;
+use App\Model\SystemicSructureMap;
 use App\Model\SystemicMapItems;
 use App\Model\SystemicMapChain;
 use App\Model\ActionListGroup;
@@ -1401,4 +1402,81 @@ $action_grp_list = new ActionListGroup();
 
         return true;
     }
+
+    public function createSystemicStructureMap()
+    {
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+        $creator = $this->getUserDetails($creatorId);
+        if ($creator['organization'] == null) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+
+        //check for required fields
+        $validate = array(
+            'name' => array('mandatory' => true, 'regex' => null),
+        );
+
+        $missing_input = array();
+
+        foreach ($data as $key => $val) {
+            $mandatory = isset($validate[$key]) ? $validate[$key] : false;
+            if ($mandatory && !trim($val)) {
+                $missing_input[] = $key;
+            }
+        }
+
+        if (!empty($missing_input)) {
+            $response = [
+                'code' => 0,
+                'status' => 'Required field: '.implode(', ', $missing_input),
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $systemicStructureMap = new \App\Model\SystemicStructureMap();
+        $systemicStructureMap->name = $data->name;
+        $systemicStructureMap->byWhom = $creatorId;
+
+        $systemicStructureMap->organization = $organization_id;
+        $systemicStructureMap->lang = $data->lang;
+        $systemicStructureMap->isActive = $data->isActive;
+        $systemicStructureMap->processId = $data->processId;
+        $systemicStructureMap->startDate = $data->startDate;
+        $systemicStructureMap->endDate = $data->endDate;
+        if ($systemicStructureMap->save() == false) {
+            $messagesErrors = array();
+            foreach ($systemicStructureMap->getMessages() as $message) {
+                // print_r($message);
+                $messagesErrors[] = $message;
+            }
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $messagesErrors,
+            ];
+        } else {
+            $systemicMapId = $systemicStructureMap->getWriteConnection()->lastInsertId();
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+                'data' => array('systemicStructureMapId' => $systemicMapId),
+            ];
+        }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
 }
