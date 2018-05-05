@@ -203,7 +203,7 @@ class DepartmentController extends CrudResourceController
         );
         if ($user) {
             foreach($data->departments as $department){
-                $department = new \App\Model\UserDepartment();
+                $department = new UserDepartment();
                 $department->user_id = $userId;
                 $department->department_id = $department;
                 $department->save();
