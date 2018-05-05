@@ -8,6 +8,7 @@ use PhalconRest\Mvc\Controllers\CrudResourceController;
 use App\Model\UserOrganization;
 use App\Model\User;
 use App\Model\Department;
+use App\Model\UserDepartment;
 use Phalcon\Http\Request;
 
 class DepartmentController extends CrudResourceController
@@ -180,5 +181,47 @@ class DepartmentController extends CrudResourceController
         } else {
             return null;
         }
+    }
+
+    public function assignUserDepartment($userId){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+
+        //check for user
+        $user = User::findFirst(
+            [
+                'conditions' => 'email = ?1 OR username = ?2',
+                'bind' => [
+                    1 => $data->email,
+                    2 => $data->username,
+                ],
+            ]
+        );
+        if ($user) {
+            foreach($data as $department){
+                $department = new \App\Model\UserDepartment();
+                $department->user_id = $userId;
+                $department->department_id = $department;
+                $department->save();
+            }
+
+            $response = [
+                'code' => 1,
+                'status' => 'Success'
+            ];
+        }else{
+            $response = [
+                'code' => 0,
+                'status' => 'User does not exists'
+            ];
+        }
+
+
+        return $this->createArrayResponse($response, 'data');
     }
 }
