@@ -29,6 +29,11 @@ class OrganizationResource extends ApiResource {
               ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
               ->description('get organizations')
           )
+          ->endpoint(ApiEndpoint::put('/', 'updateOrg')
+              ->allow(AclRoles::MANAGER)
+              ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
+              ->description('update organizations')
+          )
 
           ->endpoint(ApiEndpoint::post('/organization', 'createOrg')
               ->allow(AclRoles::MANAGER)

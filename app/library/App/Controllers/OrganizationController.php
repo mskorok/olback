@@ -102,4 +102,54 @@ class OrganizationController extends CrudResourceController
      return $this->createArrayResponse($response, 'data');
 
   }
+
+  public function updateOrg(){
+      if ($this->authManager->loggedIn()) {
+          $session = $this->authManager->getSession();
+          $userId = $session->getIdentity(); // For example; 1
+          // $user = \Users::findFirstById($userId);
+      }
+
+      $request = new Request();
+      $data = $request->getJsonRawBody();
+
+      $organization = Organization::findFirst(
+          [
+              'conditions' => 'userId = ?1',
+              'bind'       => [
+                  1 => $userId
+              ]
+          ]
+      );
+
+      if($organization) {
+          if (isset($data->name))
+              $organization->name = $data->name;
+          if (isset($data->description))
+              $organization->description = $data->description;
+          if ($organization->save() == false) {
+              $messagesErrors = array();
+              foreach ($organization->getMessages() as $message) {
+                  $messagesErrors[] = $message;
+              }
+              $response = [
+                  'code' => 0,
+                  'status' => 'Error',
+                  'data' => $messagesErrors
+              ];
+          } else {
+              $response = [
+                  'code' => 1,
+                  'status' => 'Success'
+              ];
+          };
+      }else{
+          $response = [
+              'code' => 0,
+              'status' => 'Organization does not exist'
+          ];
+      }
+      return $this->createArrayResponse($response, 'data');
+
+  }
 }
