@@ -2,12 +2,13 @@
 
 namespace App\Controllers;
 
+use App\Model\SystemicStructureMap;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 // use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
 use App\Model\UserOrganization;
 use App\Model\User;
 use App\Model\SystemicMap;
-use App\Model\SystemicSructureMap;
+use App\Model\SystemicStructureMap;
 use App\Model\SystemicMapItems;
 use App\Model\SystemicMapChain;
 use App\Model\ActionListGroup;
