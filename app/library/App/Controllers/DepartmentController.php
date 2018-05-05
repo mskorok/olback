@@ -316,7 +316,7 @@ class DepartmentController extends CrudResourceController
 
         $departmentIds = array();
         foreach ($userDepartments as $d){
-            $departmentIds[] = $d->department_id;
+            $departmentIds[] = (int)$d->department_id;
         }
         $response = [
             'code' => 1,
