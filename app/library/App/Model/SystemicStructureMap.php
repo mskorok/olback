@@ -6,7 +6,7 @@ class SystemicStructureMap extends \App\Mvc\DateTrackingModel
 {
     public $id;
     public $name;
-    public $byWhom;
+    public $by_whom;
     public $organization;
     public $isActive;
     public $lang;
@@ -24,7 +24,7 @@ class SystemicStructureMap extends \App\Mvc\DateTrackingModel
         return parent::columnMap() + [
             'id' => 'id',
             'name' => 'name',
-            'byWhom' => 'by_whom',
+            'by_whom' => 'by_whom',
             'organization'=>'organization',
             'lang' => 'lang',
             'isActive'=>'isActive',

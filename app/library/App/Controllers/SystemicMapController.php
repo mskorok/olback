@@ -1448,7 +1448,7 @@ $action_grp_list = new ActionListGroup();
         }
         $systemicStructureMap = new \App\Model\SystemicStructureMap();
         $systemicStructureMap->name = $data->name;
-        $systemicStructureMap->byWhom = $creatorId;
+        $systemicStructureMap->by_whom = $creatorId;
 
         $systemicStructureMap->organization = $organization_id;
         $systemicStructureMap->lang = $data->lang;
