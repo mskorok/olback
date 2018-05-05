@@ -195,15 +195,14 @@ class DepartmentController extends CrudResourceController
         //check for user
         $user = User::findFirst(
             [
-                'conditions' => 'email = ?1 OR username = ?2',
+                'conditions' => 'id = ?1',
                 'bind' => [
-                    1 => $data->email,
-                    2 => $data->username,
+                    1 => $userId,
                 ],
             ]
         );
         if ($user) {
-            foreach($data as $department){
+            foreach($data->departments as $department){
                 $department = new \App\Model\UserDepartment();
                 $department->user_id = $userId;
                 $department->department_id = $department;
