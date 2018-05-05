@@ -1479,4 +1479,76 @@ $action_grp_list = new ActionListGroup();
         return $this->createArrayResponse($response, 'data');
     }
 
+
+    public function updateSystemicStructureMap($id)
+    {
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $userId = $session->getIdentity(); // For example; 1
+        }
+        $creator = $this->getUserDetails($userId);
+        if ($creator['organization'] == null) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+        $user = User::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $userId,
+                ],
+            ]);
+
+        if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
+            $systemicStructureMap = SystemicSructureMap::findFirst(
+                [
+                    'conditions' => 'id = ?1 AND organization = ?2',
+                    'bind' => [
+                        1 => $id,
+                        2 => $organization_id,
+                    ],
+                ]);
+        } else {
+            $systemicStructureMap = false;
+        }
+        if ($systemicStructureMap) {
+            if (isset($data->name)) {
+                $systemicStructureMap->name = $data->name;
+            }
+            if (isset($data->startDate)) {
+                $systemicStructureMap->startDate = $data->startDate;
+            }
+            if (isset($data->endDate)) {
+                $systemicStructureMap->endDate = $data->endDate;
+            }
+            if (isset($data->lang)) {
+                $systemicStructureMap->lang = $data->lang;
+            }
+            if (isset($data->isActive)) {
+                $systemicStructureMap->isActive = $data->isActive;
+            }
+            $systemicStructureMap->save();
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+            ];
+        } else {
+            $response = [
+                'code' => 0,
+                'status' => 'You cannot edit this systemic map!',
+            ];
+        }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
 }
