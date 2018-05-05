@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Model\ProcessDepartments;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 // use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
 // use App\Model\Group;
@@ -233,6 +234,72 @@ class DepartmentController extends CrudResourceController
         }
 
 
+        return $this->createArrayResponse($response, 'data');
+    }
+
+
+    public function deleteDepartment($departmentId){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+        $creator = $this->getUserDetails($creatorId);
+        $organization = $creator['organization']->organization_id;
+
+        //check if user is authorized to delete the department
+        $department = Department::findFirst(
+            [
+                'conditions' => 'id = ?1 AND organization_id = ?2',
+                'bind' => [
+                    1 => $departmentId,
+                    2 => $organization,
+                ],
+            ]);
+
+        if($department){
+            $userDepartment = UserDepartment::findFirst(
+                [
+                    'conditions' => 'department_id = ?1',
+                    'bind' => [
+                        1 => $departmentId,
+                    ],
+                ]);
+                if($userDepartment){
+                    $response = [
+                        'code' => 0,
+                        'status' => 'Assigned users'
+                    ];
+                    return $this->createArrayResponse($response, 'data');
+                }
+
+            $processDepartment = ProcessDepartments::findFirst(
+                [
+                    'conditions' => 'departmentId = ?1',
+                    'bind' => [
+                        1 => $departmentId,
+                    ],
+                ]);
+            if($processDepartment){
+                $response = [
+                    'code' => 0,
+                    'status' => 'Assigned processes'
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+
+            $department->delete();
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+            ];
+
+
+        }else{
+            $response = [
+                'code' => 0,
+                'status' => 'You are not authorized to delete the department'
+            ];
+        }
         return $this->createArrayResponse($response, 'data');
     }
 }
