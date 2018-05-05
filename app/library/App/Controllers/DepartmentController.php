@@ -202,10 +202,10 @@ class DepartmentController extends CrudResourceController
             ]
         );
         if ($user) {
-            foreach($data->departments as $department){
+            foreach($data->departments as $departmentId){
                 $department = new UserDepartment();
                 $department->user_id = $userId;
-                $department->department_id = $department;
+                $department->department_id = $departmentId;
                 if ($department->save() == false) {
                     $messagesErrors = array();
                     foreach ($department->getMessages() as $message) {
