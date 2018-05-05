@@ -8,7 +8,6 @@ use PhalconRest\Mvc\Controllers\CrudResourceController;
 use App\Model\UserOrganization;
 use App\Model\User;
 use App\Model\SystemicMap;
-use App\Model\SystemicStructureMap;
 use App\Model\SystemicMapItems;
 use App\Model\SystemicMapChain;
 use App\Model\ActionListGroup;
@@ -1510,7 +1509,7 @@ $action_grp_list = new ActionListGroup();
             ]);
 
         if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
-            $systemicStructureMap = SystemicStructureMap::findFirst(
+            $systemicStructureMap = \App\Model\SystemicStructureMap::findFirst(
                 [
                     'conditions' => 'id = ?1 AND organization = ?2',
                     'bind' => [
