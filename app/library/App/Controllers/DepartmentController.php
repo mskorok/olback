@@ -206,7 +206,19 @@ class DepartmentController extends CrudResourceController
                 $department = new UserDepartment();
                 $department->user_id = $userId;
                 $department->department_id = $department;
-                $department->save();
+                if ($department->save() == false) {
+                    $messagesErrors = array();
+                    foreach ($department->getMessages() as $message) {
+                        // print_r($message);
+                        $messagesErrors[] = $message;
+                    }
+                    $response = [
+                        'code' => 0,
+                        'status' => 'Error',
+                        'data' => $messagesErrors,
+                    ];
+                    return $this->createArrayResponse($response, 'data');
+                }
             }
 
             $response = [
