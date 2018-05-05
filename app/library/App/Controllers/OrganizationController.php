@@ -73,9 +73,23 @@ class OrganizationController extends CrudResourceController
       // $user = \Users::findFirstById($userId);
     }
 
+      $organizationCheck = Organization::findFirst(
+          [
+              'conditions' => 'userId = ?1',
+              'bind'       => [
+                  1 => $userId
+              ]
+          ]
+      );
 
-// var_dump($data->name);die();
-// echo "Dfsds";die();
+      if($organizationCheck) {
+          $response = [
+              'code' => 1,
+              'status' => 'Cannot create organization'
+          ];
+
+          return $this->createArrayResponse($response, 'data');
+      }
 
 
     //
