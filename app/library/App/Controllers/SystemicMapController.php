@@ -1551,4 +1551,96 @@ $action_grp_list = new ActionListGroup();
         return $this->createArrayResponse($response, 'data');
     }
 
+
+    public function createSystemicStructureMapItem()
+    {
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+
+        $validate = array(
+            'systemic_map_id' => array('mandatory' => true, 'regex' => null),
+            'question' => array('mandatory' => true, 'regex' => null),
+        );
+
+        $missing_input = array();
+
+        foreach ($data as $key => $val) {
+            $mandatory = isset($validate[$key]) ? $validate[$key] : false;
+            if ($mandatory && !trim($val)) {
+                $missing_input[] = $key;
+            }
+        }
+
+        if (!empty($missing_input)) {
+            $response = [
+                'code' => 0,
+                'status' => 'Required field: '.implode(', ', $missing_input),
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+
+        if ($data->proposal == '') {
+            $dp = '-';
+        } else {
+            $dp = $data->proposal;
+        }
+
+        $systemicStructureItem = new \App\Model\SystemicStructureMapItems();
+        $systemicStructureItem->systemic_map_id = $data->systemic_map_id;
+        $systemicStructureItem->question = $data->question;
+        $systemicStructureItem->proposal = $dp;
+        $systemicStructureItem->groupId = $data->groupId;
+        $systemicStructureItem->userId = $creatorId;
+        if ($systemicStructureItem->save() == false) {
+            $messagesErrors = array();
+            foreach ($systemicStructureItem->getMessages() as $message) {
+                //  print_r($message);
+                $messagesErrors[] = $message;
+            }
+            //die();
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $messagesErrors,
+            ];
+        } else {
+            $systemicStructureMapItemId = $systemicStructureItem->getWriteConnection()->lastInsertId();
+            $chain = new \App\Model\SystemicStructureMapChain();
+            if ($data->from_item == '') {
+                $chain->from_item = null;
+            } else {
+                $chain->from_item = $data->from_item;
+            }
+            $chain->to_item = $systemicStructureMapItemId;
+            if ($chain->save() == false) {
+                $messagesErrors = array();
+                foreach ($chain->getMessages() as $message) {
+                    $messagesErrors[] = $message;
+                }
+                //die();
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => $messagesErrors,
+                ];
+
+                return $this->createArrayResponse($response, 'data');
+            }
+
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+                'data' => array('systemicStructureMapItemId' => $systemicStructureMapItemId),
+            ];
+        }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
 }
