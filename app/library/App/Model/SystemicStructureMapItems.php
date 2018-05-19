@@ -10,6 +10,7 @@ class SystemicStructureMapItems extends \App\Mvc\DateTrackingModel
     public $proposal;
     public $groupId;
     public $userId;
+    public $itemType;
 
     public function getSource()
     {
@@ -24,7 +25,8 @@ class SystemicStructureMapItems extends \App\Mvc\DateTrackingModel
             'question' => 'question',
             'proposal'=>'proposal',
             'groupId'=>'groupId',
-            'userId'=>'userId'
+            'userId'=>'userId',
+                'itemType'=>'itemType'
         ];
     }
 }

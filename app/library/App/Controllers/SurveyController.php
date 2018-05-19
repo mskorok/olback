@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Model\Process;
+use App\Model\SurveyTemplate;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 // use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
 // use App\Model\Group;
@@ -10,6 +11,7 @@ use App\Model\UserOrganization;
 use App\Model\User;
 use App\Model\Survey;
 use App\Model\SurveyQuestion;
+use App\Model\SurveyTemplateQuestion;
 use Phalcon\Http\Request;
 
 class SurveyController extends CrudResourceController
@@ -330,14 +332,21 @@ class SurveyController extends CrudResourceController
                 ],
             ]);
         if($proc->id) {
+            $surveyTemplate = \App\Model\SurveyTemplate::findFirst(
+                [
+                    'conditions' => 'tag LIKE "%0#3_0%"',
+                    'bind' => [
+                    ],
+                ]);
+
             //create step0
             $step0 = new \App\Model\Survey();
-            $step0->title = "The self-evaluation questionnaire";
-            $step0->description = "";
-            $step0->isEditable = 0;
-            $step0->isOlset = 1;
-            $step0->creator = $creator['account']->id;
-            $step0->organization_id = $organization;
+            $step0->title = $surveyTemplate->title;
+            $step0->description = $surveyTemplate->description;
+            $step0->isEditable = $surveyTemplate->isEditable;
+            $step0->isOlset = $surveyTemplate->isOlset;
+            $step0->creator = $surveyTemplate->creator;
+            $step0->organization_id = $surveyTemplate->organization_id;
 
             $step0->save();
 
@@ -345,101 +354,85 @@ class SurveyController extends CrudResourceController
 
             //create step3_0
             $step3_0 = new \App\Model\Survey();
-            $step3_0->title = "The self-evaluation questionnaire";
-            $step3_0->description = "";
-            $step3_0->isEditable = 0;
-            $step3_0->isOlset = 1;
-            $step3_0->creator = $creator['account']->id;
-            $step3_0->organization_id = $organization;
+            $step3_0->title = $surveyTemplate->title;
+            $step3_0->description = $surveyTemplate->description;
+            $step3_0->isEditable = $surveyTemplate->isEditable;
+            $step3_0->isOlset = $surveyTemplate->isOlset;
+            $step3_0->creator = $surveyTemplate->creator;
+            $step3_0->organization_id = $surveyTemplate->organization_id;
             $step3_0->save();
             $step3_0_ID = $step3_0->getWriteConnection()->lastInsertId();
 
+
+            $surveyTemplate2 = \App\Model\SurveyTemplate::findFirst(
+                [
+                    'conditions' => 'tag LIKE "%3_1%"',
+                    'bind' => [
+                    ],
+                ]);
+
+
             //create step3_1
             $step3_1 = new \App\Model\Survey();
-            $step3_1->title = "Micro tool/guidelines";
-            $step3_1->description = "On a daily basis Step 3 is performed through the tool named After Action Review (AAR)15. AAR is a
-sequence of four questions intended for use right after the conclusion of each individual action/project,
-practically enacting and forcing double-loop learning. The four questions are:
-";
-            $step3_1->isEditable = 0;
-            $step3_1->isOlset = 1;
-            $step3_1->creator = $creator['account']->id;
-            $step3_1->organization_id = $organization;
+            $step3_1->title = $surveyTemplate2->title;
+            $step3_1->description = $surveyTemplate2->description;
+            $step3_1->isEditable = $surveyTemplate2->isEditable;
+            $step3_1->isOlset = $surveyTemplate2->isOlset;
+            $step3_1->creator = $surveyTemplate2->creator;
+            $step3_1->organization_id = $surveyTemplate2->organization_id;
             $step3_1->save();
             $step3_1_ID = $step3_1->getWriteConnection()->lastInsertId();
 
             $connection = $this->db;
             //create questions
-            $sqlStep0 = "INSERT INTO `survey_questions` (`id`, `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
-(NULL, '1. Co-operation agreements with other companies, universities, technical colleges, experts, etc. are promoted.', NULL, 2, 1, $step0_ID),
-(NULL, '2. The organization encourages its employees in various practical ways to join formal or informal networks.', NULL, 2, 2, $step0_ID),
-(NULL, '3. New ideas and approaches on work performance are experimented with continually.', NULL, 2, 3, $step0_ID),
-(NULL, '4. Organizational systems and procedures support innovation.', NULL, 2, 4, $step0_ID),
-(NULL, '5. The company has formal mechanisms to guarantee the sharing of best practices among the different fields of activity.', NULL, 2, 5, $step0_ID),
-(NULL, '6. There are individuals within the organization who take part in several teams or divisions and who also act as links between them.', NULL, 2, 6, $step0_ID),
-(NULL, '7. There are individuals responsible for collecting, assembling and distributing employees’ suggestions internally.', NULL, 2, 7, $step0_ID),
-(NULL, '8. The company offers internal opportunities to learn (visits to other parts of the organization, in- ternal training programs, etc.) so as to make individuals aware of other people’s or departments’ duties and share employees knowledge and experience.', NULL, 2, 8, $step3_0_ID),
-(NULL, '9. Teamwork is a very common practice in the company.', NULL, 2, 9, $step0_ID),
-(NULL, '10. All the members of the organization share the same aim, to which they feel committed.', NULL, 2, 10, $step0_ID),
-(NULL, '11. The company has databases or other means to store its experiences and knowledge so as to be able to use them later on.', NULL, 2, 11, $step0_ID),
-(NULL, '12. Databases are always kept up to date.', NULL, 2, 12, $step0_ID),
-(NULL, '13. All the employees in the organization have access to the organization’s databases.', NULL, 2, 13, $step0_ID),
-(NULL, '14. The codification and knowledge administration system makes work easier for employees.', NULL, 2, 14, $step0_ID),
-(NULL, '15. My organization encourages people to think from a community perspective.', NULL, 2, 15, $step0_ID),
-(NULL, '16. My organization works together with the outside community to meet mutual needs.', NULL, 2, 16, $step0_ID),
-(NULL, '17. In my organization, leaders ensure that the organization’s actions are consistent with its values.', NULL, 2, 17, $step0_ID),
-(NULL, '18. My organization builds alignment of visions across different levels and work groups.', NULL, 2, 18, $step0_ID),
-(NULL, '19. My organization considers the impact of decisions on employee morale.', NULL, 2, 19, $step0_ID),
-(NULL, '20. My organization encourages people to get answers from across the organization when solving problems.', NULL, 2, 20, $step0_ID),
-(NULL, '21. In my organization, people openly discuss mistakes in order to learn from them.', NULL, 2, 21, $step0_ID),
-(NULL, '22. In my organization, people give open and honest feedback to each other.', NULL, 2, 22, $step0_ID),
-(NULL, '23. In my organization, people view problems in their work as an opportunity to learn.', NULL, 2, 23, $step0_ID),
-(NULL, '24. In my organization, people are rewarded for exploring new ways of working.', NULL, 2, 24, $step0_ID),
-(NULL, '25. My organization recognizes people for taking the initiative.', NULL, 2, 25, $step0_ID),
-(NULL, '26. My organization gives people control over the resources they need to accomplish their work.', NULL, 2, 26, $step0_ID),
-(NULL, '27. In my organization, leaders generally support requests for learning opportunities.', NULL, 2, 27, $step0_ID),
-(NULL, '28. In my organization, investment in workers’ skills and professional development is greater than last year.', NULL, 2, 28, $step0_ID)";
-            $connection->query($sqlStep0);
+
+            $surveyTemplateQuestions = \App\Model\SurveyTemplateQuestion::find(
+                [
+                    'conditions' => 'survey_id = ?1 ',
+                    'bind' => [
+                        1 => $surveyTemplate->id
+                    ]
+                ]);
 
 
-            //create questions
-            $sqlStep3_0 = "INSERT INTO `survey_questions` (`id`, `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
-(NULL, '1. Co-operation agreements with other companies, universities, technical colleges, experts, etc. are promoted.', NULL, 2, 1, $step3_0_ID),
-(NULL, '2. The organization encourages its employees in various practical ways to join formal or informal networks.', NULL, 2, 2, $step3_0_ID),
-(NULL, '3. New ideas and approaches on work performance are experimented with continually.', NULL, 2, 3, $step3_0_ID),
-(NULL, '4. Organizational systems and procedures support innovation.', NULL, 2, 4, $step3_0_ID),
-(NULL, '5. The company has formal mechanisms to guarantee the sharing of best practices among the different fields of activity.', NULL, 2, 5, $step3_0_ID),
-(NULL, '6. There are individuals within the organization who take part in several teams or divisions and who also act as links between them.', NULL, 2, 6, $step3_0_ID),
-(NULL, '7. There are individuals responsible for collecting, assembling and distributing employees’ suggestions internally.', NULL, 2, 7, $step3_0_ID),
-(NULL, '8. The company offers internal opportunities to learn (visits to other parts of the organization, in- ternal training programs, etc.) so as to make individuals aware of other people’s or departments’ duties and share employees knowledge and experience.', NULL, 2, 8, $step3_0_ID),
-(NULL, '9. Teamwork is a very common practice in the company.', NULL, 2, 9, $step3_0_ID),
-(NULL, '10. All the members of the organization share the same aim, to which they feel committed.', NULL, 2, 10, $step3_0_ID),
-(NULL, '11. The company has databases or other means to store its experiences and knowledge so as to be able to use them later on.', NULL, 2, 11, $step3_0_ID),
-(NULL, '12. Databases are always kept up to date.', NULL, 2, 12, $step3_0_ID),
-(NULL, '13. All the employees in the organization have access to the organization’s databases.', NULL, 2, 13, $step3_0_ID),
-(NULL, '14. The codification and knowledge administration system makes work easier for employees.', NULL, 2, 14, $step3_0_ID),
-(NULL, '15. My organization encourages people to think from a community perspective.', NULL, 2, 15, $step3_0_ID),
-(NULL, '16. My organization works together with the outside community to meet mutual needs.', NULL, 2, 16, $step3_0_ID),
-(NULL, '17. In my organization, leaders ensure that the organization’s actions are consistent with its values.', NULL, 2, 17, $step3_0_ID),
-(NULL, '18. My organization builds alignment of visions across different levels and work groups.', NULL, 2, 18, $step3_0_ID),
-(NULL, '19. My organization considers the impact of decisions on employee morale.', NULL, 2, 19, $step3_0_ID),
-(NULL, '20. My organization encourages people to get answers from across the organization when solving problems.', NULL, 2, 20, $step3_0_ID),
-(NULL, '21. In my organization, people openly discuss mistakes in order to learn from them.', NULL, 2, 21, $step3_0_ID),
-(NULL, '22. In my organization, people give open and honest feedback to each other.', NULL, 2, 22, $step3_0_ID),
-(NULL, '23. In my organization, people view problems in their work as an opportunity to learn.', NULL, 2, 23, $step3_0_ID),
-(NULL, '24. In my organization, people are rewarded for exploring new ways of working.', NULL, 2, 24, $step3_0_ID),
-(NULL, '25. My organization recognizes people for taking the initiative.', NULL, 2, 25, $step3_0_ID),
-(NULL, '26. My organization gives people control over the resources they need to accomplish their work.', NULL, 2, 26, $step3_0_ID),
-(NULL, '27. In my organization, leaders generally support requests for learning opportunities.', NULL, 2, 27, $step3_0_ID),
-(NULL, '28. In my organization, investment in workers’ skills and professional development is greater than last year.', NULL, 2, 28, $step3_0_ID)";
-            $connection->query($sqlStep3_0);
+            foreach ($surveyTemplateQuestions as $temp_question){
+                $question = new \App\Model\SurveyQuestion();
+                $question->question = $temp_question->question;
+                $question->description = $temp_question->description;
+                $question->answered_type = $temp_question->answered_type;
+                $question->question_order = $temp_question->question_order;
+                $question->survey_id = $step0_ID;
+                $question->save();
+            }
 
+            foreach ($surveyTemplateQuestions as $temp_question){
+                $question = new \App\Model\SurveyQuestion();
+                $question->question = $temp_question->question;
+                $question->description = $temp_question->description;
+                $question->answered_type = $temp_question->answered_type;
+                $question->question_order = $temp_question->question_order;
+                $question->survey_id = $step3_0_ID;
+                $question->save();
+            }
 
-            $sqlStep3_1 = "INSERT INTO `survey_questions` ( `question`, `description`, `answered_type`, `question_order`, `survey_id`) VALUES
-( 'What was the purpose(s) of doing this action/project?', NULL, 1, 1, $step3_1_ID),
-( 'Did we achieve it and how can we tell/know? (what are the observable facts indicating clearly\r\nthat we achieved or not the purpose(s) identified through the previous question?)', NULL, 1, 1, $step3_1_ID),
-( 'If we were to repeat the same action/project now, what would we do the same? Why?', NULL, 1, 1, $step3_1_ID)";
-            $connection->query($sqlStep3_1);
+            $surveyTemplateQuestions2 = \App\Model\SurveyTemplateQuestion::find(
+                [
+                    'conditions' => 'survey_id = ?1 ',
+                    'bind' => [
+                        1 => $surveyTemplate2->id
+                    ]
+                ]);
+
+            foreach ($surveyTemplateQuestions2 as $temp_question2){
+                $question = new \App\Model\SurveyQuestion();
+                $question->question = $temp_question2->question;
+                $question->description = $temp_question2->description;
+                $question->answered_type = $temp_question2->answered_type;
+                $question->question_order = $temp_question2->question_order;
+                $question->survey_id = $step3_1_ID;
+                $question->save();
+            }
+
 
 
             $process = Process::findFirst(

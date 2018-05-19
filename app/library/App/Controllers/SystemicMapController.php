@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Model\SystemicStructureMap;
+use App\Model\SystemicStructureMapChain;
+use App\Model\SystemicStructureMapItems;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 // use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
 use App\Model\UserOrganization;
@@ -1648,6 +1650,7 @@ $action_grp_list = new ActionListGroup();
         $systemicStructureItem->question = $data->question;
         $systemicStructureItem->proposal = $dp;
         $systemicStructureItem->groupId = $data->groupId;
+        $systemicStructureItem->itemType = $data->itemType;
         $systemicStructureItem->userId = $creatorId;
         if ($systemicStructureItem->save() == false) {
             $messagesErrors = array();
@@ -1694,5 +1697,105 @@ $action_grp_list = new ActionListGroup();
 
         return $this->createArrayResponse($response, 'data');
     }
+
+
+    public function deleteSystemicStructureItem($id)
+    {
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $userId = $session->getIdentity(); // For example; 1
+        }
+        $creator = \App\Controllers\SystemicMapController::getUserDetails($userId);
+        if ($creator['organization'] == null) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+        $user = User::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $userId,
+                ],
+            ]);
+        if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
+            $systemicChains = SystemicStructureMapChain::find(
+                [
+                    'conditions' => 'from_item =?1 OR to_item =?1',
+                    'bind' => [
+                        1 => $id,
+                    ],
+                ]
+            );
+            foreach ($systemicChains as $systemicChain) {
+                $systemicChain->delete();
+            }
+            $systemicItems = SystemicMapItems::find(
+                [
+                    'conditions' => 'id =?1',
+                    'bind' => [
+                        1 => $id,
+                    ],
+                ]
+            );
+            foreach ($systemicItems as $systemicItem) {
+                $systemicItem->delete();
+            }
+
+            $response = [
+                'code' => 1,
+                'status' => 'Success!',
+            ];
+        } else {
+            $systemicItems = SystemicStructureMapItems::find(
+                [
+                    'conditions' => 'userId =?1 AND id =?2',
+                    'bind' => [
+                        1 => $userId,
+                        2 => $id,
+                    ],
+                ]
+            );
+            if ($systemicItems) {
+                foreach ($systemicItems as $systemicItem) {
+                    $systemicChain = SystemicStructureMapChain::find(
+                        [
+                            'conditions' => 'from_item =?1 OR to_item =?1',
+                            'bind' => [
+                                1 => $systemicItem->id,
+                            ],
+                        ]
+                    );
+                    if ($systemicChain) {
+                        $response = [
+                            'code' => 0,
+                            'status' => 'You cannot delete this systemic item!',
+                        ];
+                    } else {
+                        $systemicItem->delete();
+                        $response = [
+                            'code' => 1,
+                            'status' => 'Success',
+                        ];
+                    }
+                }
+            } else {
+                $response = [
+                    'code' => 0,
+                    'status' => 'You cannot delete this systemic item!',
+                ];
+            }
+        }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
 
 }
