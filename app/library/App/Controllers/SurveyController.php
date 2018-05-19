@@ -27,7 +27,7 @@ class SurveyController extends CrudResourceController
         $organization = $creator['organization']->organization_id;
         $request = new Request();
         $data = $request->getJsonRawBody();
-        $survey = new \App\Model\Survey();
+        $survey = new \App\Model\SurveyTemplate();
         $survey->title = $data->title;
         $survey->description = $data->description;
         $survey->isEditable = $data->isEditable;
@@ -66,9 +66,9 @@ class SurveyController extends CrudResourceController
 
         $creator = $this->getUserDetails($creatorId);
         $organization = $creator['organization']->organization_id;
-        $surveys = Survey::find(
+        $surveys = SurveyTemplate::find(
           [
-              'conditions' => '	organization_id = ?1',
+              'conditions' => '	organization_id = ?1 AND isOlset = 0 ',
               'bind' => [
                   1 => $organization,
               ],
@@ -104,7 +104,7 @@ class SurveyController extends CrudResourceController
       }
 
 
-      $survey = Survey::findFirst(
+      $survey = SurveyTemplate::findFirst(
           [
           'conditions' => 'id = ?1 AND organization_id = ?2 AND creator = ?3',
           'bind' => [
@@ -167,7 +167,7 @@ class SurveyController extends CrudResourceController
           $request = new Request();
           $data = $request->getJsonRawBody();
 
-          $survey = Survey::findFirst(
+          $survey = SurveyTemplate::findFirst(
               [
               'conditions' => 'id = ?1 AND organization_id = ?2 AND creator = ?3',
               'bind' => [
@@ -178,7 +178,7 @@ class SurveyController extends CrudResourceController
           ]);
 
           if ($survey->id) {
-            $surveyQuestion = new \App\Model\SurveyQuestion();
+            $surveyQuestion = new \App\Model\SurveyTemplateQuestion();
             $surveyQuestion->question = $data->question;
             $surveyQuestion->description = $data->description;
             $surveyQuestion->answered_type = $data->answered_type;
@@ -225,7 +225,7 @@ class SurveyController extends CrudResourceController
 
       $creator = $this->getUserDetails($creatorId);
       $organization = $creator['organization']->organization_id;
-      $survey = Survey::findFirst(
+      $survey = SurveyTemplate::findFirst(
           [
           'conditions' => 'id = ?1 AND organization_id = ?2',
           'bind' => [
@@ -236,7 +236,7 @@ class SurveyController extends CrudResourceController
 
       if ($survey->id) {
         
-      $surveyQuestion = SurveyQuestion::find(
+      $surveyQuestion = SurveyTemplateQuestion::find(
         [
           'conditions' => 'survey_id = ?1',
           'bind' => [
