@@ -120,6 +120,56 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    public function getSystemicStructureMapByProcess($id)
+    {
+        //  echo 'asas';die();
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $creator = $this->getUserDetails($creatorId);
+        if ($creator['organization'] == null) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+        $systemicMaps = SystemicStructureMap::find(
+            [
+                'conditions' => '	organization = ?1 AND processId = ?2',
+                'bind' => [
+                    1 => $organization_id,
+                    2 => $id,
+                ],
+            ]
+        );
+        $systemicMapsArray = array();
+        if ($systemicMaps) {
+            foreach ($systemicMaps as $systemicMap) {
+                $systemicMapsArray[] = array(
+                    'id' => $systemicMap->id,
+                    'name' => $systemicMap->name,
+                    'department' => $systemicMap->department,
+                    'organization' => $systemicMap->organization,
+                    'isActive' => $systemicMap->isActive,
+                );
+            }
+        }
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => $systemicMapsArray,
+        ];
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
     private function findItemIndexForId($arr, $id)
     {
         $index = 0;
