@@ -157,6 +157,8 @@ class SystemicMapController extends CrudResourceController
                     'name' => $systemicMap->name,
                     'department' => $systemicMap->department,
                     'organization' => $systemicMap->organization,
+                    'startDate' => $systemicMap->startDate,
+                    'endDate' => $systemicMap->endDate,
                     'isActive' => $systemicMap->isActive,
                 );
             }
