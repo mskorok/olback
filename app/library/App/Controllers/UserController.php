@@ -269,11 +269,12 @@ class UserController extends CrudResourceController
             'data' => $messagesErrors,
         ];
         } else {
+            $managerId = $manager->getWriteConnection()->lastInsertId();
             $response = [
              'code' => 1,
              'status' => 'Success',
              'data' => array(
-               'userid' => 123,
+               'userid' => $managerId,
              ),
          ];
         }
