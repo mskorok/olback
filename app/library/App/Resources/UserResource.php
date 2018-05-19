@@ -73,7 +73,15 @@ class UserResource extends ApiResource {
                 ->allow(AclRoles::MANAGER)
                 ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                 ->description('getProcessPermissions'))
-
+            ->endpoint(ApiEndpoint::put('/updateOtherUser/{id}', 'updateOtherUser')
+                ->allow(AclRoles::MANAGER)
+                ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                ->description('updateOtherUser'))
+            //deactivateOtherUser
+            ->endpoint(ApiEndpoint::delete('/deactivateOtherUser/{id}', 'deactivateOtherUser')
+                ->allow(AclRoles::MANAGER)
+                ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                ->description('deactivateOtherUser'))
 
             ->endpoint(ApiEndpoint::put('/updateUser', 'updateUser')
                 ->allow(AclRoles::MANAGER,AclRoles::AUTHORIZED)

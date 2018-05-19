@@ -608,6 +608,107 @@ $organization_id = $data->organization;
         return $this->createArrayResponse($response, 'data');
     }
 
+    public function updateOtherUser($userId){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+
+
+        $user = User::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $userId
+                ],
+            ]);
+
+        if($user) {
+            $user->firstName = $data->firstName;
+            $user->lastName = $data->lastName;
+            $user->location = $data->location;
+            if ($user->save() == false) {
+                $messagesErrors = array();
+                foreach ($user->getMessages() as $message) {
+                    // print_r($message);
+                    $messagesErrors[] = $message;
+                }
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => $messagesErrors,
+                ];
+            } else {
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success'
+                ];
+            }
+        }else{
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "User not found",
+            ];
+        }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function deactivateOtherUser($userId){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+
+
+        $user = User::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $userId
+                ],
+            ]);
+
+        if($user) {
+            $user->firstName = "deleted";
+            $user->lastName = "deleted";
+            $user->email = "deleted@deleted.com";
+            $user->location = $data->location;
+            if ($user->save() == false) {
+                $messagesErrors = array();
+                foreach ($user->getMessages() as $message) {
+                    // print_r($message);
+                    $messagesErrors[] = $message;
+                }
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => $messagesErrors,
+                ];
+            } else {
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success'
+                ];
+            }
+        }else{
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "User not found",
+            ];
+        }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
     public static function getUserDetails($userId)
     {
         $user = User::findFirst(
