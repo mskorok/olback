@@ -780,4 +780,38 @@ $organization_id = $data->organization;
         ];
         return $this->createArrayResponse($response, 'data');
     }
+
+    public function getUsers(){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $creator = $this->getUserDetails($creatorId);
+        if ($creator['organization'] == null) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+        $connection = $this->db;
+        $sql_dist = 'SELECT U.* FROM user U INNER JOIN user_organizationHide O ON O.user_id = U.id WHERE O.organization_id = '.$organization_id.' AND U.email != "deleted@deleted.com" ';
+        $data_dist = $connection->query($sql_dist);
+        $data_dist->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $results_dist = $data_dist->fetchAll();
+
+//        $a = array(
+//            'tree' => $tree,
+//        );
+
+        return $this->createArrayResponse($results_dist, 'users');
+
+
+
+    }
 }
