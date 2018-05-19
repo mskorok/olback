@@ -184,7 +184,7 @@ class UserController extends CrudResourceController
                        'code' => 1,
                        'status' => 'Success',
                        'data' => array(
-                         'userid' => 123,
+                         'userid' => $managerId,
                        ),
                    ];
             }
