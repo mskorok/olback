@@ -1737,7 +1737,7 @@ $action_grp_list = new ActionListGroup();
             foreach ($systemicChains as $systemicChain) {
                 $systemicChain->delete();
             }
-            $systemicItems = SystemicMapItems::find(
+            $systemicItems = SystemicStructureMapItems::find(
                 [
                     'conditions' => 'id =?1',
                     'bind' => [
