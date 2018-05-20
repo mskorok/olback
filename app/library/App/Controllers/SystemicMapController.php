@@ -1974,4 +1974,22 @@ $action_grp_list = new ActionListGroup();
 
         return $this->createArrayResponse($resultArray, 'chain');
     }
+
+
+    public function deleteStructureChain($id){
+        $chain = SystemicStructureMapChain::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $id,
+                ],
+            ]);
+        $chain->delete();
+
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+        ];
+        return $this->createArrayResponse($response, 'data');
+    }
 }
