@@ -788,7 +788,7 @@ $organization_id = $data->organization;
         }
 
         $creator = $this->getUserDetails($creatorId);
-        var_dump($creator);die();
+//        var_dump($creator);die();
         if ($creator['organization'] == null) {
             $response = [
                 'code' => 0,
