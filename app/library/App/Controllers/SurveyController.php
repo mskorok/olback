@@ -227,10 +227,9 @@ class SurveyController extends CrudResourceController
       $organization = $creator['organization']->organization_id;
       $survey = SurveyTemplate::findFirst(
           [
-          'conditions' => 'id = ?1 AND organization_id = ?2',
+          'conditions' => 'id = ?1',
           'bind' => [
-              1 => $id,
-              2 => $organization
+              1 => $id
           ],
       ]);
 
