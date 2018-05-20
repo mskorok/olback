@@ -98,7 +98,7 @@ class StatisticsController extends CollectionController
         $data_dist_totals->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
         $COUNT_TOTALS = $data_dist_totals->fetchAll();
 
-        $sql_dist_answer = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id = 1 GROUP BY SQ.id';
+        $sql_dist_answer = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals, SQ.question FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id = 1 GROUP BY SQ.id';
         $data_dist_answer = $connection->query($sql_dist_answer);
         $data_dist_answer->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
         $COUNT_ANSWERS = $data_dist_answer->fetchAll();
