@@ -1958,14 +1958,7 @@ $action_grp_list = new ActionListGroup();
 
     public function getStructureChain($id, $itemType){
 
-        if(($itemType!="normal")||($itemType!="loop")){
-            $response = [
-                'code' => 0,
-                'status' => 'Available types: loop,normal',
-            ];
 
-            return $this->createArrayResponse($response, 'data');
-        }
 
 
         $connection = $this->db;
