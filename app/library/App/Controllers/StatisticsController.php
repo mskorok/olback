@@ -98,7 +98,7 @@ class StatisticsController extends CollectionController
         $data_dist_totals->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
         $COUNT_TOTALS = $data_dist_totals->fetchAll();
 
-        $sql_dist_answer = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals, SQ.question FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id = 1 GROUP BY SQ.id';
+        $sql_dist_answer = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals, SQ.question FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id = '.$id.' GROUP BY SQ.id';
         $data_dist_answer = $connection->query($sql_dist_answer);
         $data_dist_answer->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
         $COUNT_ANSWERS = $data_dist_answer->fetchAll();
@@ -123,5 +123,44 @@ class StatisticsController extends CollectionController
         return $this->createArrayResponse($response, 'data');
     }
 
+    public function getReportsBySurveyAndUser($id,$userId){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $creator = $this->getUserDetails($creatorId);
+
+        $organization = $creator['organization']->organization_id;
+        $connection = $this->db;
+        $sql_dist_totals = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id =  '.$id.' AND A.userId = '.$userId.' ';
+        $data_dist_totals = $connection->query($sql_dist_totals);
+        $data_dist_totals->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $COUNT_TOTALS = $data_dist_totals->fetchAll();
+
+        $sql_dist_answer = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals, SQ.question FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id = '.$id.' AND A.userId = '.$userId.' GROUP BY SQ.id';
+        $data_dist_answer = $connection->query($sql_dist_answer);
+        $data_dist_answer->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $COUNT_ANSWERS = $data_dist_answer->fetchAll();
+
+        $sql_dist_GROUP = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals,QG.name FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id = '.$id.' AND A.userId = '.$userId.' GROUP BY SQ.question_group_id ';
+        $data_dist_GROUP = $connection->query($sql_dist_GROUP);
+        $data_dist_GROUP->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $COUNT_GROUP = $data_dist_GROUP->fetchAll();
+
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => array(
+                'totals'=>array(
+                    "avg"=>$COUNT_TOTALS[0]['average'],
+                    "totals" =>$COUNT_TOTALS[0]['totals'] ),
+                'byQuestion'=>$COUNT_ANSWERS,
+                'byGroup' => $COUNT_GROUP
+            ),
+        ];
+
+        return $this->createArrayResponse($response, 'data');
+    }
 
 }

@@ -33,6 +33,11 @@ class StatisticsResource extends ApiResource {
                 ->allow(AclRoles::MANAGER)
                 ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
                 ->description('getReportsBySurvey')
+            )
+            ->endpoint(ApiEndpoint::get('/getReportsBySurveyAndUser/{id}/{userId}', 'getReportsBySurveyAndUser')
+                ->allow(AclRoles::MANAGER)
+                ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
+                ->description('getReportsBySurveyAndUser')
             );
     }
 
