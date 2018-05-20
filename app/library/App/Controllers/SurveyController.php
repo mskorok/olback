@@ -218,7 +218,7 @@ class SurveyController extends CrudResourceController
           return $this->createArrayResponse($response, 'data');
     }
 
-    public function getQuestionQroups(){
+    public function getQuestionGroups(){
         $questionGroups = QuestionGroups::find();
         $response = [
             'code' => 1,
