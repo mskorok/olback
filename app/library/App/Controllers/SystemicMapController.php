@@ -1957,17 +1957,21 @@ $action_grp_list = new ActionListGroup();
     }
 
     public function getStructureChain($id, $itemType){
-
-
-
-
         $connection = $this->db;
         $sql_dist = 'SELECT DISTINCT SC.id,SC.from_item,SC.to_item,I.itemType FROM `systemic_structure_map_chain` SC left JOIN systemic_map_structure_items I ON SC.from_item = I.id OR SC.to_item = I.id WHERE I.itemType = "'.$itemType.'" AND systemic_map_id = '.$id.' ';
         $data_dist = $connection->query($sql_dist);
         $data_dist->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
         $results_dist = $data_dist->fetchAll();
+        $resultArray = array();
+        foreach ($results_dist as $item) {
+            $resultArray[] = array(
+                "id"=>(int)$item['id'],
+                "from_item"=>(int)$item['from_item'],
+                "to_item"=>(int)$item['to_item'],
+                "itemType"=>$item['itemType']
+            );
+        }
 
-
-        return $this->createArrayResponse($results_dist, 'chain');
+        return $this->createArrayResponse($resultArray, 'chain');
     }
 }
