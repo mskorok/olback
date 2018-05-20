@@ -103,12 +103,10 @@ class StatisticsController extends CollectionController
         $data_dist_answer->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
         $COUNT_ANSWERS = $data_dist_answer->fetchAll();
 
-        $sql_dist_GROUP = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals,QG.name FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id IN (SELECT step0 FROM `process` WHERE id = '.$id.' UNION SELECT step3_0 FROM process WHERE id = '.$id.' UNION SELECT step3_1 FROM process WHERE id = '.$id.') GROUP BY SQ.question_group_id';
+        $sql_dist_GROUP = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals,QG.name FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id = '.$id.' GROUP BY SQ.question_group_id ';
         $data_dist_GROUP = $connection->query($sql_dist_GROUP);
         $data_dist_GROUP->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
         $COUNT_GROUP = $data_dist_GROUP->fetchAll();
-
-
 
         $response = [
             'code' => 1,
@@ -123,11 +121,6 @@ class StatisticsController extends CollectionController
         ];
 
         return $this->createArrayResponse($response, 'data');
-
-
-//SELECT AVG(answer), COUNT(A.id)FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id
-//SELECT AVG(answer), COUNT(A.id),SQ.question FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id GROUP BY SQ.id
-//SELECT AVG(answer), COUNT(A.id),QG.name FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id GROUP BY SQ.question_group_id
     }
 
 
