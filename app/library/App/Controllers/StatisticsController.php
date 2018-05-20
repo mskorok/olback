@@ -82,4 +82,24 @@ class StatisticsController extends CollectionController
 
 
     }
+
+    public function getReportsByProcess($id){
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $creatorId = $session->getIdentity();
+        }
+
+        $creator = $this->getUserDetails($creatorId);
+
+        $organization = $creator['organization']->organization_id;
+        $connection = $this->db;
+        $sql_dist = 'SELECT COUNT(U.id) AS count,role FROM `user` U INNER JOIN user_organization UO ON U.id = UO.user_id WHERE (U.role = \'Manager\' OR U.role = \'User\' ) AND UO.organization_id = '.$organization.' GROUP BY role';
+        $data_dist = $connection->query($sql_dist);
+        $data_dist->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $COUNT_USERS = $data_dist->fetchAll();
+
+
+    }
+
+
 }

@@ -401,6 +401,7 @@ class SurveyController extends CrudResourceController
                 $question->answered_type = $temp_question->answered_type;
                 $question->question_order = $temp_question->question_order;
                 $question->survey_id = $step0_ID;
+                $question->question_group_id = $temp_question->question_group_id;
                 $question->save();
             }
 
@@ -411,6 +412,7 @@ class SurveyController extends CrudResourceController
                 $question->answered_type = $temp_question->answered_type;
                 $question->question_order = $temp_question->question_order;
                 $question->survey_id = $step3_0_ID;
+                $question->question_group_id = $temp_question->question_group_id;
                 $question->save();
             }
 
@@ -429,6 +431,7 @@ class SurveyController extends CrudResourceController
                 $question->answered_type = $temp_question2->answered_type;
                 $question->question_order = $temp_question2->question_order;
                 $question->survey_id = $step3_1_ID;
+                $question->question_group_id = $temp_question2->question_group_id;
                 $question->save();
             }
 
