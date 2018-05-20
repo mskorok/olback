@@ -225,7 +225,7 @@ class SurveyController extends CrudResourceController
 
       $creator = $this->getUserDetails($creatorId);
       $organization = $creator['organization']->organization_id;
-      $survey = SurveyTemplate::findFirst(
+      $survey = Survey::findFirst(
           [
           'conditions' => 'id = ?1',
           'bind' => [
@@ -235,7 +235,7 @@ class SurveyController extends CrudResourceController
 
       if ($survey->id) {
         
-      $surveyQuestion = SurveyTemplateQuestion::find(
+      $surveyQuestion = SurveyQuestion::find(
         [
           'conditions' => 'survey_id = ?1',
           'bind' => [
