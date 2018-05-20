@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Model\Process;
+use App\Model\QuestionGroups;
 use App\Model\SurveyTemplate;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 // use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
@@ -215,6 +216,16 @@ class SurveyController extends CrudResourceController
 
 
           return $this->createArrayResponse($response, 'data');
+    }
+
+    public function getQuestionQroups(){
+        $questionGroups = QuestionGroups::find();
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => $questionGroups,
+        ];
+        return $this->createArrayResponse($response, 'data');
     }
 
     public function getQuestion($id){

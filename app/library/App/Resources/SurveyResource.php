@@ -61,6 +61,11 @@ class SurveyResource extends ApiResource
                 ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                 ->description('create answer')
             )
+            //getQuestionQroups
+            ->endpoint(ApiEndpoint::get('/getQuestionQroups', 'getQuestionQroups')
+                ->allow(AclRoles::MANAGER)
+                ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                ->description('getQuestionQroups'))
          ->endpoint(ApiEndpoint::post('/addQuestion/{id}', 'createQuestion')
               ->allow(AclRoles::MANAGER)
               ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
