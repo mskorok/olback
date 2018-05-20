@@ -1797,5 +1797,69 @@ $action_grp_list = new ActionListGroup();
         return $this->createArrayResponse($response, 'data');
     }
 
+    public function getSystemicStructureItem($id,$type)
+    {
+        $systemicMaps = SystemicStructureMapItems::find(
+            [
+                'conditions' => 'systemic_map_id = ?1 and itemType = ?2 ',
+                'bind' => [
+                    1 => $id,
+                    2 => $type
+                ],
+            ]
+        );
+        $systemicMapsArray = array();
+        $linksArray = array();
+        if ($systemicMaps) {
+            foreach ($systemicMaps as $systemicMap) {
+                $groupColorValue = null;
+                if (isset($systemicMap->groupId)) {
+                    $groupColor = Group::findFirst(
+                        [
+                            'conditions' => 'id = ?1',
+                            'bind' => [
+                                1 => $systemicMap->groupId,
+                            ],
+                        ]);
+                    // var_dump($groupColorValue = $groupColor->color);die();
+                    if ($groupColor->color != null) {
+                        $groupColorValue = $groupColor->color;
+                    }
+                }
 
+                $systemicMapsArray[] = array(
+                    'id' => $systemicMap->id,
+                    'systemic_map_id' => $systemicMap->systemic_map_id,
+                    'name' => $systemicMap->question,
+                    'proposal' => $systemicMap->proposal,
+                    'group' => intval($systemicMap->groupId),
+                    'groupColor' => $groupColorValue,
+                );
+
+                $chains = SystemicStructureMapChain::find(
+                    [
+                        'conditions' => 'to_item =?1',
+                        'bind' => [
+                            1 => $systemicMap->id,
+                        ],
+                    ]
+                );
+                // echo "dada";die();
+                foreach ($chains as $chain) {
+                    $linksArray[] = array(
+                        'source' => $this->findItemIndexForId($systemicMapsArray, intval($chain->from_item)),
+                        'target' => $this->findItemIndexForId($systemicMapsArray, intval($chain->to_item)),
+                        'value' => 2,
+                    );
+                }
+            }
+        }
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => array('nodes' => $systemicMapsArray, 'links' => $linksArray),
+        ];
+
+        return $this->createArrayResponse($response, 'data');
+    }
 }
