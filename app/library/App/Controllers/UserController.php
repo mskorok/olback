@@ -7,6 +7,7 @@ use PhalconRest\Mvc\Controllers\CrudResourceController;
 // use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
 use App\Model\User;
 use App\Model\Organization;
+use App\Model\UserOrganization;
 use Phalcon\Http\Request;
 use App\Model\ProcessDepartments;
 
