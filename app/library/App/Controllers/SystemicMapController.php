@@ -1862,4 +1862,98 @@ $action_grp_list = new ActionListGroup();
 
         return $this->createArrayResponse($response, 'data');
     }
+
+    public function updateSystemicStructureItem($id)
+    {
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $userId = $session->getIdentity(); // For example; 1
+        }
+        $creator = \App\Controllers\SystemicMapController::getUserDetails($userId);
+        if ($creator['organization'] == null) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+        $user = User::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $userId,
+                ],
+            ]);
+
+        if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
+            $systemicItems = SystemicStructureMapItems::findFirst(
+                [
+                    'conditions' => 'id = ?1',
+                    'bind' => [
+                        1 => $id,
+                    ],
+                ]);
+
+            if ($systemicItems) {
+                if ($userId != $systemicItems->userId) {
+                    $organizationChecked = UserOrganization::findFirst(
+                        [
+                            'conditions' => 'user_id = ?1 AND organization_id = ?2',
+                            'bind' => [
+                                1 => $userId,
+                                2 => $organization_id,
+                            ],
+                        ]);
+
+                    if (!$organizationChecked) {
+                        $response = [
+                            'code' => 0,
+                            'status' => 'You cannot edit this group2!',
+                        ];
+
+                        return $this->createArrayResponse($response, 'data');
+                    }
+                }
+            }
+        } else {
+            $systemicItems = SystemicStructureMapItems::findFirst(
+                [
+                    'conditions' => 'id = ?1 AND userId = ?2',
+                    'bind' => [
+                        1 => $id,
+                        2 => $userId,
+                    ],
+                ]);
+        }
+        if ($systemicItems) {
+            if (isset($data->question)) {
+                $systemicItems->question = $data->question;
+            }
+            if (isset($data->proposal)) {
+                $systemicItems->proposal = $data->proposal;
+            }
+            if (isset($data->groupId)) {
+                $systemicItems->groupId = $data->groupId;
+            }
+            $systemicItems->save();
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+            ];
+        } else {
+            $response = [
+                'code' => 0,
+                'status' => 'You cannot edit this group!',
+            ];
+        }
+
+        return $this->createArrayResponse($response, 'data');
+    }
+
 }

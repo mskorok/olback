@@ -85,6 +85,13 @@ class SystemicMapResource extends ApiResource
               ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
               ->description('update systemicmapsItem')
           )
+
+            //updateSystemicStructureItem
+            ->endpoint(ApiEndpoint::put('/updateSystemicStructureItem/{id}', 'updateSystemicStructureItem')
+                ->allow(AclRoles::MANAGER)
+                ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                ->description('update updateSystemicStructureItem')
+            )
           ->endpoint(ApiEndpoint::delete('/{id}', 'deleteSystemicMap')
               ->allow(AclRoles::MANAGER)
               ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
