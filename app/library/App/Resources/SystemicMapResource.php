@@ -109,6 +109,11 @@ class SystemicMapResource extends ApiResource
                 ->description('delete deleteSystemicStructureItem')
             )
 
+            ->endpoint(ApiEndpoint::get('/getStructureChain/{id}/{type}', 'getStructureChain')
+                ->allow(AclRoles::MANAGER)
+                ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                ->description('getStructureChain')
+            )
             ->endpoint(ApiEndpoint::get('/getSystemicStructureItem/{id}/{type}', 'getSystemicStructureItem')
                 ->allow(AclRoles::MANAGER)
                 ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
