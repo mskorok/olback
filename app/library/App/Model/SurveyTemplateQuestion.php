@@ -10,6 +10,7 @@ class SurveyTemplateQuestion extends \App\Mvc\DateTrackingModel
     public $answered_type;
     public $question_order;
     public $survey_id;
+    public $question_group_id;
 
     public function getSource()
     {
@@ -24,7 +25,8 @@ class SurveyTemplateQuestion extends \App\Mvc\DateTrackingModel
             'description' => 'description',
             'answered_type'=>'answered_type',
             'question_order' => 'question_order',
-            'survey_id' => 'survey_id'
+            'survey_id' => 'survey_id',
+                'question_group_id' => 'question_group_id'
         ];
     }
 }
