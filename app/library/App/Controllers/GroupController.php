@@ -39,20 +39,24 @@ class GroupController extends CrudResourceController
       ]
     );
 
+
+
         $groupArray = array();
         if ($groups) {
             foreach ($groups as $group) {
                 $groupArray[] = array(
-        'id' => (int)$group->id,
+        'id' => (int) $group->id,
         'title' => $group->title,
         'color' =>  $group->color,
+                    'organization' => $group->organization,
+                    'creatorId' => $group->creatorId,
       );
             }
         }
         $response = [
         'code' => 1,
         'status' => 'Success',
-        'data' => $groups,
+        'data' => $groupArray,
         ];
 
         return $this->createArrayResponse($response, 'data');
