@@ -93,12 +93,39 @@ class StatisticsController extends CollectionController
 
         $organization = $creator['organization']->organization_id;
         $connection = $this->db;
-        $sql_dist = 'SELECT COUNT(U.id) AS count,role FROM `user` U INNER JOIN user_organization UO ON U.id = UO.user_id WHERE (U.role = \'Manager\' OR U.role = \'User\' ) AND UO.organization_id = '.$organization.' GROUP BY role';
-        $data_dist = $connection->query($sql_dist);
-        $data_dist->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
-        $COUNT_USERS = $data_dist->fetchAll();
+        $sql_dist_totals = 'SELECT AVG(answer), COUNT(A.id)FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id IN (SELECT step0 FROM `process` WHERE id = '.$id.' UNION SELECT step3_0 FROM process WHERE id = '.$id.' UNION SELECT step3_1 FROM process WHERE id = '.$id.')';
+        $data_dist_totals = $connection->query($sql_dist_totals);
+        $data_dist_totals->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $COUNT_TOTALS = $data_dist_totals->fetchAll();
+
+        $sql_dist_answer = 'SELECT AVG(answer), COUNT(A.id),SQ.question FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id IN (SELECT step0 FROM `process` WHERE id = '.$id.' UNION SELECT step3_0 FROM process WHERE id = '.$id.' UNION SELECT step3_1 FROM process WHERE id = '.$id.') GROUP BY SQ.id';
+        $data_dist_answer = $connection->query($sql_dist_answer);
+        $data_dist_answer->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $COUNT_ANSWERS = $data_dist_answer->fetchAll();
+
+        $sql_dist_GROUP = 'SELECT AVG(answer), COUNT(A.id),QG.name FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id WHERE SQ.answered_type = 2 AND S.id IN (SELECT step0 FROM `process` WHERE id = '.$id.' UNION SELECT step3_0 FROM process WHERE id = '.$id.' UNION SELECT step3_1 FROM process WHERE id = '.$id.') GROUP BY SQ.question_group_id';
+        $data_dist_GROUP = $connection->query($sql_dist_GROUP);
+        $data_dist_GROUP->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $COUNT_GROUP = $data_dist_answer->fetchAll();
 
 
+
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => array(
+                'totals'=>$COUNT_TOTALS,
+                'byQuestion'=>$COUNT_ANSWERS,
+                'byGroup' => $COUNT_GROUP
+            ),
+        ];
+
+        return $this->createArrayResponse($response, 'data');
+
+
+//SELECT AVG(answer), COUNT(A.id)FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id
+//SELECT AVG(answer), COUNT(A.id),SQ.question FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id GROUP BY SQ.id
+//SELECT AVG(answer), COUNT(A.id),QG.name FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id GROUP BY SQ.question_group_id
     }
 
 

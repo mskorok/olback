@@ -28,6 +28,11 @@ class StatisticsResource extends ApiResource {
                 ->allow(AclRoles::MANAGER)
                 ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
                 ->description('get dashboard statistics')
+            )
+            ->endpoint(ApiEndpoint::get('/getReportsByProcess/{id}', 'getReportsByProcess')
+                ->allow(AclRoles::MANAGER)
+                ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
+                ->description('getReportsByProcess')
             );
     }
 
