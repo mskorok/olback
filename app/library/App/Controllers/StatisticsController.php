@@ -115,8 +115,8 @@ class StatisticsController extends CollectionController
             'status' => 'Success',
             'data' => array(
                 'totals'=>array(
-                    "avg"=>$COUNT_TOTALS['average'],
-                    "totals" =>$COUNT_TOTALS['totals'] ),
+                    "avg"=>$COUNT_TOTALS[0]['average'],
+                    "totals" =>$COUNT_TOTALS[0]['totals'] ),
                 'byQuestion'=>$COUNT_ANSWERS,
                 'byGroup' => $COUNT_GROUP
             ),
