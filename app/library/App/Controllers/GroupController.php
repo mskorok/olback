@@ -43,7 +43,7 @@ class GroupController extends CrudResourceController
         if ($groups) {
             foreach ($groups as $group) {
                 $groupArray[] = array(
-        'id' => $group->id,
+        'id' => (int)$group->id,
         'title' => $group->title,
         'color' =>  $group->color,
       );
