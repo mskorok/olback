@@ -1992,4 +1992,73 @@ $action_grp_list = new ActionListGroup();
         ];
         return $this->createArrayResponse($response, 'data');
     }
+
+
+    public function createStructureChain(){
+        $request = new Request();
+        $data = $request->getJsonRawBody();
+        if ($this->authManager->loggedIn()) {
+            $session = $this->authManager->getSession();
+            $userId = $session->getIdentity(); // For example; 1
+        }
+        $creator = \App\Controllers\SystemicMapController::getUserDetails($userId);
+        if ($creator['organization'] == null) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+
+        $systemicMapsItems = SystemicStructureMapItems::find(
+            [
+                'conditions' => 'id = ?1 ',
+                'bind' => [
+                    1 => $data->from_item
+                ],
+            ]
+        );
+
+        if(!$systemicMapsItems){
+            $response = [
+                'code' => 0,
+                'status' => 'Cannot find item id: '+ $data->from_item,
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
+
+        $systemicMapsItems2 = SystemicStructureMapItems::find(
+            [
+                'conditions' => 'id = ?1 ',
+                'bind' => [
+                    1 => $data->from_item
+                ],
+            ]
+        );
+
+        if(!$systemicMapsItems2){
+            $response = [
+                'code' => 0,
+                'status' => 'Cannot find item id: '+ $data->to_item,
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
+
+        $chain = new SystemicStructureMapChain();
+        if(isset($data->from_item)){
+            $chain->from_item = $data->from_item;
+        }
+        $chain->to_item = $data->to_item;
+        $chain->save();
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+        ];
+        return $this->createArrayResponse($response, 'data');
+
+    }
 }
