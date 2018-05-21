@@ -1665,28 +1665,28 @@ $action_grp_list = new ActionListGroup();
                 'data' => $messagesErrors,
             ];
         } else {
-            $systemicStructureMapItemId = $systemicStructureItem->getWriteConnection()->lastInsertId();
-            $chain = new \App\Model\SystemicStructureMapChain();
-            if ($data->from_item == '') {
-                $chain->from_item = null;
-            } else {
-                $chain->from_item = $data->from_item;
-            }
-            $chain->to_item = $systemicStructureMapItemId;
-            if ($chain->save() == false) {
-                $messagesErrors = array();
-                foreach ($chain->getMessages() as $message) {
-                    $messagesErrors[] = $message;
-                }
-                //die();
-                $response = [
-                    'code' => 0,
-                    'status' => 'Error',
-                    'data' => $messagesErrors,
-                ];
-
-                return $this->createArrayResponse($response, 'data');
-            }
+//            $systemicStructureMapItemId = $systemicStructureItem->getWriteConnection()->lastInsertId();
+//            $chain = new \App\Model\SystemicStructureMapChain();
+//            if ($data->from_item == '') {
+//                $chain->from_item = null;
+//            } else {
+//                $chain->from_item = $data->from_item;
+//            }
+//            $chain->to_item = $systemicStructureMapItemId;
+//            if ($chain->save() == false) {
+//                $messagesErrors = array();
+//                foreach ($chain->getMessages() as $message) {
+//                    $messagesErrors[] = $message;
+//                }
+//                //die();
+//                $response = [
+//                    'code' => 0,
+//                    'status' => 'Error',
+//                    'data' => $messagesErrors,
+//                ];
+//
+//                return $this->createArrayResponse($response, 'data');
+//            }
 
             $response = [
                 'code' => 1,
