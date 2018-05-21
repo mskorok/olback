@@ -2026,7 +2026,7 @@ $action_grp_list = new ActionListGroup();
             if (!$systemicMapsItems) {
                 $response = [
                     'code' => 0,
-                    'status' => 'Cannot find item id: ' + $data->from_item,
+                    'status' => 'Cannot find item id: '. $data->from_item,
                 ];
                 return $this->createArrayResponse($response, 'data');
             }
@@ -2043,7 +2043,7 @@ $action_grp_list = new ActionListGroup();
         if(!$systemicMapsItems2){
             $response = [
                 'code' => 0,
-                'status' => 'Cannot find item id: '+ $data->to_item,
+                'status' => 'Cannot find item id: '. $data->to_item,
             ];
             return $this->createArrayResponse($response, 'data');
         }
