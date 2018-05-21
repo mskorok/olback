@@ -2013,25 +2013,25 @@ $action_grp_list = new ActionListGroup();
         }
         $organization_id = $creator['organization']->organization_id;
 
+        if(isset($data->from_item)) {
+            $systemicMapsItems = SystemicStructureMapItems::findFirst(
+                [
+                    'conditions' => 'id = ?1 ',
+                    'bind' => [
+                        1 => $data->from_item
+                    ],
+                ]
+            );
 
-        $systemicMapsItems = SystemicStructureMapItems::find(
-            [
-                'conditions' => 'id = ?1 ',
-                'bind' => [
-                    1 => $data->from_item
-                ],
-            ]
-        );
-
-        if(!$systemicMapsItems){
-            $response = [
-                'code' => 0,
-                'status' => 'Cannot find item id: '+ $data->from_item,
-            ];
-            return $this->createArrayResponse($response, 'data');
+            if (!$systemicMapsItems) {
+                $response = [
+                    'code' => 0,
+                    'status' => 'Cannot find item id: ' + $data->from_item,
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
         }
-
-        $systemicMapsItems2 = SystemicStructureMapItems::find(
+        $systemicMapsItems2 = SystemicStructureMapItems::findFirst(
             [
                 'conditions' => 'id = ?1 ',
                 'bind' => [
