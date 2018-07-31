@@ -1687,7 +1687,8 @@ $action_grp_list = new ActionListGroup();
 //
 //                return $this->createArrayResponse($response, 'data');
 //            }
-
+ 
+            $systemicStructureMapItemId=(int)($systemicStructureItem->id);
             $response = [
                 'code' => 1,
                 'status' => 'Success',
@@ -1828,8 +1829,8 @@ $action_grp_list = new ActionListGroup();
                 }
 
                 $systemicMapsArray[] = array(
-                    'id' => $systemicMap->id,
-                    'systemic_map_id' => $systemicMap->systemic_map_id,
+                    'id' => intval($systemicMap->id),
+                    'systemic_map_id' => intval($systemicMap->systemic_map_id),
                     'name' => $systemicMap->question,
                     'proposal' => $systemicMap->proposal,
                     'group' => intval($systemicMap->groupId),
