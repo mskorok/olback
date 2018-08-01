@@ -2,7 +2,9 @@
 
 namespace App\Mvc;
 
-class DateTrackingModel extends \Phalcon\Mvc\Model
+use Phalcon\Mvc\Model;
+
+class DateTrackingModel extends Model
 {
     public $createdAt;
     public $updatedAt;

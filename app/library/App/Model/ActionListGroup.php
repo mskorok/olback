@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
-class ActionListGroup extends \App\Mvc\DateTrackingModel
+use App\Mvc\DateTrackingModel;
+
+class ActionListGroup extends DateTrackingModel
 {
     public $id;
     public $systemic_map_id;

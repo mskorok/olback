@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
-class UserDepartment extends \App\Mvc\DateTrackingModel
+use App\Mvc\DateTrackingModel;
+
+class UserDepartment extends DateTrackingModel
 {
     public $id;
     public $department_id;

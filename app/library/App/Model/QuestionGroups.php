@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
-class QuestionGroups extends \App\Mvc\DateTrackingModel
+use App\Mvc\DateTrackingModel;
+
+class QuestionGroups extends DateTrackingModel
 {
     public $id;
     public $name;

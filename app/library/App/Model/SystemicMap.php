@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
-class SystemicMap extends \App\Mvc\DateTrackingModel
+use App\Mvc\DateTrackingModel;
+
+class SystemicMap extends DateTrackingModel
 {
     public $id;
     public $name;

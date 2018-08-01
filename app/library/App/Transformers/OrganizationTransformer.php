@@ -2,7 +2,7 @@
 
 namespace App\Transformers;
 
-use App\Model\User;
+use App\Model\Organization;
 use PhalconRest\Transformers\ModelTransformer;
 
 class OrganizationTransformer extends ModelTransformer

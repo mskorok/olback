@@ -7,11 +7,11 @@
  */
 
 namespace App\Transformers;
+
 use App\Model\Process;
 use PhalconRest\Transformers\ModelTransformer;
 
 class ProcessTransformer extends ModelTransformer
 {
     protected $modelClass = Process::class;
-
 }

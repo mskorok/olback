@@ -2,7 +2,13 @@
 
 namespace App\Controllers;
 
+use App\Auth\UsernameAccountType;
+use App\Constants\AclRoles;
+use App\Model\ProcessOrganizations;
 use App\Model\ProcessUsers;
+use App\Transformers\UserTransformer;
+use Phalcon\Db;
+use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 // use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
 use App\Model\User;
@@ -13,40 +19,52 @@ use App\Model\ProcessDepartments;
 
 class UserController extends CrudResourceController
 {
+    /**
+     * @return mixed
+     * @throws \PhalconApi\Exception
+     */
     public function me()
     {
         return $this->createResourceResponse($this->userService->getDetails());
     }
 
-    public function refreshToken(){
-      if ($this->authManager->loggedIn()) {
-        $response = [
-            'status' => 0,
-            'msg' => "you are logged in"
-        ];
-      }else{
-        $response = [
-            'status' => 1,
-            'msg' => "you are not logged in"
-        ];
-      }
+    public function refreshToken()
+    {
+        if ($this->authManager->loggedIn()) {
+            $response = [
+                'status' => 0,
+                'msg' => 'you are logged in'
+            ];
+        } else {
+            $response = [
+                'status' => 1,
+                'msg' => 'you are not logged in'
+            ];
+        }
 
-      return $this->createArrayResponse($response, 'data');
+        return $this->createArrayResponse($response, 'data');
     }
 
 
+    /**
+     * @return mixed
+     * @throws \PhalconApi\Exception
+     */
     public function authenticate()
     {
         $username = $this->request->getUsername();
         $password = $this->request->getPassword();
 
-        $session = $this->authManager->loginWithUsernamePassword(\App\Auth\UsernameAccountType::NAME, $username,
-            $password);
+        $session = $this->authManager->loginWithUsernamePassword(
+            UsernameAccountType::NAME,
+            $username,
+            $password
+        );
 
-        $transformer = new \App\Transformers\UserTransformer();
-        $transformer->setModelClass('App\Model\User');
+        $transformer = new UserTransformer();
+        $transformer->setModelClass(User::class);
 
-        $user = $this->createItemResponse(\App\Model\User::findFirst($session->getIdentity()), $transformer);
+        $user = $this->createItemResponse(User::findFirst($session->getIdentity()), $transformer);
 
         $response = [
             'token' => $session->getToken(),
@@ -59,52 +77,50 @@ class UserController extends CrudResourceController
 
     public function createManager()
     {
+        $adminId = null;
+        $organization_id = null;
         if ($this->authManager->loggedIn()) {
             $session = $this->authManager->getSession();
-            $adminId = $session->getIdentity(); // For example; 1
-        // $user = \Users::findFirstById($userId);
+            $adminId = $session ? $session->getIdentity() : null;
         }
 
+        /** @var Simple $organizations */
         $organizations = Organization::find(
-        [
-            'conditions' => 'userId = ?1',
-            'bind' => [
-                1 => $adminId,
-            ],
-        ]
-      );
+            [
+                'conditions' => 'userId = ?1',
+                'bind' => [
+                    1 => $adminId,
+                ],
+            ]
+        );
         $orgs = array();
-        if ($organizations) {
+        if ($organizations->count() > 0) {
+            /** @var Organization $or */
             foreach ($organizations as $or) {
-                $organization_id = $or->id;
+                $organization_id = $or->id;//todo
             }
-      //  echo $organization_id;die();
         } else {
             $response = [
-            'code' => 0,
-            'status' => 'Error',
-            'data' => "Admin's organization not found!",
-        ];
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Admin's organization not found!",
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
 
-      // error_reporting(E_ERROR | E_PARSE);
-
-      $request = new Request();
+        $request = new Request();
         $data = $request->getJsonRawBody();
 
-      // var_dump($data);die();
-      //check for required fields
-      $validate = array(
-        'password' => array('mandatory' => true, 'regex' => null),
-        'email' => array('mandatory' => true, 'regex' => null),
-      );
+        $validate = [
+            'password' => ['mandatory' => true, 'regex' => null],
+            'email' => ['mandatory' => true, 'regex' => null],
+        ];
 
-        $missing_input = array();
+        $missing_input = [];
 
         foreach ($data as $key => $val) {
-            $mandatory = isset($validate[$key]) ? $validate[$key] : false;
+            $mandatory = $validate[$key] ?? false;
             if ($mandatory && !trim($val)) {
                 $missing_input[] = $key;
             }
@@ -112,87 +128,87 @@ class UserController extends CrudResourceController
 
         if (!empty($missing_input)) {
             $response = [
-            'code' => 0,
-            'status' => 'Required field: '.implode(', ', $missing_input),
-        ];
+                'code' => 0,
+                'status' => 'Required field: ' . implode(', ', $missing_input),
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
 
-      //check for duplicates
-      $user = User::findFirst(
-          [
-              'conditions' => 'email = ?1 OR username = ?2',
-              'bind' => [
-                  1 => $data->email,
-                  2 => $data->username,
-              ],
-          ]
-      );
-        if ($user) {
-            if ($user->email == $data->email) {
+        //check for duplicates
+        $user = User::findFirst(
+            [
+                'conditions' => 'email = ?1 OR username = ?2',
+                'bind' => [
+                    1 => $data->email,
+                    2 => $data->username,
+                ],
+            ]
+        );
+        if ($user instanceof User) {
+            $errorText = '';
+            if ($user->email === $data->email) {
                 $errorText = 'Email';
             }
-            if ($user->username == $data->username) {
+            if ($user->username === $data->username) {
                 $errorText = 'Username';
             }
             $response = [
-            'code' => 0,
-            'status' => $errorText.' exists!',
-        ];
+                'code' => 0,
+                'status' => $errorText . ' exists!',
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
 
-      //create new manager user
-      $manager = new \App\Model\User();
-        $manager->role = \App\Constants\AclRoles::MANAGER;
+        //create new manager user
+        $manager = new User();
+        $manager->role = AclRoles::MANAGER;
         $manager->email = $data->email;
         $manager->username = $data->username;
         $manager->password = $this->security->hash($data->password);
         $manager->firstName = $data->firstName;
         $manager->lastName = $data->LastName;
-        $manager->createdAt = '2017-07-06 02:25:00';
+        $manager->createdAt = (new \DateTime())->format('Y-m-d H:i:s');
 
-        if ($manager->save() == false) {
-            $messagesErrors = array();
+        if ($manager->save() === false) {
+            $messagesErrors = [];
             foreach ($manager->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
             $response = [
-            'code' => 0,
-            'status' => 'Error',
-            'data' => $messagesErrors,
-        ];
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $messagesErrors,
+            ];
         } else {
-        //  echo "aaaa";die();
             $managerId = $manager->getWriteConnection()->lastInsertId();
-            $assign_org = new \App\Model\UserOrganization();
-            $assign_org->organization_id = $organization_id;
+            $assign_org = new UserOrganization();
+            $assign_org->organization_id = $data->organization ?? $organization_id;
             $assign_org->user_id = $managerId;
-            if ($assign_org->save() == false) {
+            if ($assign_org->save() === false) {
                 $messagesErrors = array();
                 foreach ($assign_org->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
                 $response = [
-              'code' => 0,
-              'status' => 'Error2',
-              'data' => $messagesErrors,
-          ];
+                    'code' => 0,
+                    'status' => 'Error2',
+                    'data' => $messagesErrors,
+                ];
             } else {
                 $response = [
-                       'code' => 1,
-                       'status' => 'Success',
-                       'data' => array(
-                         'userid' => $managerId,
-                       ),
-                   ];
+                    'code' => 1,
+                    'status' => 'Success',
+                    'data' => array(
+                        'userid' => $managerId,
+                    ),
+                ];
             }
         }
 
-      //response
-      return $this->createArrayResponse($response, 'data');
+        //response
+        return $this->createArrayResponse($response, 'data');
     }
 
     public function createUser()
@@ -200,16 +216,16 @@ class UserController extends CrudResourceController
         $request = new Request();
         $data = $request->getJsonRawBody();
 
-      //check for required fields
-      $validate = array(
-        'password' => array('mandatory' => true, 'regex' => null),
-        'email' => array('mandatory' => true, 'regex' => null),
-      );
+        //check for required fields
+        $validate = array(
+            'password' => array('mandatory' => true, 'regex' => null),
+            'email' => array('mandatory' => true, 'regex' => null),
+        );
 
         $missing_input = array();
 
         foreach ($data as $key => $val) {
-            $mandatory = isset($validate[$key]) ? $validate[$key] : false;
+            $mandatory = $validate[$key] ?? false;
             if ($mandatory && !trim($val)) {
                 $missing_input[] = $key;
             }
@@ -217,71 +233,71 @@ class UserController extends CrudResourceController
 
         if (!empty($missing_input)) {
             $response = [
-            'code' => 0,
-            'status' => 'Required field: '.implode(', ', $missing_input),
-        ];
+                'code' => 0,
+                'status' => 'Required field: ' . implode(', ', $missing_input),
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
 
-      //check for duplicates
-      $user = User::findFirst(
-          [
-              'conditions' => 'email = ?1 OR username = ?2',
-              'bind' => [
-                  1 => $data->email,
-                  2 => $data->username,
-              ],
-          ]
-      );
-        if ($user) {
-            if ($user->email == $data->email) {
+        //check for duplicates
+        $user = User::findFirst(
+            [
+                'conditions' => 'email = ?1 OR username = ?2',
+                'bind' => [
+                    1 => $data->email,
+                    2 => $data->username,
+                ],
+            ]
+        );
+        if ($user instanceof User) {
+            $errorText = '';
+            if ($user->email === $data->email) {
                 $errorText = 'Email';
             }
-            if ($user->username == $data->username) {
+            if ($user->username === $data->username) {
                 $errorText = 'Username';
             }
             $response = [
-            'code' => 0,
-            'status' => $errorText.' exists!',
-        ];
+                'code' => 0,
+                'status' => $errorText . ' exists!',
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
 
-      //create new manager user
-      $manager = new \App\Model\User();
-        $manager->role = \App\Constants\AclRoles::USER;
+        //create new manager user
+        $manager = new User();
+        $manager->role = AclRoles::USER;
         $manager->email = $data->email;
         $manager->username = $data->username;
         $manager->password = $this->security->hash($data->password);
         $manager->firstName = $data->firstName;
         $manager->lastName = $data->LastName;
-        $manager->createdAt = '2017-07-06 02:25:00';
+        $manager->createdAt = (new \DateTime())->format('Y-m-d H:i:s');
 
-        if ($manager->save() == false) {
+        if ($manager->save() === false) {
             $messagesErrors = array();
             foreach ($manager->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
             $response = [
-            'code' => 0,
-            'status' => 'Error',
-            'data' => $messagesErrors,
-        ];
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $messagesErrors,
+            ];
         } else {
             $managerId = $manager->getWriteConnection()->lastInsertId();
             $response = [
-             'code' => 1,
-             'status' => 'Success',
-             'data' => array(
-               'userid' => $managerId,
-             ),
-         ];
+                'code' => 1,
+                'status' => 'Success',
+                'data' => array(
+                    'userid' => $managerId,
+                ),
+            ];
         }
 
-      //response
-      return $this->createArrayResponse($response, 'data');
+        return $this->createArrayResponse($response, 'data');
     }
 
 
@@ -296,26 +312,18 @@ class UserController extends CrudResourceController
 
     public function createManagerPublic()
     {
-
-
-
-
-      // error_reporting(E_ERROR | E_PARSE);
-
-      $request = new Request();
+        $request = new Request();
         $data = $request->getJsonRawBody();
-$organization_id = $data->organization;
-      // var_dump($data);die();
-      //check for required fields
-      $validate = array(
-        'password' => array('mandatory' => true, 'regex' => null),
-        'email' => array('mandatory' => true, 'regex' => null),
-      );
+        $organization_id = $data->organization;
+        $validate = array(
+            'password' => array('mandatory' => true, 'regex' => null),
+            'email' => array('mandatory' => true, 'regex' => null),
+        );
 
         $missing_input = array();
 
         foreach ($data as $key => $val) {
-            $mandatory = isset($validate[$key]) ? $validate[$key] : false;
+            $mandatory = $validate[$key] ?? false;
             if ($mandatory && !trim($val)) {
                 $missing_input[] = $key;
             }
@@ -323,87 +331,87 @@ $organization_id = $data->organization;
 
         if (!empty($missing_input)) {
             $response = [
-            'code' => 0,
-            'status' => 'Required field: '.implode(', ', $missing_input),
-        ];
+                'code' => 0,
+                'status' => 'Required field: ' . implode(', ', $missing_input),
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
 
-      //check for duplicates
-      $user = User::findFirst(
-          [
-              'conditions' => 'email = ?1 OR username = ?2',
-              'bind' => [
-                  1 => $data->email,
-                  2 => $data->username,
-              ],
-          ]
-      );
-        if ($user) {
-            if ($user->email == $data->email) {
+        //check for duplicates
+        $user = User::findFirst(
+            [
+                'conditions' => 'email = ?1 OR username = ?2',
+                'bind' => [
+                    1 => $data->email,
+                    2 => $data->username,
+                ],
+            ]
+        );
+        if ($user instanceof User) {
+            $errorText = '';
+            if ($user->email === $data->email) {
                 $errorText = 'Email';
             }
-            if ($user->username == $data->username) {
+            if ($user->username === $data->username) {
                 $errorText = 'Username';
             }
             $response = [
-            'code' => 0,
-            'status' => $errorText.' exists!',
-        ];
+                'code' => 0,
+                'status' => $errorText . ' exists!',
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
 
-      //create new manager user
-      $manager = new \App\Model\User();
-        $manager->role = \App\Constants\AclRoles::MANAGER;
+        //create new manager user
+        $manager = new User();
+        $manager->role = AclRoles::MANAGER;
         $manager->email = $data->email;
         $manager->username = $data->username;
         $manager->password = $this->security->hash($data->password);
         $manager->firstName = $data->firstName;
         $manager->lastName = $data->LastName;
-        $manager->createdAt = '2017-07-06 02:25:00';
+        $manager->createdAt = (new \DateTime())->format('Y-m-d H:i:s');
 
-        if ($manager->save() == false) {
+        if ($manager->save() === false) {
             $messagesErrors = array();
             foreach ($manager->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
             $response = [
-            'code' => 0,
-            'status' => 'Error',
-            'data' => $messagesErrors,
-        ];
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $messagesErrors,
+            ];
         } else {
-        //  echo "aaaa";die();
             $managerId = $manager->getWriteConnection()->lastInsertId();
-            $assign_org = new \App\Model\UserOrganization();
+            $assign_org = new UserOrganization();
             $assign_org->organization_id = $organization_id;
             $assign_org->user_id = $managerId;
-            if ($assign_org->save() == false) {
+            if ($assign_org->save() === false) {
                 $messagesErrors = array();
                 foreach ($assign_org->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
                 $response = [
-              'code' => 0,
-              'status' => 'Error2',
-              'data' => $messagesErrors,
-          ];
+                    'code' => 0,
+                    'status' => 'Error2',
+                    'data' => $messagesErrors,
+                ];
             } else {
                 $response = [
-                       'code' => 1,
-                       'status' => 'Success',
-                       'data' => array(
-                         'userid' => $managerId,
-                       ),
-                   ];
+                    'code' => 1,
+                    'status' => 'Success',
+                    'data' => array(
+                        'userid' => $managerId,
+                    ),
+                ];
             }
         }
 
-      //response
-      return $this->createArrayResponse($response, 'data');
+        //response
+        return $this->createArrayResponse($response, 'data');
     }
 
     public function createUserPublic()
@@ -411,16 +419,16 @@ $organization_id = $data->organization;
         $request = new Request();
         $data = $request->getJsonRawBody();
         $organization_id = $data->organization;
-      //check for required fields
-      $validate = array(
-        'password' => array('mandatory' => true, 'regex' => null),
-        'email' => array('mandatory' => true, 'regex' => null),
-      );
+        //check for required fields
+        $validate = array(
+            'password' => array('mandatory' => true, 'regex' => null),
+            'email' => array('mandatory' => true, 'regex' => null),
+        );
 
         $missing_input = array();
 
         foreach ($data as $key => $val) {
-            $mandatory = isset($validate[$key]) ? $validate[$key] : false;
+            $mandatory = $validate[$key] ?? false;
             if ($mandatory && !trim($val)) {
                 $missing_input[] = $key;
             }
@@ -428,87 +436,87 @@ $organization_id = $data->organization;
 
         if (!empty($missing_input)) {
             $response = [
-            'code' => 0,
-            'status' => 'Required field: '.implode(', ', $missing_input),
-        ];
+                'code' => 0,
+                'status' => 'Required field: ' . implode(', ', $missing_input),
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
 
-      //check for duplicates
-      $user = User::findFirst(
-          [
-              'conditions' => 'email = ?1 OR username = ?2',
-              'bind' => [
-                  1 => $data->email,
-                  2 => $data->username,
-              ],
-          ]
-      );
-        if ($user) {
-            if ($user->email == $data->email) {
+        //check for duplicates
+        $user = User::findFirst(
+            [
+                'conditions' => 'email = ?1 OR username = ?2',
+                'bind' => [
+                    1 => $data->email,
+                    2 => $data->username,
+                ],
+            ]
+        );
+        if ($user instanceof User) {
+            $errorText = '';
+            if ($user->email === $data->email) {
                 $errorText = 'Email';
             }
-            if ($user->username == $data->username) {
+            if ($user->username === $data->username) {
                 $errorText = 'Username';
             }
             $response = [
-            'code' => 0,
-            'status' => $errorText.' exists!',
-        ];
+                'code' => 0,
+                'status' => $errorText . ' exists!',
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
 
-      //create new manager user
-      $manager = new \App\Model\User();
-        $manager->role = \App\Constants\AclRoles::USER;
+        //create new manager user
+        $manager = new User();
+        $manager->role = AclRoles::USER;
         $manager->email = $data->email;
         $manager->username = $data->username;
         $manager->password = $this->security->hash($data->password);
         $manager->firstName = $data->firstName;
         $manager->lastName = $data->LastName;
-        $manager->createdAt = '2017-07-06 02:25:00';
+        $manager->createdAt = (new \DateTime())->format('Y-m-d H:i:s');
 
-        if ($manager->save() == false) {
+        if ($manager->save() === false) {
             $messagesErrors = array();
             foreach ($manager->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
             $response = [
-            'code' => 0,
-            'status' => 'Error',
-            'data' => $messagesErrors,
-        ];
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $messagesErrors,
+            ];
         } else {
-
-          $managerId = $manager->getWriteConnection()->lastInsertId();
-          $assign_org = new \App\Model\UserOrganization();
-          $assign_org->organization_id = $organization_id;
-          $assign_org->user_id = $managerId;
-          if ($assign_org->save() == false) {
-              $messagesErrors = array();
-              foreach ($assign_org->getMessages() as $message) {
-                  $messagesErrors[] = $message;
-              }
-              $response = [
-            'code' => 0,
-            'status' => 'Error2',
-            'data' => $messagesErrors,
-        ];
-          } else {
-              $response = [
-                     'code' => 1,
-                     'status' => 'Success',
-                     'data' => array(
-                       'userid' => $managerId,
-                     ),
-                 ];
-          }
+            $managerId = $manager->getWriteConnection()->lastInsertId();
+            $assign_org = new UserOrganization();
+            $assign_org->organization_id = $organization_id;
+            $assign_org->user_id = $managerId;
+            if ($assign_org->save() === false) {
+                $messagesErrors = array();
+                foreach ($assign_org->getMessages() as $message) {
+                    $messagesErrors[] = $message;
+                }
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error2',
+                    'data' => $messagesErrors,
+                ];
+            } else {
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success',
+                    'data' => array(
+                        'userid' => $managerId,
+                    ),
+                ];
+            }
         }
 
-      //response
-      return $this->createArrayResponse($response, 'data');
+        //response
+        return $this->createArrayResponse($response, 'data');
     }
 
     public function setProcessPermissions()
@@ -518,33 +526,33 @@ $organization_id = $data->organization;
         $processId = $data->processId;
 
         $connection = $this->db;
-        $sqlDepartment = 'DELETE FROM `process_departments` WHERE `processId` = '.$processId;
+        $sqlDepartment = 'DELETE FROM `process_departments` WHERE `processId` = ' . $processId;
         $connection->query($sqlDepartment);
 
-        $sqlUsers = 'DELETE FROM `process_users` WHERE `processId` = '.$processId;
+        $sqlUsers = 'DELETE FROM `process_users` WHERE `processId` = ' . $processId;
         $connection->query($sqlUsers);
 
-        $sqlOrg = 'DELETE FROM `process_organizations` WHERE `processId` = '.$processId;
+        $sqlOrg = 'DELETE FROM `process_organizations` WHERE `processId` = ' . $processId;
         $connection->query($sqlOrg);
 
         //organization
-        foreach ($data->organization as $valueOrganization){
-            $processOrganizations = new \App\Model\ProcessOrganizations();
+        foreach ($data->organization as $valueOrganization) {
+            $processOrganizations = new ProcessOrganizations();
             $processOrganizations->processId = $processId;
             $processOrganizations->organizationId = $valueOrganization;
             $processOrganizations->save();
         }
 
         //departments
-        foreach ($data->department as $valueDepartment){
+        foreach ($data->department as $valueDepartment) {
             $processDepartments = new ProcessDepartments();
             $processDepartments->processId = $processId;
             $processDepartments->departmentId = $valueDepartment;
             $processDepartments->save();
         }
         //persons
-        foreach ($data->persons as $valuePersons){
-            $processUsers = new \App\Model\ProcessUsers();
+        foreach ($data->persons as $valuePersons) {
+            $processUsers = new ProcessUsers();
             $processUsers->processId = $processId;
             $processUsers->userId = $valuePersons;
             $processUsers->save();
@@ -559,10 +567,12 @@ $organization_id = $data->organization;
     }
 
 
-    public function updateUser(){
+    public function updateUser()
+    {
+        $creatorId = null;
         if ($this->authManager->loggedIn()) {
             $session = $this->authManager->getSession();
-            $creatorId = $session->getIdentity();
+            $creatorId = $session ? $session->getIdentity() : null;
         }
 
         $request = new Request();
@@ -575,14 +585,15 @@ $organization_id = $data->organization;
                 'bind' => [
                     1 => $creatorId
                 ],
-            ]);
+            ]
+        );
 
-        if($user) {
+        if ($user instanceof User) {
             $user->firstName = $data->firstName;
             $user->lastName = $data->lastName;
             $user->location = $data->location;
-            if ($user->save() == false) {
-                $messagesErrors = array();
+            if ($user->save() === false) {
+                $messagesErrors = [];
                 foreach ($user->getMessages() as $message) {
                     // print_r($message);
                     $messagesErrors[] = $message;
@@ -598,21 +609,23 @@ $organization_id = $data->organization;
                     'status' => 'Success'
                 ];
             }
-        }else{
+        } else {
             $response = [
                 'code' => 0,
                 'status' => 'Error',
-                'data' => "User not found",
+                'data' => 'User not found',
             ];
         }
 
         return $this->createArrayResponse($response, 'data');
     }
 
-    public function updateOtherUser($userId){
+    public function updateOtherUser($userId)
+    {
+        $creatorId = null;
         if ($this->authManager->loggedIn()) {
             $session = $this->authManager->getSession();
-            $creatorId = $session->getIdentity();
+            $creatorId = $session ? $session->getIdentity() : null;
         }
 
         $request = new Request();
@@ -625,14 +638,15 @@ $organization_id = $data->organization;
                 'bind' => [
                     1 => $userId
                 ],
-            ]);
+            ]
+        );
 
-        if($user) {
+        if ($user instanceof User) {
             $user->firstName = $data->firstName;
             $user->lastName = $data->lastName;
             $user->location = $data->location;
-            if ($user->save() == false) {
-                $messagesErrors = array();
+            if ($user->save() === false) {
+                $messagesErrors = [];
                 foreach ($user->getMessages() as $message) {
                     // print_r($message);
                     $messagesErrors[] = $message;
@@ -648,21 +662,23 @@ $organization_id = $data->organization;
                     'status' => 'Success'
                 ];
             }
-        }else{
+        } else {
             $response = [
                 'code' => 0,
                 'status' => 'Error',
-                'data' => "User not found",
+                'data' => 'User not found',
             ];
         }
 
         return $this->createArrayResponse($response, 'data');
     }
 
-    public function deactivateOtherUser($userId){
+    public function deactivateOtherUser($userId)
+    {
+        $creatorId = null;
         if ($this->authManager->loggedIn()) {
             $session = $this->authManager->getSession();
-            $creatorId = $session->getIdentity();
+            $creatorId = $session ? $session->getIdentity() : null;
         }
 
         $request = new Request();
@@ -675,17 +691,17 @@ $organization_id = $data->organization;
                 'bind' => [
                     1 => $userId
                 ],
-            ]);
+            ]
+        );
 
-        if($user) {
-            $user->firstName = "deleted";
-            $user->lastName = "deleted";
-            $user->email = "deleted@deleted.com";
+        if ($user instanceof User) {
+            $user->firstName = 'deleted';
+            $user->lastName = 'deleted';
+            $user->email = 'deleted@deleted.com';
             $user->location = $data->location;
-            if ($user->save() == false) {
+            if ($user->save() === false) {
                 $messagesErrors = array();
                 foreach ($user->getMessages() as $message) {
-                    // print_r($message);
                     $messagesErrors[] = $message;
                 }
                 $response = [
@@ -699,11 +715,11 @@ $organization_id = $data->organization;
                     'status' => 'Success'
                 ];
             }
-        }else{
+        } else {
             $response = [
                 'code' => 0,
                 'status' => 'Error',
-                'data' => "User not found",
+                'data' => 'User not found',
             ];
         }
 
@@ -720,7 +736,7 @@ $organization_id = $data->organization;
                 ],
             ]
         );
-        if ($user) {
+        if ($user instanceof User) {
             $organization = UserOrganization::findFirst(
                 [
                     'conditions' => 'user_id = ?1',
@@ -732,46 +748,46 @@ $organization_id = $data->organization;
 
             if ($organization) {
                 return array('account' => $user, 'organization' => $organization);
-            } else {
-                return array('account' => $user, 'organization' => null);
             }
-        } else {
-            return null;
+            return array('account' => $user, 'organization' => null);
         }
+        return null;
     }
 
-    public function getProcessPermissions($permissionId){
+    public function getProcessPermissions($permissionId)
+    {
 
         $permissions = array();
 //        $permissions['departments'] = $processDepartments;
 //        $permissions['users'] = $processUsers;
-        $processDepartments =  ProcessDepartments::find(
+        /** @var Simple $processDepartments */
+        $processDepartments = ProcessDepartments::find(
             [
                 'conditions' => 'processId = ?1',
                 'bind' => [
-                    1 =>$permissionId
+                    1 => $permissionId
                 ],
             ]
         );
 
-
-        $processUsers =  ProcessUsers::find(
+        /** @var Simple $processUsers */
+        $processUsers = ProcessUsers::find(
             [
                 'conditions' => 'processId = ?1',
                 'bind' => [
-                    1 =>$permissionId
+                    1 => $permissionId
                 ],
             ]
         );
 
+        /** @var ProcessDepartments $dep */
         foreach ($processDepartments as $dep) {
-            $permissions['departments'][] = (int) $dep->departmentId;
+            $permissions['departments'][] = (int)$dep->departmentId;
         }
 
-
-
+        /** @var ProcessUsers $depU */
         foreach ($processUsers as $depU) {
-            $permissions['users'][] = (int) $depU->userId;
+            $permissions['users'][] = (int)$depU->userId;
         }
 
         $response = [
@@ -782,19 +798,30 @@ $organization_id = $data->organization;
         return $this->createArrayResponse($response, 'data');
     }
 
-    public function getUsers(){
+    public function getUsers()
+    {
+        $creatorId = null;
         if ($this->authManager->loggedIn()) {
             $session = $this->authManager->getSession();
-            $creatorId = $session->getIdentity();
+            $creatorId = $session ? $session->getIdentity() : null;
         }
 
-        $creator = $this->getUserDetails($creatorId);
-//        var_dump($creator);die();
-        if ($creator['organization'] == null) {
+        $creator = static::getUserDetails($creatorId);
+        if (!$creator) {
             $response = [
                 'code' => 0,
                 'status' => 'Error',
-                'data' => "Manager's organization not found!",
+                'data' => 'Creator not found!',
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+
+        if ($creator && $creator['organization'] === null) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'Manager\'s organization not found!',
             ];
 
             return $this->createArrayResponse($response, 'data');
@@ -802,15 +829,12 @@ $organization_id = $data->organization;
         $organization_id = $creator['organization']->organization_id;
 
         $connection = $this->db;
-        $sql_dist = 'SELECT U.`id`, U.`role`, U.`email`, U.`username`,  U.`first_name` as firstName, U.`last_name` as lastName, U.`location`, U.`created_at` AS createdAt, U.`updated_at` AS updatedAt  FROM user U INNER JOIN user_organization O ON O.user_id = U.id WHERE O.organization_id = '.$organization_id.' AND U.email != "deleted@deleted.com" ';
+        $sql_dist = 'SELECT U.`id`, U.`role`, U.`email`, U.`username`,  U.`first_name` as firstName, U.`last_name` as lastName, U.`location`, U.`created_at` AS createdAt, U.`updated_at` AS updatedAt  FROM user U INNER JOIN user_organization O ON O.user_id = U.id WHERE O.organization_id = ' . $organization_id . ' AND U.email != "deleted@deleted.com" ';
         $data_dist = $connection->query($sql_dist);
-        $data_dist->setFetchMode(\Phalcon\Db::FETCH_ASSOC);
+        $data_dist->setFetchMode(Db::FETCH_ASSOC);
         $results_dist = $data_dist->fetchAll();
 
 
         return $this->createArrayResponse($results_dist, 'users');
-
-
-
     }
 }

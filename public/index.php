@@ -1,5 +1,5 @@
 <?php
-require_once("/var/www/wp-load.php");
+//require_once("/var/www/wp-load.php");
 /** @var \Phalcon\Config $config */
 $config = null;
 
@@ -11,7 +11,6 @@ $response = null;
 
 
 try {
-
 //    ini_set('display_errors', 1);
 //    ini_set('display_startup_errors', 1);
 //    error_reporting(E_ALL);
@@ -82,25 +81,22 @@ try {
 
     $returnedValue = $app->getReturnedValue();
 
-    if($returnedValue !== null) {
-
+    if ($returnedValue !== null) {
         if (is_string($returnedValue)) {
             $response->setContent($returnedValue);
         } else {
             $response->setJsonContent($returnedValue);
         }
     }
-
 } catch (\Exception $e) {
-
     // Handle exceptions
     $di = $app && $app->di ? $app->di : new PhalconRest\Di\FactoryDefault();
     $response = $di->getShared(App\Constants\Services::RESPONSE);
-    if(!$response || !$response instanceof PhalconApi\Http\Response){
+    if (!$response || !$response instanceof PhalconApi\Http\Response) {
         $response = new PhalconApi\Http\Response();
     }
 
-    $debugMode = isset($config->debug) ? $config->debug : (APPLICATION_ENV == 'development');
+    $debugMode = $config->debug ?? APPLICATION_ENV === 'development';
 
     $response->setErrorContent($e, $debugMode);
 }

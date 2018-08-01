@@ -6,13 +6,23 @@
     "license": "MIT",
     "homepage": "http://phalcon-rest.redound.org",
     "require": {
+        "php": ">=7.1.0",
         "redound/phalcon-rest": "^2.0.0",
         "league/fractal": "^0.13.0",
         "firebase/php-jwt": "^3.0",
-        "phpoffice/phpexcel": "1.8.*"
+        "phpoffice/phpexcel": "1.8.*",
+        "phalcon/incubator": "3.2.2",
+        "mikehaertl/phpwkhtmltopdf": "^2.3",
+        "mpdf/mpdf": "^7.1",
+        "dompdf/dompdf": "^0.8.2",
+        "jpgraph/jpgraph": "^4.0",
+        "tecnickcom/tcpdf": "^6.2",
+        "phalcon/ide-stubs": "^3.4",
+        "psr/log": "^1.0"
     },
     "require-dev": {
-        "codeception/codeception": "^2.1"
+        "codeception/codeception": "^2.1",
+        "phalcon/devtools": "3.2.2"
     },
     "authors": [
         {

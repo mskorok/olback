@@ -9,7 +9,8 @@ use App\Transformers\AlbumTransformer;
 use App\Constants\AclRoles;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 
-class AlbumResource extends ApiResource {
+class AlbumResource extends ApiResource
+{
 
     public function initialize()
     {

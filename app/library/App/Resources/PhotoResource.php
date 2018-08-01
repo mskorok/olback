@@ -9,7 +9,8 @@ use App\Transformers\PhotoTransformer;
 use App\Constants\AclRoles;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 
-class PhotoResource extends ApiResource {
+class PhotoResource extends ApiResource
+{
 
     public function initialize()
     {

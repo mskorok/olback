@@ -9,12 +9,12 @@ use App\Transformers\GroupTransformer;
 use App\Controllers\StatisticsController;
 use App\Constants\AclRoles;
 
-class StatisticsResource extends ApiResource {
+class StatisticsResource extends ApiResource
+{
 
     public function initialize()
     {
         $this
-
             ->name('Statistics')
 //            ->model(Statistics::class)
             ->expectsJsonData()
@@ -23,22 +23,23 @@ class StatisticsResource extends ApiResource {
             ->itemKey('Statistics')
             ->collectionKey('Statistics')
             ->deny(AclRoles::UNAUTHORIZED, AclRoles::USER)
-
-            ->endpoint(ApiEndpoint::get('/dashboard', 'getDashboardStats')
-                ->allow(AclRoles::MANAGER)
-                ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
-                ->description('get dashboard statistics')
+            ->endpoint(
+                ApiEndpoint::get('/dashboard', 'getDashboardStats')
+                    ->allow(AclRoles::MANAGER)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('get dashboard statistics')
             )
-            ->endpoint(ApiEndpoint::get('/getReportsBySurvey/{id}', 'getReportsBySurvey')
-                ->allow(AclRoles::MANAGER)
-                ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
-                ->description('getReportsBySurvey')
+            ->endpoint(
+                ApiEndpoint::get('/getReportsBySurvey/{id}', 'getReportsBySurvey')
+                    ->allow(AclRoles::MANAGER)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('getReportsBySurvey')
             )
-            ->endpoint(ApiEndpoint::get('/getReportsBySurveyAndUser/{id}/{userId}', 'getReportsBySurveyAndUser')
-                ->allow(AclRoles::MANAGER)
-                ->deny(AclRoles::UNAUTHORIZED,AclRoles::AUTHORIZED)
-                ->description('getReportsBySurveyAndUser')
+            ->endpoint(
+                ApiEndpoint::get('/getReportsBySurveyAndUser/{id}/{userId}', 'getReportsBySurveyAndUser')
+                    ->allow(AclRoles::MANAGER)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('getReportsBySurveyAndUser')
             );
     }
-
 }

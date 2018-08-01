@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
-class Album extends \App\Mvc\DateTrackingModel
+use App\Mvc\DateTrackingModel;
+
+class Album extends DateTrackingModel
 {
     public $id;
     public $title;
@@ -20,7 +22,8 @@ class Album extends \App\Mvc\DateTrackingModel
         ];
     }
 
-    public function initialize() {
+    public function initialize()
+    {
 
         $this->hasMany('id', Photo::class, 'albumId', [
             'alias' => 'Photos',

@@ -20,7 +20,12 @@ use PhalconApi\Auth\TokenParsers\JWTTokenParser;
 
 class ServiceBootstrap implements BootstrapInterface
 {
-    public function run(Api $api, DiInterface $di, Config $config)
+    /**
+     * @param Api $api
+     * @param DiInterface $di
+     * @param Config $config
+     */
+    public function run(Api $api, DiInterface $di, Config $config) :void
     {
         /**
          * @description Config - \Phalcon\Config
@@ -115,11 +120,11 @@ class ServiceBootstrap implements BootstrapInterface
 
 
         $di->set(
-      "modelsManager",
-      function() {
-          return new ModelsManager();
-      }
-  );
+            'modelsManager',
+            function () {
+                return new ModelsManager();
+            }
+        );
         /**
          * @description PhalconRest - \PhalconRest\User\Service
          */

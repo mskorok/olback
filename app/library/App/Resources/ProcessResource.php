@@ -9,7 +9,8 @@ use App\Transformers\ProcessTransformer;
 use App\Constants\AclRoles;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 
-class ProcessResource extends ApiResource {
+class ProcessResource extends ApiResource
+{
 
     public function initialize()
     {

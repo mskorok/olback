@@ -21,6 +21,12 @@ use PhalconRest\Api;
 
 class CollectionBootstrap implements BootstrapInterface
 {
+    /**
+     * @param Api $api
+     * @param DiInterface $di
+     * @param Config $config
+     * @throws \PhalconApi\Exception
+     */
     public function run(Api $api, DiInterface $di, Config $config)
     {
       // echo "Fds";die();

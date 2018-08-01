@@ -2,10 +2,14 @@
 
 namespace App\Model;
 
-class User extends \App\Mvc\DateTrackingModel
+use App\Mvc\DateTrackingModel;
+
+class User extends DateTrackingModel
 {
     public $id;
     public $role;
+    public $email;
+    public $location;
     public $firstName;
     public $lastName;
     public $username;

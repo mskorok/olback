@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
-class Photo extends \App\Mvc\DateTrackingModel
+use App\Mvc\DateTrackingModel;
+
+class Photo extends DateTrackingModel
 {
     public $id;
     public $title;
@@ -22,7 +24,8 @@ class Photo extends \App\Mvc\DateTrackingModel
         ];
     }
 
-    public function initialize() {
+    public function initialize()
+    {
 
         $this->belongsTo('albumId', Album::class, 'id', [
             'alias' => 'Album',

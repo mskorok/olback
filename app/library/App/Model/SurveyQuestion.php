@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
-class SurveyQuestion extends \App\Mvc\DateTrackingModel
+use App\Mvc\DateTrackingModel;
+
+class SurveyQuestion extends DateTrackingModel
 {
     public $id;
     public $question;

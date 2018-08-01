@@ -13,50 +13,49 @@ class GroupController extends CrudResourceController
 {
     public function getGroups()
     {
-
+        $userId = null;
         if ($this->authManager->loggedIn()) {
             $session = $this->authManager->getSession();
-            $userId = $session->getIdentity(); // For example; 1
+            $userId = $session ? $session->getIdentity() : null; // For example; 1
         }
-        $creator = \App\Controllers\SystemicMapController::getUserDetails($userId);
-        if ($creator['organization'] == null) {
+        $creator = SystemicMapController::getUserDetails($userId);
+        if ($creator && $creator['organization'] === null) {
             $response = [
-          'code' => 0,
-          'status' => 'Error',
-          'data' => "Manager's organization not found!",
-        ];
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
         $organization_id = $creator['organization']->organization_id;
 
         $groups = Group::find(
-      [
-          'conditions' => '	organization = ?1',
-          'bind' => [
-              1 => $organization_id,
-          ],
-      ]
-    );
-
+            [
+                'conditions' => '	organization = ?1',
+                'bind' => [
+                    1 => $organization_id,
+                ],
+            ]
+        );
 
 
         $groupArray = array();
-        if ($groups) {
+        if ($groups && (\is_array($groups) || $groups instanceof \Traversable)) {
             foreach ($groups as $group) {
                 $groupArray[] = array(
-        'id' => (int) $group->id,
-        'title' => $group->title,
-        'color' =>  $group->color,
+                    'id' => (int)$group->id,
+                    'title' => $group->title,
+                    'color' => $group->color,
                     'organization' => $group->organization,
                     'creatorId' => $group->creatorId,
-      );
+                );
             }
         }
         $response = [
-        'code' => 1,
-        'status' => 'Success',
-        'data' => $groupArray,
+            'code' => 1,
+            'status' => 'Success',
+            'data' => $groupArray,
         ];
 
         return $this->createArrayResponse($response, 'data');
@@ -64,48 +63,48 @@ class GroupController extends CrudResourceController
 
     public function createGroup()
     {
+        $userId = null;
         if ($this->authManager->loggedIn()) {
             $session = $this->authManager->getSession();
-            $userId = $session->getIdentity(); // For example; 1
+            $userId = $session ? $session->getIdentity() : null; // For example; 1
         }
-        $creator = \App\Controllers\SystemicMapController::getUserDetails($userId);
-        if ($creator['organization'] == null) {
+        $creator = SystemicMapController::getUserDetails($userId);
+        if ($creator && $creator['organization'] === null) {
             $response = [
-            'code' => 0,
-            'status' => 'Error',
-            'data' => "Manager's organization not found!",
-          ];
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
         $organization_id = $creator['organization']->organization_id;
-//echo $organization_id;die();
+
         $request = new Request();
         $data = $request->getJsonRawBody();
 
-        $group = new \App\Model\Group();
+        $group = new Group();
         $group->title = $data->title;
         $group->organization = $organization_id;
         $group->creatorId = $userId;
         $group->color = $data->color;
-        if ($group->save() == false) {
+        if ($group->save() === false) {
             $messagesErrors = array();
             foreach ($group->getMessages() as $message) {
-                print_r($message);
                 $messagesErrors[] = $message;
             }
             $response = [
-            'code' => 0,
-            'status' => 'Error',
-            'data' => $messagesErrors,
-        ];
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $messagesErrors,
+            ];
         } else {
             $groupId = $group->getWriteConnection()->lastInsertId();
             $response = [
-          'code' => 1,
-          'status' => 'Success',
-          'data' => array('systemicMapId' => $groupId),
-        ];
+                'code' => 1,
+                'status' => 'Success',
+                'data' => array('systemicMapId' => $groupId),
+            ];
         }
 
         return $this->createArrayResponse($response, 'data');
@@ -115,65 +114,69 @@ class GroupController extends CrudResourceController
     {
         $request = new Request();
         $data = $request->getJsonRawBody();
+        $userId = null;
         if ($this->authManager->loggedIn()) {
             $session = $this->authManager->getSession();
-            $userId = $session->getIdentity(); // For example; 1
+            $userId = $session ? $session->getIdentity() : null; // For example; 1
         }
-        $creator = \App\Controllers\SystemicMapController::getUserDetails($userId);
-        if ($creator['organization'] == null) {
+        $creator = SystemicMapController::getUserDetails($userId);
+        if ($creator && $creator['organization'] === null) {
             $response = [
-          'code' => 0,
-          'status' => 'Error',
-          'data' => "Manager's organization not found!",
-        ];
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
         $organization_id = $creator['organization']->organization_id;
 
         $user = User::findFirst(
-      [
-          'conditions' => 'id = ?1',
-          'bind' => [
-              1 => $userId,
-          ],
-      ]);
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $userId,
+                ],
+            ]
+        );
 
-        if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
+        if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
             $group = Group::findFirst(
-        [
-            'conditions' => 'id = ?1 AND organization = ?2',
-            'bind' => [
-                1 => $id,
-                2 => $organization_id,
-            ],
-        ]);
+                [
+                    'conditions' => 'id = ?1 AND organization = ?2',
+                    'bind' => [
+                        1 => $id,
+                        2 => $organization_id,
+                    ],
+                ]
+            );
         } else {
             $group = Group::findFirst(
-        [
-            'conditions' => 'id = ?1 AND creatorId = ?2',
-            'bind' => [
-                1 => $id,
-                2 => $userId,
-            ],
-        ]);
+                [
+                    'conditions' => 'id = ?1 AND creatorId = ?2',
+                    'bind' => [
+                        1 => $id,
+                        2 => $userId,
+                    ],
+                ]
+            );
         }
-        if ($group) {
+        if ($group instanceof Group) {
             $group->title = $data->title;
-            if(isset($data->color)){
-              $group->color = $data->color;
+            if (isset($data->color)) {
+                $group->color = $data->color;
             }
 
             $group->save();
             $response = [
-          'code' => 1,
-          'status' => 'Success',
-        ];
+                'code' => 1,
+                'status' => 'Success',
+            ];
         } else {
             $response = [
-          'code' => 0,
-          'status' => 'You cannot edit this group!',
-        ];
+                'code' => 0,
+                'status' => 'You cannot edit this group!',
+            ];
         }
 
         return $this->createArrayResponse($response, 'data');
@@ -181,60 +184,64 @@ class GroupController extends CrudResourceController
 
     public function deleteGroup($id)
     {
+        $userId = null;
         if ($this->authManager->loggedIn()) {
             $session = $this->authManager->getSession();
-            $userId = $session->getIdentity(); // For example; 1
+            $userId = $session ? $session->getIdentity() : null; // For example; 1
         }
-        $creator = \App\Controllers\SystemicMapController::getUserDetails($userId);
-        if ($creator['organization'] == null) {
+        $creator = SystemicMapController::getUserDetails($userId);
+        if ($creator && $creator['organization'] === null) {
             $response = [
-          'code' => 0,
-          'status' => 'Error',
-          'data' => "Manager's organization not found!",
-        ];
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
 
             return $this->createArrayResponse($response, 'data');
         }
         $organization_id = $creator['organization']->organization_id;
 
         $user = User::findFirst(
-      [
-          'conditions' => 'id = ?1',
-          'bind' => [
-              1 => $userId,
-          ],
-      ]);
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $userId,
+                ],
+            ]
+        );
 
-        if ((AclRoles::MANAGER === $user->role) || (AclRoles::ADMINISTRATOR === $user->role)) {
+        if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
             $group = Group::findFirst(
-        [
-            'conditions' => 'id = ?1 AND organization = ?2',
-            'bind' => [
-                1 => $id,
-                2 => $organization_id,
-            ],
-        ]);
+                [
+                    'conditions' => 'id = ?1 AND organization = ?2',
+                    'bind' => [
+                        1 => $id,
+                        2 => $organization_id,
+                    ],
+                ]
+            );
         } else {
             $group = Group::findFirst(
-        [
-            'conditions' => 'id = ?1 AND creatorId = ?2',
-            'bind' => [
-                1 => $id,
-                2 => $userId,
-            ],
-        ]);
+                [
+                    'conditions' => 'id = ?1 AND creatorId = ?2',
+                    'bind' => [
+                        1 => $id,
+                        2 => $userId,
+                    ],
+                ]
+            );
         }
-        if ($group) {
+        if ($group instanceof User) {
             $group->delete();
             $response = [
-          'code' => 1,
-          'status' => 'Success',
-        ];
+                'code' => 1,
+                'status' => 'Success',
+            ];
         } else {
             $response = [
-          'code' => 0,
-          'status' => 'You cannot delete this group!',
-        ];
+                'code' => 0,
+                'status' => 'You cannot delete this group!',
+            ];
         }
 
         return $this->createArrayResponse($response, 'data');

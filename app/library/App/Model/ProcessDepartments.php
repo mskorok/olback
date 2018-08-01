@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
-class ProcessDepartments  extends \App\Mvc\DateTrackingModel
+use App\Mvc\DateTrackingModel;
+
+class ProcessDepartments extends DateTrackingModel
 {
     public $id;
     public $processId;
