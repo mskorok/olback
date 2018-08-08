@@ -18,6 +18,7 @@ class Manager extends \PhalconApi\Auth\Manager
      * @throws Exception
      *
      * Helper to login with email & password
+     * @throws \PhalconApi\Exception
      */
     public function loginWithEmailPassword($accountTypeName, $email, $password)
     {

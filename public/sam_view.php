@@ -51,8 +51,11 @@
 
         $curl = curl_init();
 
+//        $url = 'http://144.76.5.203/olsetapp/systemicmap/getItem/';//dev
+        $url = 'http://olset/systemicmap/getItem/';//local
+
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://144.76.5.203/olsetapp/systemicmap/getItem/' . $_REQUEST['id'],
+            CURLOPT_URL => $url . $_REQUEST['id'],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,

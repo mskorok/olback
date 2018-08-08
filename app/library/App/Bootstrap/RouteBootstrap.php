@@ -12,16 +12,14 @@ class RouteBootstrap implements BootstrapInterface
 {
     public function run(Api $api, DiInterface $di, Config $config)
     {
-        $api->get('/', function() use ($api) {
-
+        $api->get('/', function () use ($api) {
             /** @var \Phalcon\Mvc\View\Simple $view */
             $view = $api->di->get(Services::VIEW);
 
             return $view->render('general/index');
         });
 
-        $api->get('/proxy.html', function() use ($api, $config) {
-
+        $api->get('/proxy.html', function () use ($api, $config) {
             /** @var \Phalcon\Mvc\View\Simple $view */
             $view = $api->di->get(Services::VIEW);
 
@@ -29,8 +27,7 @@ class RouteBootstrap implements BootstrapInterface
             return $view->render('general/proxy');
         });
 
-        $api->get('/documentation.html', function() use ($api, $config) {
-
+        $api->get('/documentation.html', function () use ($api, $config) {
             /** @var \Phalcon\Mvc\View\Simple $view */
             $view = $api->di->get(Services::VIEW);
 

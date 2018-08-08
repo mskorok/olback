@@ -7,6 +7,8 @@ use PhalconRest\Transformers\Transformer;
 
 class AlbumTransformer extends Transformer
 {
+    protected $modelClass = Album::class;
+
     protected $availableIncludes = [
         'photos'
     ];

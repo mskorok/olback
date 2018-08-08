@@ -2,12 +2,11 @@
 
 namespace App\Controllers;
 
+use App\Model\Organization;
 use App\Model\ProcessDepartments;
+use App\Traits\Auth;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
-
-// use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
-// use App\Model\Group;
 use App\Model\UserOrganization;
 use App\Model\User;
 use App\Model\Department;
@@ -16,12 +15,21 @@ use Phalcon\Http\Request;
 
 class DepartmentController extends CrudResourceController
 {
+    use Auth;
+
+    /**
+     * @return mixed
+     */
     public function createDepartment()
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
         $creator = static::getUserDetails($creatorId);
@@ -35,7 +43,6 @@ class DepartmentController extends CrudResourceController
         if ($department->save() === false) {
             $messagesErrors = array();
             foreach ($department->getMessages() as $message) {
-                // print_r($message);
                 $messagesErrors[] = $message;
             }
             $response = [
@@ -55,12 +62,19 @@ class DepartmentController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function getDepartment()
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
         $creator = static::getUserDetails($creatorId);
@@ -95,15 +109,23 @@ class DepartmentController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function updateDepartment($id)
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+
+        $data = $this->request->getJsonRawBody();
         $creator = static::getUserDetails($creatorId);
         $organization = $creator['organization']->organization_id;
         if ($creator['organization'] === null) {
@@ -128,8 +150,7 @@ class DepartmentController extends CrudResourceController
             ]
         );
 
-        if ($department->id) {
-            //  echo $department->id;die();
+        if ($department instanceof Department) {
             if (isset($data->title)) {
                 $department->title = $data->title;
             }
@@ -139,7 +160,6 @@ class DepartmentController extends CrudResourceController
             if ($department->save() === false) {
                 $messagesErrors = array();
                 foreach ($department->getMessages() as $message) {
-                    // print_r($message);
                     $messagesErrors[] = $message;
                 }
                 $response = [
@@ -163,47 +183,24 @@ class DepartmentController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
-    public static function getUserDetails($userId)
-    {
-        $user = User::findFirst(
-            [
-                'conditions' => 'id = ?1',
-                'bind' => [
-                    1 => $userId,
-                ],
-            ]
-        );
-        if ($user) {
-            $organization = UserOrganization::findFirst(
-                [
-                    'conditions' => 'user_id = ?1',
-                    'bind' => [
-                        1 => $userId,
-                    ],
-                ]
-            );
-
-            if ($organization) {
-                return array('account' => $user, 'organization' => $organization);
-            }
-            return array('account' => $user, 'organization' => null);
-        }
-        return null;
-    }
-
+    /**
+     * @param $userId
+     * @return mixed
+     */
     public function assignUserDepartment($userId)
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
 
-        //check for user
         $user = User::findFirst(
             [
                 'conditions' => 'id = ?1',
@@ -222,7 +219,6 @@ class DepartmentController extends CrudResourceController
                     if ($department->save() === false) {
                         $messagesErrors = array();
                         foreach ($department->getMessages() as $message) {
-                            // print_r($message);
                             $messagesErrors[] = $message;
                         }
                         $response = [
@@ -250,13 +246,20 @@ class DepartmentController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
+    /**
+     * @param $departmentId
+     * @return mixed
+     */
     public function deleteDepartment($departmentId)
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
         $creator = static::getUserDetails($creatorId);
         $organization = $creator['organization']->organization_id;
@@ -272,7 +275,7 @@ class DepartmentController extends CrudResourceController
             ]
         );
 
-        if ($department) {
+        if ($department instanceof Department) {
             $userDepartment = UserDepartment::findFirst(
                 [
                     'conditions' => 'department_id = ?1',
@@ -281,7 +284,7 @@ class DepartmentController extends CrudResourceController
                     ],
                 ]
             );
-            if ($userDepartment) {
+            if ($userDepartment instanceof UserDepartment) {
                 $response = [
                     'code' => 0,
                     'status' => 'Assigned users'
@@ -297,7 +300,7 @@ class DepartmentController extends CrudResourceController
                     ],
                 ]
             );
-            if ($processDepartment) {
+            if ($processDepartment instanceof ProcessDepartments) {
                 $response = [
                     'code' => 0,
                     'status' => 'Assigned processes'
@@ -320,6 +323,10 @@ class DepartmentController extends CrudResourceController
     }
 
 
+    /**
+     * @param $userId
+     * @return mixed
+     */
     public function getUserDepartments($userId)
     {
         /** @var Simple $userDepartments */
@@ -332,7 +339,7 @@ class DepartmentController extends CrudResourceController
             ]
         );
 
-        $departmentIds = array();
+        $departmentIds = [];
         /** @var UserDepartment $d */
         foreach ($userDepartments as $d) {
             $departmentIds[] = (int)$d->department_id;
@@ -346,16 +353,23 @@ class DepartmentController extends CrudResourceController
     }
 
 
+    /**
+     * @param $userId
+     * @return mixed
+     */
     public function updateUserDepartments($userId)
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
 
         //check for user
         $user = User::findFirst(
@@ -366,7 +380,7 @@ class DepartmentController extends CrudResourceController
                 ],
             ]
         );
-        if ($user) {
+        if ($user instanceof User) {
             /** @var Simple $userDepartments */
             $userDepartments = UserDepartment::find(
                 [
@@ -392,7 +406,6 @@ class DepartmentController extends CrudResourceController
                         if ($department->save() === false) {
                             $messagesErrors = array();
                             foreach ($department->getMessages() as $message) {
-                                // print_r($message);
                                 $messagesErrors[] = $message;
                             }
                             $response = [

@@ -34,4 +34,24 @@ class Service extends \PhalconApi\User\Service
 
         return $details;
     }
+
+    /**
+     * @param $role
+     * @return bool
+     * @throws \PhalconApi\Exception
+     */
+    public function hasRole($role) :bool
+    {
+        return $role === $this->getRole();
+    }
+
+    /**
+     * @param array $roles
+     * @return bool
+     * @throws \PhalconApi\Exception
+     */
+    public function hasRoles(array $roles) :bool
+    {
+        return \in_array($this->getRole(), $roles, false);
+    }
 }

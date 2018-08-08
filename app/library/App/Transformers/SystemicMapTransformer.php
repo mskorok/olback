@@ -9,8 +9,32 @@ class SystemicMapTransformer extends ModelTransformer
 {
     protected $modelClass = SystemicMap::class;
 
-    protected function excludedProperties()
+    protected $availableIncludes = [
+        'ActionListGroup', 'SystemicMapItems', 'Departments', 'Organization', 'Process'
+    ];
+
+    public function includeActionListGroup($model)
     {
-        //return ['password'];
+        return $this->collection($model->getActionListGroup(), new ActionListGroupTransformer());
+    }
+
+    public function includeSystemicMapItems($model)
+    {
+        return $this->collection($model->getSystemicMapItems(), new SystemicMapItemsTransformer());
+    }
+
+    public function includeDepartments($model)
+    {
+        return $this->item($model->getDepartments(), new DepartmentTransformer());
+    }
+
+    public function includeOrganization($model)
+    {
+        return $this->item($model->getOrganization(), new OrganizationTransformer());
+    }
+
+    public function includeProcess($model)
+    {
+        return $this->item($model->getProcess(), new ProcessTransformer());
     }
 }

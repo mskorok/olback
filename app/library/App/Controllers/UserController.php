@@ -6,6 +6,7 @@ use App\Auth\UsernameAccountType;
 use App\Constants\AclRoles;
 use App\Model\ProcessOrganizations;
 use App\Model\ProcessUsers;
+use App\Traits\Auth;
 use App\Transformers\UserTransformer;
 use Phalcon\Db;
 use Phalcon\Mvc\Model\Resultset\Simple;
@@ -19,6 +20,7 @@ use App\Model\ProcessDepartments;
 
 class UserController extends CrudResourceController
 {
+    use Auth;
     /**
      * @return mixed
      * @throws \PhalconApi\Exception
@@ -77,11 +79,15 @@ class UserController extends CrudResourceController
 
     public function createManager()
     {
-        $adminId = null;
         $organization_id = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $adminId = $session ? $session->getIdentity() : null;
+        $adminId = $this->getAuthenticatedId();
+        if (null === $adminId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
         /** @var Simple $organizations */
@@ -93,7 +99,6 @@ class UserController extends CrudResourceController
                 ],
             ]
         );
-        $orgs = array();
         if ($organizations->count() > 0) {
             /** @var Organization $or */
             foreach ($organizations as $or) {
@@ -109,8 +114,7 @@ class UserController extends CrudResourceController
             return $this->createArrayResponse($response, 'data');
         }
 
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
 
         $validate = [
             'password' => ['mandatory' => true, 'regex' => null],
@@ -187,7 +191,7 @@ class UserController extends CrudResourceController
             $assign_org->organization_id = $data->organization ?? $organization_id;
             $assign_org->user_id = $managerId;
             if ($assign_org->save() === false) {
-                $messagesErrors = array();
+                $messagesErrors = [];
                 foreach ($assign_org->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
@@ -200,9 +204,9 @@ class UserController extends CrudResourceController
                 $response = [
                     'code' => 1,
                     'status' => 'Success',
-                    'data' => array(
+                    'data' => [
                         'userid' => $managerId,
-                    ),
+                    ],
                 ];
             }
         }
@@ -213,16 +217,15 @@ class UserController extends CrudResourceController
 
     public function createUser()
     {
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
 
         //check for required fields
-        $validate = array(
-            'password' => array('mandatory' => true, 'regex' => null),
-            'email' => array('mandatory' => true, 'regex' => null),
-        );
+        $validate = [
+            'password' => ['mandatory' => true, 'regex' => null],
+            'email' => ['mandatory' => true, 'regex' => null],
+        ];
 
-        $missing_input = array();
+        $missing_input = [];
 
         foreach ($data as $key => $val) {
             $mandatory = $validate[$key] ?? false;
@@ -277,7 +280,7 @@ class UserController extends CrudResourceController
         $manager->createdAt = (new \DateTime())->format('Y-m-d H:i:s');
 
         if ($manager->save() === false) {
-            $messagesErrors = array();
+            $messagesErrors = [];
             foreach ($manager->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
@@ -291,9 +294,9 @@ class UserController extends CrudResourceController
             $response = [
                 'code' => 1,
                 'status' => 'Success',
-                'data' => array(
+                'data' => [
                     'userid' => $managerId,
-                ),
+                ],
             ];
         }
 
@@ -312,15 +315,14 @@ class UserController extends CrudResourceController
 
     public function createManagerPublic()
     {
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
         $organization_id = $data->organization;
-        $validate = array(
-            'password' => array('mandatory' => true, 'regex' => null),
-            'email' => array('mandatory' => true, 'regex' => null),
-        );
+        $validate = [
+            'password' => ['mandatory' => true, 'regex' => null],
+            'email' => ['mandatory' => true, 'regex' => null],
+        ];
 
-        $missing_input = array();
+        $missing_input = [];
 
         foreach ($data as $key => $val) {
             $mandatory = $validate[$key] ?? false;
@@ -375,7 +377,7 @@ class UserController extends CrudResourceController
         $manager->createdAt = (new \DateTime())->format('Y-m-d H:i:s');
 
         if ($manager->save() === false) {
-            $messagesErrors = array();
+            $messagesErrors = [];
             foreach ($manager->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
@@ -390,7 +392,7 @@ class UserController extends CrudResourceController
             $assign_org->organization_id = $organization_id;
             $assign_org->user_id = $managerId;
             if ($assign_org->save() === false) {
-                $messagesErrors = array();
+                $messagesErrors = [];
                 foreach ($assign_org->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
@@ -403,9 +405,9 @@ class UserController extends CrudResourceController
                 $response = [
                     'code' => 1,
                     'status' => 'Success',
-                    'data' => array(
+                    'data' => [
                         'userid' => $managerId,
-                    ),
+                    ],
                 ];
             }
         }
@@ -416,16 +418,15 @@ class UserController extends CrudResourceController
 
     public function createUserPublic()
     {
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
         $organization_id = $data->organization;
         //check for required fields
-        $validate = array(
-            'password' => array('mandatory' => true, 'regex' => null),
-            'email' => array('mandatory' => true, 'regex' => null),
-        );
+        $validate = [
+            'password' => ['mandatory' => true, 'regex' => null],
+            'email' => ['mandatory' => true, 'regex' => null],
+        ];
 
-        $missing_input = array();
+        $missing_input = [];
 
         foreach ($data as $key => $val) {
             $mandatory = $validate[$key] ?? false;
@@ -480,7 +481,7 @@ class UserController extends CrudResourceController
         $manager->createdAt = (new \DateTime())->format('Y-m-d H:i:s');
 
         if ($manager->save() === false) {
-            $messagesErrors = array();
+            $messagesErrors = [];
             foreach ($manager->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
@@ -495,7 +496,7 @@ class UserController extends CrudResourceController
             $assign_org->organization_id = $organization_id;
             $assign_org->user_id = $managerId;
             if ($assign_org->save() === false) {
-                $messagesErrors = array();
+                $messagesErrors = [];
                 foreach ($assign_org->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
@@ -508,21 +509,19 @@ class UserController extends CrudResourceController
                 $response = [
                     'code' => 1,
                     'status' => 'Success',
-                    'data' => array(
+                    'data' => [
                         'userid' => $managerId,
-                    ),
+                    ],
                 ];
             }
         }
 
-        //response
         return $this->createArrayResponse($response, 'data');
     }
 
     public function setProcessPermissions()
     {
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
         $processId = $data->processId;
 
         $connection = $this->db;
@@ -536,27 +535,41 @@ class UserController extends CrudResourceController
         $connection->query($sqlOrg);
 
         //organization
-        foreach ($data->organization as $valueOrganization) {
-            $processOrganizations = new ProcessOrganizations();
-            $processOrganizations->processId = $processId;
-            $processOrganizations->organizationId = $valueOrganization;
-            $processOrganizations->save();
+        /** @var array|\Traversable $organizations */
+        $organizations = $data->organization;
+        if (\is_array($organizations) || $organizations instanceof \Traversable) {
+            foreach ($organizations as $valueOrganization) {
+                $processOrganizations = new ProcessOrganizations();
+                $processOrganizations->processId = $processId;
+                $processOrganizations->organizationId = $valueOrganization;
+                $processOrganizations->save();
+            }
         }
 
+        /** @var array|\Traversable $departments */
+        $departments = $data->department;
         //departments
-        foreach ($data->department as $valueDepartment) {
-            $processDepartments = new ProcessDepartments();
-            $processDepartments->processId = $processId;
-            $processDepartments->departmentId = $valueDepartment;
-            $processDepartments->save();
+        if (\is_array($departments) || $departments instanceof \Traversable) {
+            foreach ($departments as $valueDepartment) {
+                $processDepartments = new ProcessDepartments();
+                $processDepartments->processId = $processId;
+                $processDepartments->departmentId = $valueDepartment;
+                $processDepartments->save();
+            }
         }
+
+        /** @var array|\Traversable $persons */
+        $persons = $data->persons;
         //persons
-        foreach ($data->persons as $valuePersons) {
-            $processUsers = new ProcessUsers();
-            $processUsers->processId = $processId;
-            $processUsers->userId = $valuePersons;
-            $processUsers->save();
+        if (\is_array($persons) || $persons instanceof \Traversable) {
+            foreach ($persons as $valuePersons) {
+                $processUsers = new ProcessUsers();
+                $processUsers->processId = $processId;
+                $processUsers->userId = $valuePersons;
+                $processUsers->save();
+            }
         }
+
 
         $response = [
             'code' => 1,
@@ -569,14 +582,17 @@ class UserController extends CrudResourceController
 
     public function updateUser()
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
 
 
         $user = User::findFirst(
@@ -595,7 +611,6 @@ class UserController extends CrudResourceController
             if ($user->save() === false) {
                 $messagesErrors = [];
                 foreach ($user->getMessages() as $message) {
-                    // print_r($message);
                     $messagesErrors[] = $message;
                 }
                 $response = [
@@ -622,14 +637,17 @@ class UserController extends CrudResourceController
 
     public function updateOtherUser($userId)
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
 
 
         $user = User::findFirst(
@@ -675,14 +693,17 @@ class UserController extends CrudResourceController
 
     public function deactivateOtherUser($userId)
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
 
 
         $user = User::findFirst(
@@ -700,7 +721,7 @@ class UserController extends CrudResourceController
             $user->email = 'deleted@deleted.com';
             $user->location = $data->location;
             if ($user->save() === false) {
-                $messagesErrors = array();
+                $messagesErrors = [];
                 foreach ($user->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
@@ -726,38 +747,10 @@ class UserController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-    public static function getUserDetails($userId)
-    {
-        $user = User::findFirst(
-            [
-                'conditions' => 'id = ?1',
-                'bind' => [
-                    1 => $userId,
-                ],
-            ]
-        );
-        if ($user instanceof User) {
-            $organization = UserOrganization::findFirst(
-                [
-                    'conditions' => 'user_id = ?1',
-                    'bind' => [
-                        1 => $userId,
-                    ],
-                ]
-            );
-
-            if ($organization) {
-                return array('account' => $user, 'organization' => $organization);
-            }
-            return array('account' => $user, 'organization' => null);
-        }
-        return null;
-    }
-
     public function getProcessPermissions($permissionId)
     {
 
-        $permissions = array();
+        $permissions = [];
 //        $permissions['departments'] = $processDepartments;
 //        $permissions['users'] = $processUsers;
         /** @var Simple $processDepartments */
@@ -800,10 +793,14 @@ class UserController extends CrudResourceController
 
     public function getUsers()
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
         $creator = static::getUserDetails($creatorId);
@@ -829,7 +826,11 @@ class UserController extends CrudResourceController
         $organization_id = $creator['organization']->organization_id;
 
         $connection = $this->db;
-        $sql_dist = 'SELECT U.`id`, U.`role`, U.`email`, U.`username`,  U.`first_name` as firstName, U.`last_name` as lastName, U.`location`, U.`created_at` AS createdAt, U.`updated_at` AS updatedAt  FROM user U INNER JOIN user_organization O ON O.user_id = U.id WHERE O.organization_id = ' . $organization_id . ' AND U.email != "deleted@deleted.com" ';
+        $sql_dist = 'SELECT U.`id`, U.`role`, U.`email`, U.`username`, '
+            . ' U.`first_name` as firstName, U.`last_name` as lastName, '
+            . 'U.`location`, U.`created_at` AS createdAt, U.`updated_at` AS updatedAt  '
+            . 'FROM user U INNER JOIN user_organization O ON O.user_id = U.id '
+            . 'WHERE O.organization_id = ' . $organization_id . ' AND U.email != "deleted@deleted.com" ';
         $data_dist = $connection->query($sql_dist);
         $data_dist->setFetchMode(Db::FETCH_ASSOC);
         $results_dist = $data_dist->fetchAll();

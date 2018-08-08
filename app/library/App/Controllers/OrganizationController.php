@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Traits\Auth;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 use App\Model\Organization;
@@ -9,16 +10,24 @@ use Phalcon\Http\Request;
 
 class OrganizationController extends CrudResourceController
 {
+    use Auth;
 
-
+    /**
+     * @return mixed
+     *
+     */
     public function getOrgs()
     {
-        $userId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $userId = $session ? $session->getIdentity() : null; // For example; 1
-            // $user = \Users::findFirstById($userId);
+        $userId = $this->getAuthenticatedId();
+        if (null === $userId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
+
 
         /** @var Simple $organizations */
         $organizations = Organization::find(
@@ -50,16 +59,23 @@ class OrganizationController extends CrudResourceController
     }
 
 
+    /**
+     * @return mixed
+     *
+     */
     public function createOrg()
     {
         $request = new Request();
         $data = $request->getJsonRawBody();
 
-        $userId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $userId = $session ? $session->getIdentity() : null; // For example; 1
-            // $user = \Users::findFirstById($userId);
+        $userId = $this->getAuthenticatedId();
+        if (null === $userId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
         $organizationCheck = Organization::findFirst(
@@ -71,7 +87,7 @@ class OrganizationController extends CrudResourceController
             ]
         );
 
-        if ($organizationCheck) {
+        if ($organizationCheck instanceof Organization) {
             $response = [
                 'code' => 1,
                 'status' => 'Cannot create organization'
@@ -81,7 +97,6 @@ class OrganizationController extends CrudResourceController
         }
 
 
-        //
         $organization = new Organization();
         $organization->name = $data->name;
         $organization->description = $data->description;
@@ -107,11 +122,14 @@ class OrganizationController extends CrudResourceController
 
     public function updateOrg()
     {
-        $userId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $userId = $session ? $session->getIdentity() : null; // For example; 1
-            // $user = \Users::findFirstById($userId);
+        $userId = $this->getAuthenticatedId();
+        if (null === $userId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
 
         $request = new Request();

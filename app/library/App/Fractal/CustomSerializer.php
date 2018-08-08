@@ -2,11 +2,13 @@
 
 namespace App\Fractal;
 
-class CustomSerializer extends \League\Fractal\Serializer\ArraySerializer
+use League\Fractal\Serializer\ArraySerializer;
+
+class CustomSerializer extends ArraySerializer
 {
     public function collection($resourceKey, array $data)
     {
-        if ($resourceKey == null) {
+        if ($resourceKey === null) {
             return $data;
         }
 
@@ -15,7 +17,7 @@ class CustomSerializer extends \League\Fractal\Serializer\ArraySerializer
 
     public function item($resourceKey, array $data)
     {
-        if ($resourceKey == null) {
+        if ($resourceKey === null) {
             return $data;
         }
 
