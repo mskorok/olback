@@ -36,14 +36,14 @@ class Process extends DateTrackingModel
      * @var string
      * @Column(type="string", nullable=false)
      */
-    public $currentReality;
+    public $CurrentReality;
 
     /**
      *
      * @var string
      * @Column(type="string", nullable=false)
      */
-    public $initialIntentions;
+    public $InitialIntentions;
 
     /**
      *
