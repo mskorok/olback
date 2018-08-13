@@ -2,11 +2,13 @@
 
 namespace App\Controllers;
 
+use App\Model\Group;
+use App\Model\GroupTemplate;
+use App\Model\User;
 use App\Traits\Auth;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 use App\Model\Organization;
-use Phalcon\Http\Request;
 
 class OrganizationController extends CrudResourceController
 {
@@ -42,11 +44,11 @@ class OrganizationController extends CrudResourceController
         if ($organizations) {
             /** @var Organization $or */
             foreach ($organizations as $or) {
-                $orgs[] = array(
+                $orgs[] = [
                     'id' => $or->id,
                     'name' => $or->name,
                     'description' => $or->description
-                );
+                ];
             }
         }
         $response = [
@@ -65,8 +67,7 @@ class OrganizationController extends CrudResourceController
      */
     public function createOrg()
     {
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
 
         $userId = $this->getAuthenticatedId();
         if (null === $userId) {
@@ -102,7 +103,7 @@ class OrganizationController extends CrudResourceController
         $organization->description = $data->description;
         $organization->userId = $userId;
         if ($organization->save() === false) {
-            $messagesErrors = array();
+            $messagesErrors = [];
             foreach ($organization->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
@@ -112,14 +113,27 @@ class OrganizationController extends CrudResourceController
                 'data' => $messagesErrors
             ];
         } else {
-            $response = [
-                'code' => 1,
-                'status' => 'Success'
-            ];
+            $organization->refresh();
+            $messagesErrors = $this->createDefaultGroups($organization);
+            if (\count($messagesErrors) > 0) {
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => $messagesErrors
+                ];
+            } else {
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success'
+                ];
+            }
         }
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function updateOrg()
     {
         $userId = $this->getAuthenticatedId();
@@ -132,8 +146,7 @@ class OrganizationController extends CrudResourceController
             return $this->createArrayResponse($response, 'data');
         }
 
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
 
         $organization = Organization::findFirst(
             [
@@ -153,7 +166,7 @@ class OrganizationController extends CrudResourceController
                 $organization->description = $data->description;
             }
             if ($organization->save() === false) {
-                $messagesErrors = array();
+                $messagesErrors = [];
                 foreach ($organization->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
@@ -167,7 +180,7 @@ class OrganizationController extends CrudResourceController
                     'code' => 1,
                     'status' => 'Success'
                 ];
-            };
+            }
         } else {
             $response = [
                 'code' => 0,
@@ -175,5 +188,35 @@ class OrganizationController extends CrudResourceController
             ];
         }
         return $this->createArrayResponse($response, 'data');
+    }
+
+    /**
+     * @param Organization $organization
+     * @return array
+     */
+    protected function createDefaultGroups(Organization $organization): array
+    {
+        $messages = [];
+        $user = User::findFirst($organization->userId);
+        if ($user instanceof User) {
+            /** @var Simple $templates */
+            $templates = GroupTemplate::find();
+            /** @var GroupTemplate $template */
+            foreach ($templates as $template) {
+                $group = new Group();
+                $group->organization = $organization->id;
+                $group->creatorId = $user->id;
+                $group->title = $template->title;
+                $group->color = $template->color;
+                if ($group->save() === false) {
+                    $msg = $group->getMessages();
+                    foreach ($msg as $message) {
+                        $messages[] = $message->getMessage();
+                    }
+                }
+            }
+        }
+
+        return $messages;
     }
 }

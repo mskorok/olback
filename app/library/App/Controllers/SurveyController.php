@@ -14,12 +14,14 @@ use PhalconRest\Mvc\Controllers\CrudResourceController;
 use App\Model\Survey;
 use App\Model\SurveyQuestion;
 use App\Model\SurveyTemplateQuestion;
-use Phalcon\Http\Request;
 
 class SurveyController extends CrudResourceController
 {
     use Auth;
 
+    /**
+     * @return mixed
+     */
     public function createSurveyDefinition()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -44,7 +46,7 @@ class SurveyController extends CrudResourceController
         $survey->creator = $creator['account']->id;
         $survey->organization_id = $organization;
         if ($survey->save() === false) {
-            $messagesErrors = array();
+            $messagesErrors = [];
             foreach ($survey->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
@@ -58,13 +60,16 @@ class SurveyController extends CrudResourceController
             $response = [
                 'code' => 1,
                 'status' => 'Success',
-                'data' => array('surveyId' => $surveyId),
+                'data' => ['surveyId' => $surveyId],
             ];
         }
 
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function getSurveyDefinition()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -97,15 +102,22 @@ class SurveyController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function updateSurveyDefinition($id)
     {
-        $creatorId = null;
-        if ($this->authManager->loggedIn()) {
-            $session = $this->authManager->getSession();
-            $creatorId = $session ? $session->getIdentity() : null;
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => ['User not authenticated']
+            ];
+            return $this->createArrayResponse($response, 'data');
         }
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
         $creator = static::getUserDetails($creatorId);
         $organization = $creator['organization']->organization_id;
         if ($creator && $creator['organization'] === null) {
@@ -144,7 +156,7 @@ class SurveyController extends CrudResourceController
                 $survey->isOlset = $data->isOlset;
             }
             if ($survey->save() === false) {
-                $messagesErrors = array();
+                $messagesErrors = [];
                 foreach ($survey->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
@@ -169,6 +181,10 @@ class SurveyController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function createQuestion($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -204,8 +220,21 @@ class SurveyController extends CrudResourceController
             $surveyQuestion->answered_type = $data->answered_type;
             $surveyQuestion->question_order = $data->question_order;
             $surveyQuestion->survey_id = $id;
+            if (property_exists($data, 'question_group_id')) {
+                $surveyQuestion->question_group_id = $data->question_group_id;
+            }
+            if (property_exists($data, 'showExtraInfoAndTags')) {
+                $surveyQuestion->showExtraInfoAndTags = $data->showExtraInfoAndTags;
+            } else {
+                $surveyQuestion->showExtraInfoAndTags = false;
+            }
+            if (property_exists($data, 'extraInfo')) {
+                $surveyQuestion->extraInfo = $data->extraInfo;
+            } else {
+                $surveyQuestion->extraInfo = '';
+            }
             if ($surveyQuestion->save() === false) {
-                $messagesErrors = array();
+                $messagesErrors = [];
                 foreach ($surveyQuestion->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
@@ -219,7 +248,7 @@ class SurveyController extends CrudResourceController
                 $response = [
                     'code' => 1,
                     'status' => 'Success',
-                    'data' => array('surveyQuestion' => $surveyId),
+                    'data' => ['surveyQuestion' => $surveyId],
                 ];
             }
         } else {
@@ -233,6 +262,9 @@ class SurveyController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function getQuestionGroups()
     {
         $questionGroups = QuestionGroups::find();
@@ -244,6 +276,10 @@ class SurveyController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getQuestion($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -255,8 +291,6 @@ class SurveyController extends CrudResourceController
             ];
             return $this->createArrayResponse($response, 'data');
         }
-
-        $creator = static::getUserDetails($creatorId);
 
         $survey = Survey::findFirst(
             [
@@ -291,6 +325,9 @@ class SurveyController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function createAnswer()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -323,6 +360,10 @@ class SurveyController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function initProcess($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -426,7 +467,20 @@ class SurveyController extends CrudResourceController
                 $question->answered_type = $temp_question->answered_type;
                 $question->question_order = $temp_question->question_order;
                 $question->survey_id = $step0_ID;
-                $question->question_group_id = $temp_question->question_group_id;
+
+                if (property_exists($temp_question, 'question_group_id')) {
+                    $question->question_group_id = $temp_question->question_group_id;
+                }
+                if (property_exists($temp_question, 'showExtraInfoAndTags')) {
+                    $question->showExtraInfoAndTags = $temp_question->showExtraInfoAndTags;
+                } else {
+                    $question->showExtraInfoAndTags = false;
+                }
+                if (property_exists($temp_question, 'extraInfo')) {
+                    $question->extraInfo = $temp_question->extraInfo;
+                } else {
+                    $question->extraInfo = '';
+                }
                 $question->save();
             }
             /** @var SurveyTemplateQuestion $temp_question */
@@ -437,7 +491,20 @@ class SurveyController extends CrudResourceController
                 $question->answered_type = $temp_question->answered_type;
                 $question->question_order = $temp_question->question_order;
                 $question->survey_id = $step3_0_ID;
-                $question->question_group_id = $temp_question->question_group_id;
+
+                if (property_exists($temp_question, 'question_group_id')) {
+                    $question->question_group_id = $temp_question->question_group_id;
+                }
+                if (property_exists($temp_question, 'showExtraInfoAndTags')) {
+                    $question->showExtraInfoAndTags = $temp_question->showExtraInfoAndTags;
+                } else {
+                    $question->showExtraInfoAndTags = false;
+                }
+                if (property_exists($temp_question, 'extraInfo')) {
+                    $question->extraInfo = $temp_question->extraInfo;
+                } else {
+                    $question->extraInfo = '';
+                }
                 $question->save();
             }
 
@@ -459,7 +526,20 @@ class SurveyController extends CrudResourceController
                 $question->answered_type = $temp_question2->answered_type;
                 $question->question_order = $temp_question2->question_order;
                 $question->survey_id = $step3_1_ID;
-                $question->question_group_id = $temp_question2->question_group_id;
+
+                if (property_exists($temp_question, 'question_group_id')) {
+                    $question->question_group_id = $temp_question->question_group_id;
+                }
+                if (property_exists($temp_question, 'showExtraInfoAndTags')) {
+                    $question->showExtraInfoAndTags = $temp_question->showExtraInfoAndTags;
+                } else {
+                    $question->showExtraInfoAndTags = false;
+                }
+                if (property_exists($temp_question, 'extraInfo')) {
+                    $question->extraInfo = $temp_question->extraInfo;
+                } else {
+                    $question->extraInfo = '';
+                }
                 $question->save();
             }
 
@@ -474,9 +554,9 @@ class SurveyController extends CrudResourceController
             );
 
             if ($process instanceof Process) {
-                $process->step0 = (int)$step0_ID;
-                $process->step3_0 = (int)$step3_0_ID;
-                $process->step3_1 = (int)$step3_1_ID;
+                $process->step0 = $step0_ID;
+                $process->step3_0 = $step3_0_ID;
+                $process->step3_1 = $step3_1_ID;
                 $process->organizationId = $organization;
                 $process->save();
             }
@@ -489,6 +569,10 @@ class SurveyController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function changeProcessStatus($id)
     {
         $proc = Process::findFirst(
@@ -521,6 +605,9 @@ class SurveyController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function getUserSurveyAnswers()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -548,7 +635,10 @@ class SurveyController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getSurveyAnswers($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -582,45 +672,46 @@ class SurveyController extends CrudResourceController
 
     public function helpPage()//todo
     {
-//        $request = new Request();
-//        $data = $request->getJsonRawBody();
-//
-//        $to_slug = $data->slug;
-//        $find_help_post = array(
-//            'name' => $to_slug,
-//            'post_type' => 'help',
-//            'post_status' => 'publish'
-//        );
-//
-//        $help_post_result = get_posts($find_help_post);
-//
-//        if (empty($help_post_result)) {
-//            $help_post = array(
-//                'post_title' => $to_slug,
-//                'post_name' => $to_slug,
-//                'post_type' => 'help',
-//                'post_status' => 'publish'
-//            );
-//
-//            $help_post_id = wp_insert_post($help_post);
-//
-//            $response = [
-//                'code' => 0,
-//                'status' => 'Success',
-//                'msg' => 'page not exists created just now with id: ' . $help_post_id,
-//            ];
-//
-//            return $this->createArrayResponse($response, 'data');
-//        }
-//        $response = [
-//            'code' => 1,
-//            'status' => 'Success',
-//            'data' => $help_post_result[0]->post_content,
-//        ];
-//        return $this->createArrayResponse($response, 'data');
+        $data = $this->request->getJsonRawBody();
+
+        $to_slug = $data->slug;
+        $find_help_post = [
+            'name' => $to_slug,
+            'post_type' => 'help',
+            'post_status' => 'publish'
+        ];
+
+        $help_post_result = $find_help_post;//get_posts($find_help_post);
+
+        if (empty($help_post_result)) {
+            $help_post = [
+                'post_title' => $to_slug,
+                'post_name' => $to_slug,
+                'post_type' => 'help',
+                'post_status' => 'publish'
+            ];
+
+            $help_post_id = $help_post;//wp_insert_post($help_post);
+
+            $response = [
+                'code' => 0,
+                'status' => 'Success',
+                'msg' => 'page not exists created just now with id: ' . $help_post_id,
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => $help_post_result[0]->post_content,
+        ];
+        return $this->createArrayResponse($response, 'data');
     }
 
-
+    /**
+     * @return mixed
+     */
     public function availableUserSurveys()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -647,7 +738,7 @@ class SurveyController extends CrudResourceController
         $data = $connection->query($sql_getProcesses);
         $data->setFetchMode(Db::FETCH_ASSOC);
         $iresults = $data->fetchAll();
-        $processes = array();
+        $processes = [];
         foreach ($iresults as $val) {
             $sql_isCompleted_step0 = 'SELECT count(A.id) as countAnswers,S.title FROM `answers` A '
                 . 'INNER JOIN survey_questions SQ ON A.questionId = SQ.id '

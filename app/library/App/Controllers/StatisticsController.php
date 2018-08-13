@@ -11,6 +11,9 @@ class StatisticsController extends CollectionController
 {
     use Auth;
 
+    /**
+     * @return mixed
+     */
     public function getDashboardStats()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -48,15 +51,19 @@ class StatisticsController extends CollectionController
         $response = [
             'code' => 1,
             'status' => 'Success',
-            'data' => array(
+            'data' => [
                 'count_users'=>$COUNT_USERS,
                 'count_organizations'=>$COUNT_ORGS
-            ),
+            ],
         ];
 
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getReportsBySurvey($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -98,18 +105,23 @@ class StatisticsController extends CollectionController
         $response = [
             'code' => 1,
             'status' => 'Success',
-            'data' => array(
-                'totals'=>array(
+            'data' => [
+                'totals'=> [
                     'avg'=>$COUNT_TOTALS[0]['average'],
-                    'totals' =>$COUNT_TOTALS[0]['totals'] ),
+                    'totals' =>$COUNT_TOTALS[0]['totals']],
                 'byQuestion'=>$COUNT_ANSWERS,
                 'byGroup' => $COUNT_GROUP
-            ),
+            ],
         ];
 
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @param $userId
+     * @return mixed
+     */
     public function getReportsBySurveyAndUser($id, $userId)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -150,13 +162,13 @@ class StatisticsController extends CollectionController
         $response = [
             'code' => 1,
             'status' => 'Success',
-            'data' => array(
-                'totals'=>array(
+            'data' => [
+                'totals'=> [
                     'avg'=>$COUNT_TOTALS[0]['average'],
-                    'totals' =>$COUNT_TOTALS[0]['totals'] ),
+                    'totals' =>$COUNT_TOTALS[0]['totals']],
                 'byQuestion'=>$COUNT_ANSWERS,
                 'byGroup' => $COUNT_GROUP
-            ),
+            ],
         ];
 
         return $this->createArrayResponse($response, 'data');

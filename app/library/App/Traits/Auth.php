@@ -72,9 +72,9 @@ trait Auth
             );
 
             if ($organization instanceof UserOrganization) {
-                return array('account' => $user, 'organization' => $organization);
+                return ['account' => $user, 'organization' => $organization];
             }
-            return array('account' => $user, 'organization' => null);
+            return ['account' => $user, 'organization' => null];
         }
         return null;
     }

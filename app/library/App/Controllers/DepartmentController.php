@@ -2,16 +2,13 @@
 
 namespace App\Controllers;
 
-use App\Model\Organization;
 use App\Model\ProcessDepartments;
 use App\Traits\Auth;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
-use App\Model\UserOrganization;
 use App\Model\User;
 use App\Model\Department;
 use App\Model\UserDepartment;
-use Phalcon\Http\Request;
 
 class DepartmentController extends CrudResourceController
 {
@@ -34,14 +31,13 @@ class DepartmentController extends CrudResourceController
 
         $creator = static::getUserDetails($creatorId);
         $organization = $creator['organization']->organization_id;
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
         $department = new Department();
         $department->title = $data->title;
         $department->description = $data->description;
         $department->organization_id = $organization;
         if ($department->save() === false) {
-            $messagesErrors = array();
+            $messagesErrors = [];
             foreach ($department->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
@@ -55,7 +51,7 @@ class DepartmentController extends CrudResourceController
             $response = [
                 'code' => 1,
                 'status' => 'Success',
-                'data' => array('departmentId' => $departmentId),
+                'data' => ['departmentId' => $departmentId],
             ];
         }
 
@@ -158,7 +154,7 @@ class DepartmentController extends CrudResourceController
                 $department->description = $data->description;
             }
             if ($department->save() === false) {
-                $messagesErrors = array();
+                $messagesErrors = [];
                 foreach ($department->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
@@ -217,7 +213,7 @@ class DepartmentController extends CrudResourceController
                     $department->user_id = $userId;
                     $department->department_id = $departmentId;
                     if ($department->save() === false) {
-                        $messagesErrors = array();
+                        $messagesErrors = [];
                         foreach ($department->getMessages() as $message) {
                             $messagesErrors[] = $message;
                         }
@@ -404,7 +400,7 @@ class DepartmentController extends CrudResourceController
                         $department->user_id = $userId;
                         $department->department_id = $departmentId;
                         if ($department->save() === false) {
-                            $messagesErrors = array();
+                            $messagesErrors = [];
                             foreach ($department->getMessages() as $message) {
                                 $messagesErrors[] = $message;
                             }

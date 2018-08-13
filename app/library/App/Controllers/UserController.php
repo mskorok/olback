@@ -11,11 +11,9 @@ use App\Transformers\UserTransformer;
 use Phalcon\Db;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
-// use PhalconRest\Transformers\Postman\ApiCollectionTransformer;
 use App\Model\User;
 use App\Model\Organization;
 use App\Model\UserOrganization;
-use Phalcon\Http\Request;
 use App\Model\ProcessDepartments;
 
 class UserController extends CrudResourceController
@@ -30,6 +28,9 @@ class UserController extends CrudResourceController
         return $this->createResourceResponse($this->userService->getDetails());
     }
 
+    /**
+     * @return mixed
+     */
     public function refreshToken()
     {
         if ($this->authManager->loggedIn()) {
@@ -77,6 +78,9 @@ class UserController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function createManager()
     {
         $organization_id = null;
@@ -215,6 +219,9 @@ class UserController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function createUser()
     {
         $data = $this->request->getJsonRawBody();
@@ -304,7 +311,10 @@ class UserController extends CrudResourceController
     }
 
 
-    public function whitelist()
+    /**
+     * @return array
+     */
+    public function whitelist(): array
     {
         return [
             'firstName',
@@ -313,6 +323,9 @@ class UserController extends CrudResourceController
         ];
     }
 
+    /**
+     * @return mixed
+     */
     public function createManagerPublic()
     {
         $data = $this->request->getJsonRawBody();
@@ -416,6 +429,9 @@ class UserController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function createUserPublic()
     {
         $data = $this->request->getJsonRawBody();
@@ -519,6 +535,9 @@ class UserController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function setProcessPermissions()
     {
         $data = $this->request->getJsonRawBody();
@@ -579,7 +598,9 @@ class UserController extends CrudResourceController
         return $this->createResponse($response);
     }
 
-
+    /**
+     * @return mixed
+     */
     public function updateUser()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -635,6 +656,10 @@ class UserController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $userId
+     * @return mixed
+     */
     public function updateOtherUser($userId)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -691,6 +716,10 @@ class UserController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $userId
+     * @return mixed
+     */
     public function deactivateOtherUser($userId)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -747,6 +776,10 @@ class UserController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $permissionId
+     * @return mixed
+     */
     public function getProcessPermissions($permissionId)
     {
 
@@ -791,6 +824,9 @@ class UserController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function getUsers()
     {
         $creatorId = $this->getAuthenticatedId();

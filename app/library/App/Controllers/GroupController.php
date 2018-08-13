@@ -7,13 +7,15 @@ use PhalconRest\Mvc\Controllers\CrudResourceController;
 use App\Model\User;
 use App\Model\Group;
 use App\Constants\AclRoles;
-use Phalcon\Http\Request;
 
 class GroupController extends CrudResourceController
 {
 
     use Auth;
 
+    /**
+     * @return mixed
+     */
     public function getGroups()
     {
         $userId = $this->getAuthenticatedId();
@@ -68,6 +70,9 @@ class GroupController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function createGroup()
     {
         $userId = $this->getAuthenticatedId();
@@ -114,17 +119,20 @@ class GroupController extends CrudResourceController
             $response = [
                 'code' => 1,
                 'status' => 'Success',
-                'data' => array('systemicMapId' => $groupId),
+                'data' => ['systemicMapId' => $groupId],
             ];
         }
 
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function updateGroup($id)
     {
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
         $userId = $this->getAuthenticatedId();
         if (null === $userId) {
             $response = [
@@ -197,6 +205,10 @@ class GroupController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function deleteGroup($id)
     {
         $userId = $this->getAuthenticatedId();

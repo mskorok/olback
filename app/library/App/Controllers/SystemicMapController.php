@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Model\Process;
 use App\Model\SystemicStructureMap;
 use App\Model\SystemicStructureMapChain;
 use App\Model\SystemicStructureMapItems;
@@ -15,7 +16,6 @@ use App\Model\SystemicMap;
 use App\Model\SystemicMapItems;
 use App\Model\SystemicMapChain;
 use App\Model\ActionListGroup;
-use Phalcon\Http\Request;
 use App\Constants\AclRoles;
 use App\Model\Group;
 
@@ -83,7 +83,10 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getSystemicMapByProcess($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -140,6 +143,10 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getSystemicStructureMapByProcess($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -198,6 +205,10 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getSystemicItem($id)
     {
         /** @var Simple $systemicMapItems */
@@ -250,23 +261,26 @@ class SystemicMapController extends CrudResourceController
 
                 /** @var SystemicMapChain $chain */
                 foreach ($chains as $chain) {
-                    $linksArray[] = array(
+                    $linksArray[] = [
                         'source' => $this->findItemIndexForId($systemicMapsArray, (int)$chain->from_item),
                         'target' => $this->findItemIndexForId($systemicMapsArray, (int)$chain->to_item),
                         'value' => 2,
-                    );
+                    ];
                 }
             }
         }
         $response = [
             'code' => 1,
             'status' => 'Success',
-            'data' => array('nodes' => $systemicMapsArray, 'links' => $linksArray),
+            'data' => ['nodes' => $systemicMapsArray, 'links' => $linksArray],
         ];
 
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function createSystemicMap()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -288,7 +302,6 @@ class SystemicMapController extends CrudResourceController
 
             return $this->createArrayResponse($response, 'data');
         }
-        $organization_id = $creator['organization']->organization_id;
 
         $data = $this->request->getJsonRawBody();
 
@@ -297,7 +310,7 @@ class SystemicMapController extends CrudResourceController
             'name' => ['mandatory' => true, 'regex' => null],
         ];
 
-        $missing_input = array();
+        $missing_input = [];
 
         foreach ($data as $key => $val) {
             $mandatory = $validate[$key] ?? false;
@@ -314,6 +327,24 @@ class SystemicMapController extends CrudResourceController
 
             return $this->createArrayResponse($response, 'data');
         }
+        if (property_exists($data, 'processId')) {
+            $process = Process::findFirst((int)$data->processId);
+            if (!($process instanceof Process)) {
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => 'Process not found',
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+        } else {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'Required field processId missed',
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
         $systemicMap = new SystemicMap();
         $systemicMap->name = $data->name;
         if ($data->department === '') {
@@ -322,12 +353,12 @@ class SystemicMapController extends CrudResourceController
             $systemicMap->department = $data->department;
         }
 
-        $systemicMap->organization = $organization_id;
+        $systemicMap->organization = $process->organizationId;
         $systemicMap->lang = $data->lang;
         $systemicMap->isActive = $data->isActive;
-        $systemicMap->processId = $data->processId;
+        $systemicMap->processId = $process->id;
         if ($systemicMap->save() === false) {
-            $messagesErrors = array();
+            $messagesErrors = [];
             foreach ($systemicMap->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
@@ -341,13 +372,16 @@ class SystemicMapController extends CrudResourceController
             $response = [
                 'code' => 1,
                 'status' => 'Success',
-                'data' => array('systemicMapId' => $systemicMap->id),
+                'data' => ['systemicMapId' => $systemicMap->id],
             ];
         }
 
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @return mixed
+     */
     public function createSystemicMapItem()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -368,7 +402,7 @@ class SystemicMapController extends CrudResourceController
             'question' => ['mandatory' => true, 'regex' => null],
         ];
 
-        $missing_input = array();
+        $missing_input = [];
 
         foreach ($data as $key => $val) {
             $mandatory = $validate[$key] ?? false;
@@ -399,7 +433,7 @@ class SystemicMapController extends CrudResourceController
         $systemicItem->groupId = $data->groupId;
         $systemicItem->userId = $creatorId;
         if ($systemicItem->save() === false) {
-            $messagesErrors = array();
+            $messagesErrors = [];
             foreach ($systemicItem->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
@@ -418,7 +452,7 @@ class SystemicMapController extends CrudResourceController
             }
             $chain->to_item = $systemicMapItemId;
             if ($chain->save() === false) {
-                $messagesErrors = array();
+                $messagesErrors = [];
                 foreach ($chain->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
@@ -434,13 +468,17 @@ class SystemicMapController extends CrudResourceController
             $response = [
                 'code' => 1,
                 'status' => 'Success',
-                'data' => array('systemicMapItemId' => $systemicMapItemId),
+                'data' => ['systemicMapItemId' => $systemicMapItemId],
             ];
         }
 
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function updateSystemicMap($id)
     {
         $data = $this->request->getJsonRawBody();
@@ -509,10 +547,13 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function updateSystemicItem($id)
     {
-        $request = new Request();
-        $data = $request->getJsonRawBody();
+        $data = $this->request->getJsonRawBody();
         $creatorId = $this->getAuthenticatedId();
         if (null === $creatorId) {
             $response = [
@@ -609,6 +650,10 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function deleteSystemicMap($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -698,6 +743,10 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function deleteSystemicItem($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -806,6 +855,10 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getSystemicItemTree($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -848,8 +901,8 @@ class SystemicMapController extends CrudResourceController
 
         $non_ch = [];
         foreach ($results_dist as $key => $value) {
-            $first_name_f = $value['first_name'];
-            $last_name_f = $value['last_name'];
+//            $first_name_f = $value['first_name'];
+//            $last_name_f = $value['last_name'];
             $non_ch[] = $value['id'];
         }
         $sql = 'SELECT to_item as id FROM `systemic_map_chain` '
@@ -872,29 +925,38 @@ class SystemicMapController extends CrudResourceController
 
 
                     <a class="fa fa-lg fa-plus" data-toggle="modal" data-target="#myModal' . $tree[0]['id'] . 'C"></a>
-                    <a class="fa fa-lg fa-pencil-square-o" data-toggle="modal" data-target="#myModal' . $tree[0]['id'] . 'E"></a>
+                    <a class="fa fa-lg fa-pencil-square-o" data-toggle="modal" data-target="#myModal' . $tree[0]['id']
+            . 'E"></a>
 
 
                     </span>
                   </div>';
         $html = $this->arrayDepth($tree[0]['items'], $creatorInfo, $non_ch)['html'];
         $html .= '
-				<data-sys-map-items-add lolo="myModal" add-func="addSysMapItem(' . $tree[0]['id'] . ',question,proposal,group,color)" datasp="' . $tree[0]['id'] . '"></data-sys-map-items-add>
+				<data-sys-map-items-add lolo="myModal" add-func="addSysMapItem(' . $tree[0]['id']
+            . ',question,proposal,group,color)" datasp="' . $tree[0]['id'] . '"></data-sys-map-items-add>
 
-				<data-sys-map-items-edit lolo="myModal" edit-func="editSysMapItem(' . $tree[0]['id'] . ',question,proposal,group,color)" datasp="' . $tree[0]['id'] . '" dataprop="' . $tree[0]['proposal'] . '" dataque="' . $tree[0]['question'] . '" datagrp="' . $tree[0]['groupId'] . '" dataclr="' . $tree[0]['color'] . '"></data-sys-map-items-edit>
+				<data-sys-map-items-edit lolo="myModal" edit-func="editSysMapItem(' . $tree[0]['id']
+            . ',question,proposal,group,color)" datasp="' . $tree[0]['id'] . '" dataprop="' . $tree[0]['proposal']
+            . '" dataque="' . $tree[0]['question'] . '" datagrp="' . $tree[0]['groupId'] . '" dataclr="'
+            . $tree[0]['color'] . '"></data-sys-map-items-edit>
 
 </li>
 ';
-        $a = array(
+        $a = [
             'tree' => $tree,
             'htmlCode' => $html,
             'systemic_map_title' => $systemicR,
-        );
+        ];
 
         return $this->createArrayResponse($a, 'data');
     }
 
-    public function fillArray(array $arrayData)
+    /**
+     * @param array $arrayData
+     * @return array
+     */
+    public function fillArray(array $arrayData): array
     {
         $tree = [];
         foreach ($arrayData as $value) {
@@ -944,7 +1006,13 @@ class SystemicMapController extends CrudResourceController
         return $tree;
     }
 
-    public function arrayDepth(array $array, $creatorInfo, $non_ch)
+    /**
+     * @param array $array
+     * @param $creatorInfo
+     * @param $non_ch
+     * @return array
+     */
+    public function arrayDepth(array $array, $creatorInfo, $non_ch): array
     {
         $max_depth = 1;
 
@@ -1002,8 +1070,12 @@ class SystemicMapController extends CrudResourceController
         return ['max' => $max_depth, 'html' => $this->html];
     }
 
-    protected function colorLuminance($hex, $percent)
+    protected function colorLuminance($hex, $percent = null)
     {
+        if (!$percent) {
+            return $hex;
+            //todo
+        }
         return $hex;//todo
         // validate hex string
 
@@ -1062,7 +1134,7 @@ class SystemicMapController extends CrudResourceController
 //
 //            $systemicMaps = SystemicMap::findFirst(
 //                [
-//                    'conditions' => 'id = ?2 AND	organization = ?1',
+//                    'conditions' => 'id = ?2 AND organization = ?1',
 //                    'bind' => [
 //                        1 => $organization_id,
 //                        2 => $data->systemicMapId,
@@ -1104,7 +1176,7 @@ class SystemicMapController extends CrudResourceController
 //                    $data_dist->setFetchMode(Db::FETCH_ASSOC);
 //                    $results_dist = $data_dist->fetchAll();
 //
-//                    $non_ch = array();
+//                    $non_ch = [];
 //                    foreach ($results_dist as $key => $value) {
 //                        $first_name_f = $value['first_name'];
 //                        $last_name_f = $value['last_name'];
@@ -1136,6 +1208,9 @@ class SystemicMapController extends CrudResourceController
 //        return $this->createArrayResponse($response, 'data');
 //    }
 
+    /**
+     * @return mixed
+     */
     public function createActionListGroup()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -1160,8 +1235,7 @@ class SystemicMapController extends CrudResourceController
                 'status' => 'You cannot delete this systemic item!',
             ];
         } else {
-            $request = new Request();
-            $data = $request->getJsonRawBody();
+            $data = $this->request->getJsonRawBody();
             $connection = $this->db;
             $sql_dist = 'SELECT SM.to_item as id FROM `systemic_map_chain` SM '
                 . 'JOIN systemic_map_items SI ON SI.id = SM.to_item WHERE NOT EXISTS '
@@ -1229,7 +1303,7 @@ class SystemicMapController extends CrudResourceController
             $data = $connection->query($sql);
             $data->setFetchMode(Db::FETCH_ASSOC);
             $ids = $data->fetchAll();
-            $item['items'] =$this->fillArray2($ids);
+            $item['items'] = $this->fillArray2($ids);
         }
         return $tree;
     }
@@ -1257,8 +1331,7 @@ class SystemicMapController extends CrudResourceController
 //                'status' => 'You cannot delete this systemic item!',
 //            ];
 //        } else {
-//            $request = new Request();
-//            $data = $request->getJsonRawBody();
+//            $data = $this->request->getJsonRawBody();
 //            $connection = $this->db;
 //            $sql_dist = 'SELECT SM.to_item as id FROM `systemic_map_chain` SM '
 //                . 'JOIN systemic_map_items SI ON SI.id = SM.to_item WHERE NOT EXISTS '
@@ -1311,7 +1384,7 @@ class SystemicMapController extends CrudResourceController
 //
 //                        $groupTitle = $groupColor->title;
 //                    }
-//                    //  $color = array();
+////                      $color = [];
 //                    $item['color'] = $groupColorValue;
 //                    $item['groupTitle'] = $groupTitle;
 //
@@ -1326,7 +1399,7 @@ class SystemicMapController extends CrudResourceController
 //                    $data = $connection->query($sql);
 //                    $data->setFetchMode(Db::FETCH_ASSOC);
 //                    $ids = $data->fetchAll();
-//                    $item['items'] = array();
+//                    $item['items'] = [];
 //
 //                    // if (!empty($ids)) {
 //                    $this->fillArray3($item['items'], $ids);
@@ -1338,6 +1411,9 @@ class SystemicMapController extends CrudResourceController
 //        }
 //    }
 
+    /**
+     * @return mixed
+     */
     protected function createActionListGroup4()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -1361,8 +1437,7 @@ class SystemicMapController extends CrudResourceController
                 'status' => 'You cannot delete this systemic item!',
             ];
         } else {
-            $request = new Request();
-            $data = $request->getJsonRawBody();
+            $data = $this->request->getJsonRawBody();
             $connection = $this->db;
             $sql_dist = 'SELECT SM.to_item as id FROM `systemic_map_chain` SM '
                 . 'JOIN systemic_map_items SI ON SI.id = SM.to_item WHERE NOT EXISTS '
@@ -1372,7 +1447,7 @@ class SystemicMapController extends CrudResourceController
             $data_dist->setFetchMode(Db::FETCH_ASSOC);
             $results_dist = $data_dist->fetchAll();
 
-            $tree =  $this->fillArray2($results_dist);
+            $tree = $this->fillArray2($results_dist);
 
             $list = new ActionListGroup();
             $list->systemic_map_id = $data->systemicMapId;
@@ -1382,7 +1457,7 @@ class SystemicMapController extends CrudResourceController
                 $list->description = $data->description;
             }
             if ($list->save() === false) {
-                $messagesErrors = array();
+                $messagesErrors = [];
                 foreach ($list->getMessages() as $message) {
                     $messagesErrors[] = $message;
                 }
@@ -1424,6 +1499,10 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $arr
+     * @return int
+     */
     public function maxDepth($arr): int
     {
 
@@ -1434,7 +1513,7 @@ class SystemicMapController extends CrudResourceController
         //Replacing object braces with array braces
         $string = str_replace(['{', '}'], ['[', ']'], $string);
 
-        $length = strlen($string);
+        $length = \strlen($string);
         $now = $max = 0;
 
         for ($i = 0; $i < $length; ++$i) {
@@ -1451,7 +1530,11 @@ class SystemicMapController extends CrudResourceController
         return $max;
     }
 
-    public function deepness(array $arr)
+    /**
+     * @param array $arr
+     * @return int
+     */
+    public function deepness(array $arr): int
     {
         $exploded = explode(',', json_encode($arr, JSON_FORCE_OBJECT) . "\n\n");
         $longest = 0;
@@ -1463,7 +1546,11 @@ class SystemicMapController extends CrudResourceController
         return $longest;
     }
 
-    public function isArrayEmpty($a)
+    /**
+     * @param array $a
+     * @return bool
+     */
+    public function isArrayEmpty(array $a): bool
     {
         foreach ($a as $elm) {
             if (!empty($elm)) {
@@ -1474,6 +1561,9 @@ class SystemicMapController extends CrudResourceController
         return true;
     }
 
+    /**
+     * @return mixed
+     */
     public function createSystemicStructureMap()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -1495,7 +1585,6 @@ class SystemicMapController extends CrudResourceController
 
             return $this->createArrayResponse($response, 'data');
         }
-        $organization_id = $creator['organization']->organization_id;
 
         $data = $this->request->getJsonRawBody();
 
@@ -1521,20 +1610,37 @@ class SystemicMapController extends CrudResourceController
 
             return $this->createArrayResponse($response, 'data');
         }
+        if (property_exists($data, 'processId')) {
+            $process = Process::findFirst((int)$data->processId);
+            if (!($process instanceof Process)) {
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => 'Process not found',
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+        } else {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'Required field processId missed',
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
         $systemicStructureMap = new SystemicStructureMap();
         $systemicStructureMap->name = $data->name;
         $systemicStructureMap->by_whom = $creatorId;
 
-        $systemicStructureMap->organization = $organization_id;
+        $systemicStructureMap->organization = $process->organizationId;
         $systemicStructureMap->lang = $data->lang;
         $systemicStructureMap->isActive = $data->isActive;
-        $systemicStructureMap->processId = $data->processId;
+        $systemicStructureMap->processId = $process->id;
         $systemicStructureMap->startDate = $data->startDate;
         $systemicStructureMap->endDate = $data->endDate;
         if ($systemicStructureMap->save() === false) {
-            $messagesErrors = array();
+            $messagesErrors = [];
             foreach ($systemicStructureMap->getMessages() as $message) {
-                // print_r($message);
                 $messagesErrors[] = $message;
             }
             $response = [
@@ -1547,14 +1653,17 @@ class SystemicMapController extends CrudResourceController
             $response = [
                 'code' => 1,
                 'status' => 'Success',
-                'data' => array('systemicStructureMapId' => $systemicMapId),
+                'data' => ['systemicStructureMapId' => $systemicMapId],
             ];
         }
 
         return $this->createArrayResponse($response, 'data');
     }
 
-
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function updateSystemicStructureMap($id)
     {
         $data = $this->request->getJsonRawBody();
@@ -1632,7 +1741,9 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
+    /**
+     * @return mixed
+     */
     public function createSystemicStructureMapItem()
     {
         $creatorId = $this->getAuthenticatedId();
@@ -1686,7 +1797,6 @@ class SystemicMapController extends CrudResourceController
         if ($systemicStructureItem->save() === false) {
             $messagesErrors = [];
             foreach ($systemicStructureItem->getMessages() as $message) {
-                //  print_r($message);
                 $messagesErrors[] = $message;
             }
             $response = [
@@ -1727,7 +1837,10 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function deleteSystemicStructureItem($id)
     {
         $creatorId = $this->getAuthenticatedId();
@@ -1767,7 +1880,7 @@ class SystemicMapController extends CrudResourceController
                 $systemicChain->delete();
             }
             /** @var SystemicStructureMapItems $systemicItem */
-            $systemicItem = SystemicStructureMapItems::findFirst((int) $id);
+            $systemicItem = SystemicStructureMapItems::findFirst((int)$id);
             $systemicItem->delete();
 
             $response = [
@@ -1817,6 +1930,11 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @param $type
+     * @return mixed
+     */
     public function getSystemicStructureItem($id, $type)
     {
         /** @var Simple $systemicMapItems */
@@ -1870,23 +1988,27 @@ class SystemicMapController extends CrudResourceController
                 );
                 /** @var SystemicStructureMapChain $chain */
                 foreach ($chains as $chain) {
-                    $linksArray[] = array(
+                    $linksArray[] = [
                         'source' => $this->findItemIndexForId($systemicMapItemsArray, (int)$chain->from_item),
                         'target' => $this->findItemIndexForId($systemicMapItemsArray, (int)$chain->to_item),
                         'value' => 2,
-                    );
+                    ];
                 }
             }
         }
         $response = [
             'code' => 1,
             'status' => 'Success',
-            'data' => array('nodes' => $systemicMapItemsArray, 'links' => $linksArray),
+            'data' => ['nodes' => $systemicMapItemsArray, 'links' => $linksArray],
         ];
 
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function updateSystemicStructureItem($id)
     {
         $data = $this->request->getJsonRawBody();
@@ -1914,7 +2036,7 @@ class SystemicMapController extends CrudResourceController
         $user = User::findFirst($creatorId);
 
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
-            $systemicItem = SystemicStructureMapItems::findFirst((int) $id);
+            $systemicItem = SystemicStructureMapItems::findFirst((int)$id);
 
             if ($systemicItem instanceof SystemicStructureMapItems && $creatorId !== $systemicItem->userId) {
                 $organizationChecked = UserOrganization::findFirst(
@@ -1972,6 +2094,11 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @param $itemType
+     * @return mixed
+     */
     public function getStructureChain($id, $itemType)
     {
         $connection = $this->db;
@@ -1982,23 +2109,26 @@ class SystemicMapController extends CrudResourceController
         $data_dist = $connection->query($sql_dist);
         $data_dist->setFetchMode(Db::FETCH_ASSOC);
         $results_dist = $data_dist->fetchAll();
-        $resultArray = array();
+        $resultArray = [];
         foreach ($results_dist as $item) {
-            $resultArray[] = array(
+            $resultArray[] = [
                 'id' => (int)$item['id'],
                 'from_item' => (int)$item['from_item'],
                 'to_item' => (int)$item['to_item'],
                 'itemType' => $item['itemType']
-            );
+            ];
         }
 
         return $this->createArrayResponse($resultArray, 'chain');
     }
 
-
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function deleteStructureChain($id)
     {
-        $chain = SystemicStructureMapChain::findFirst((int) $id);
+        $chain = SystemicStructureMapChain::findFirst((int)$id);
         $response = [
             'code' => 0,
             'status' => 'Error',
@@ -2012,7 +2142,9 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
+    /**
+     * @return mixed
+     */
     public function createStructureChain()
     {
         $data = $this->request->getJsonRawBody();
@@ -2037,7 +2169,7 @@ class SystemicMapController extends CrudResourceController
         }
 
         if (isset($data->from_item) && is_numeric($data->from_item)) {
-            $systemicMapsItemFrom = SystemicStructureMapItems::findFirst((int) $data->from_item);
+            $systemicMapsItemFrom = SystemicStructureMapItems::findFirst((int)$data->from_item);
 
             if (!($systemicMapsItemFrom instanceof SystemicStructureMapItems)) {
                 $response = [
@@ -2048,7 +2180,7 @@ class SystemicMapController extends CrudResourceController
             }
         }
         if (isset($data->to_item) && is_numeric($data->to_item)) {
-            $systemicMapsItemTo = SystemicStructureMapItems::findFirst((int) $data->to_item);
+            $systemicMapsItemTo = SystemicStructureMapItems::findFirst((int)$data->to_item);
             if (!($systemicMapsItemTo instanceof SystemicStructureMapItems)) {
                 $response = [
                     'code' => 0,
