@@ -106,11 +106,11 @@ class Group extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'title' => 'title',
-            'organization' => 'organization',
-            'creatorId' => 'creatorId',
-            'color' => 'color'
-        ];
+                'id' => 'id',
+                'title' => 'title',
+                'organization' => 'organization',
+                'creatorId' => 'creatorId',
+                'color' => 'color'
+            ];
     }
 }

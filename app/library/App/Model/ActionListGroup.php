@@ -112,12 +112,12 @@ class ActionListGroup extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'systemic_map_id' => 'systemic_map_id',
-            'title' => 'title',
-            'description' => 'description',
-            'created_by' => 'created_by',
-            'created_at' => 'created_at'
-        ];
+                'id' => 'id',
+                'systemic_map_id' => 'systemic_map_id',
+                'title' => 'title',
+                'description' => 'description',
+                'created_by' => 'created_by',
+                'created_at' => 'created_at'
+            ];
     }
 }

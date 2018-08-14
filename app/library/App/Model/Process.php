@@ -153,17 +153,17 @@ class Process extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'title' => 'title',
-            'CurrentReality' => 'CurrentReality',
-            'InitialIntentions' => 'InitialIntentions',
-            'step0' => 'step0',
-            'step3_0' => 'step3_0',
-            'step3_1' => 'step3_1',
-            'status' => 'status',
-            'organizationId' => 'organizationId',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at'
-        ];
+                'id' => 'id',
+                'title' => 'title',
+                'CurrentReality' => 'CurrentReality',
+                'InitialIntentions' => 'InitialIntentions',
+                'step0' => 'step0',
+                'step3_0' => 'step3_0',
+                'step3_1' => 'step3_1',
+                'status' => 'status',
+                'organizationId' => 'organizationId',
+                'created_at' => 'created_at',
+                'updated_at' => 'updated_at'
+            ];
     }
 }

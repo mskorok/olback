@@ -102,7 +102,7 @@ class User extends DateTrackingModel
             'email',
             new EmailValidator(
                 [
-                    'model'   => $this,
+                    'model' => $this,
                     'message' => 'Please enter a correct email address',
                 ]
             )
@@ -172,16 +172,16 @@ class User extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'role' => 'role',
-            'email' => 'email',
-            'username' => 'username',
-            'password' => 'password',
+                'id' => 'id',
+                'role' => 'role',
+                'email' => 'email',
+                'username' => 'username',
+                'password' => 'password',
                 'first_name' => 'firstName',
                 'last_name' => 'lastName',
-            'location' => 'location',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at'
-        ];
+                'location' => 'location',
+                'created_at' => 'created_at',
+                'updated_at' => 'updated_at'
+            ];
     }
 }

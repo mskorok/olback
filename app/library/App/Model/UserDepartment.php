@@ -90,9 +90,9 @@ class UserDepartment extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'department_id' => 'department_id',
-            'user_id' => 'user_id'
-        ];
+                'id' => 'id',
+                'department_id' => 'department_id',
+                'user_id' => 'user_id'
+            ];
     }
 }

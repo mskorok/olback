@@ -103,11 +103,11 @@ class ActionList extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'from_item' => 'from_item',
-            'to_item' => 'to_item',
-            'action_list_group' => 'action_list_group',
-            'path_id' => 'path_id'
-        ];
+                'id' => 'id',
+                'from_item' => 'from_item',
+                'to_item' => 'to_item',
+                'action_list_group' => 'action_list_group',
+                'path_id' => 'path_id'
+            ];
     }
 }

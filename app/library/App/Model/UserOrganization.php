@@ -90,9 +90,9 @@ class UserOrganization extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'organization_id' => 'organization_id',
-            'user_id' => 'user_id'
-        ];
+                'id' => 'id',
+                'organization_id' => 'organization_id',
+                'user_id' => 'user_id'
+            ];
     }
 }

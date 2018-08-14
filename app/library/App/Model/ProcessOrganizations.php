@@ -90,10 +90,10 @@ class ProcessOrganizations extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'processId' => 'processId',
-            'organizationId' => 'organizationId'
-        ];
+                'id' => 'id',
+                'processId' => 'processId',
+                'organizationId' => 'organizationId'
+            ];
     }
 
 }

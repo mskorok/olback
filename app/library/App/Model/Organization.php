@@ -104,10 +104,10 @@ class Organization extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'name' => 'name',
-            'description' => 'description',
-            'userId' => 'userId'
-        ];
+                'id' => 'id',
+                'name' => 'name',
+                'description' => 'description',
+                'userId' => 'userId'
+            ];
     }
 }

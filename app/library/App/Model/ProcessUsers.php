@@ -90,10 +90,10 @@ class ProcessUsers extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'processId' => 'processId',
-            'userId' => 'userId'
-        ];
+                'id' => 'id',
+                'processId' => 'processId',
+                'userId' => 'userId'
+            ];
     }
 
 }

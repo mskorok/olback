@@ -32,6 +32,13 @@ class QuestionGroups extends DateTrackingModel
     public $name;
 
     /**
+     *
+     * @var string
+     * @Column(type="string", length=255, nullable=false)
+     */
+    public $description;
+
+    /**
      * Initialize method for model.
      */
     public function initialize()
@@ -93,8 +100,9 @@ class QuestionGroups extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'name' => 'name'
-        ];
+                'id' => 'id',
+                'name' => 'name',
+                'description' => 'description'
+            ];
     }
 }

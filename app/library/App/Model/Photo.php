@@ -103,11 +103,11 @@ class Photo extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'title' => 'title',
-            'albumId' => 'albumId',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at'
-        ];
+                'id' => 'id',
+                'title' => 'title',
+                'albumId' => 'albumId',
+                'created_at' => 'created_at',
+                'updated_at' => 'updated_at'
+            ];
     }
 }

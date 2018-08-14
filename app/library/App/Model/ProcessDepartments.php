@@ -90,10 +90,10 @@ class ProcessDepartments extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'processId' => 'processId',
-            'departmentId' => 'departmentId'
-        ];
+                'id' => 'id',
+                'processId' => 'processId',
+                'departmentId' => 'departmentId'
+            ];
     }
 
 }

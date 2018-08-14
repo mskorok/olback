@@ -102,10 +102,10 @@ class Answer extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'questionId' => 'questionId',
-            'answer' => 'answer',
-            'userId' => 'userId'
-        ];
+                'id' => 'id',
+                'questionId' => 'questionId',
+                'answer' => 'answer',
+                'userId' => 'userId'
+            ];
     }
 }

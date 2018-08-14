@@ -98,10 +98,10 @@ class Department extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'title' => 'title',
-            'description' => 'description',
-            'organization_id' => 'organization_id'
-        ];
+                'id' => 'id',
+                'title' => 'title',
+                'description' => 'description',
+                'organization_id' => 'organization_id'
+            ];
     }
 }

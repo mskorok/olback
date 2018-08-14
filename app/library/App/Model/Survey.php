@@ -123,13 +123,13 @@ class Survey extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'title' => 'title',
-            'description' => 'description',
-            'isEditable' => 'isEditable',
-            'isOlset' => 'isOlset',
-            'creator' => 'creator',
-            'organization_id' => 'organization_id'
-        ];
+                'id' => 'id',
+                'title' => 'title',
+                'description' => 'description',
+                'isEditable' => 'isEditable',
+                'isOlset' => 'isOlset',
+                'creator' => 'creator',
+                'organization_id' => 'organization_id'
+            ];
     }
 }

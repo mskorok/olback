@@ -121,13 +121,13 @@ class SystemicMap extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'name' => 'name',
-            'department' => 'department',
-            'organization' => 'organization',
-            'lang' => 'lang',
-            'processId' => 'processId',
-            'isActive' => 'isActive'
-        ];
+                'id' => 'id',
+                'name' => 'name',
+                'department' => 'department',
+                'organization' => 'organization',
+                'lang' => 'lang',
+                'processId' => 'processId',
+                'isActive' => 'isActive'
+            ];
     }
 }

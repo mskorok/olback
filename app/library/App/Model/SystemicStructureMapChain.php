@@ -100,9 +100,9 @@ class SystemicStructureMapChain extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'from_item' => 'from_item',
-            'to_item' => 'to_item'
-        ];
+                'id' => 'id',
+                'from_item' => 'from_item',
+                'to_item' => 'to_item'
+            ];
     }
 }

@@ -138,15 +138,15 @@ class SystemicStructureMap extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'name' => 'name',
-            'by_whom' => 'by_whom',
-            'organization' => 'organization',
-            'lang' => 'lang',
-            'processId' => 'processId',
-            'isActive' => 'isActive',
-            'startDate' => 'startDate',
-            'endDate' => 'endDate'
-        ];
+                'id' => 'id',
+                'name' => 'name',
+                'by_whom' => 'by_whom',
+                'organization' => 'organization',
+                'lang' => 'lang',
+                'processId' => 'processId',
+                'isActive' => 'isActive',
+                'startDate' => 'startDate',
+                'endDate' => 'endDate'
+            ];
     }
 }

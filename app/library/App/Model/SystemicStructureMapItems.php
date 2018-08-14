@@ -141,13 +141,13 @@ class SystemicStructureMapItems extends DateTrackingModel
     public function columnMap()
     {
         return parent::columnMap() + [
-            'id' => 'id',
-            'systemic_map_id' => 'systemic_map_id',
-            'question' => 'question',
-            'proposal' => 'proposal',
-            'groupId' => 'groupId',
-            'userId' => 'userId',
-            'itemType' => 'itemType'
-        ];
+                'id' => 'id',
+                'systemic_map_id' => 'systemic_map_id',
+                'question' => 'question',
+                'proposal' => 'proposal',
+                'groupId' => 'groupId',
+                'userId' => 'userId',
+                'itemType' => 'itemType'
+            ];
     }
 }
