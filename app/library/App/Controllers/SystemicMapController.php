@@ -227,14 +227,8 @@ class SystemicMapController extends CrudResourceController
             foreach ($systemicMapItems as $systemicMapItem) {
                 $groupColorValue = null;
                 if ($systemicMapItem->groupId !== null) {
-                    $groupColor = Group::findFirst(
-                        [
-                            'conditions' => 'id = ?1',
-                            'bind' => [
-                                1 => $systemicMapItem->groupId,
-                            ],
-                        ]
-                    );
+                    $groupColor = Group::findFirst($systemicMapItem->groupId);
+
                     if ($groupColor instanceof Group && $groupColor->color !== null) {
                         $groupColorValue = $groupColor->color;
                     }
@@ -503,14 +497,8 @@ class SystemicMapController extends CrudResourceController
         }
         $organization_id = $creator['organization']->organization_id;
 
-        $user = User::findFirst(
-            [
-                'conditions' => 'id = ?1',
-                'bind' => [
-                    1 => $creatorId,
-                ],
-            ]
-        );
+        $user = User::findFirst($creatorId);
+
 
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
             $systemicMap = SystemicMap::findFirst(
@@ -585,14 +573,7 @@ class SystemicMapController extends CrudResourceController
         );
 
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
-            $systemicItems = SystemicMapItems::findFirst(
-                [
-                    'conditions' => 'id = ?1',
-                    'bind' => [
-                        1 => $id,
-                    ],
-                ]
-            );
+            $systemicItems = SystemicMapItems::findFirst((int) $id);
 
             if ($systemicItems instanceof SystemicMapItems && $creatorId !== $systemicItems->userId) {
                 $organizationChecked = UserOrganization::findFirst(
@@ -685,14 +666,7 @@ class SystemicMapController extends CrudResourceController
         );
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
             /** @var Simple $systemicMap */
-            $systemicMap = SystemicMap::findFirst(
-                [
-                    'conditions' => 'id = ?1',
-                    'bind' => [
-                        1 => $id,
-                    ],
-                ]
-            );
+            $systemicMap = SystemicMap::findFirst((int) $id);
 
             if ($systemicMap instanceof SystemicMap) {
                 /** @var Simple $systemicItems */
@@ -768,14 +742,8 @@ class SystemicMapController extends CrudResourceController
 
             return $this->createArrayResponse($response, 'data');
         }
-        $user = User::findFirst(
-            [
-                'conditions' => 'id = ?1',
-                'bind' => [
-                    1 => $creatorId,
-                ],
-            ]
-        );
+        $user = User::findFirst($creatorId);
+
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
             /** @var Simple $systemicChains */
             $systemicChains = SystemicMapChain::find(
@@ -791,14 +759,8 @@ class SystemicMapController extends CrudResourceController
                 $systemicChain->delete();
             }
             /** @var Simple $systemicItems */
-            $systemicItems = SystemicMapItems::find(
-                [
-                    'conditions' => 'id =?1',
-                    'bind' => [
-                        1 => $id,
-                    ],
-                ]
-            );
+            $systemicItems = SystemicMapItems::find((int)$id);
+
             /** @var SystemicMapItems $systemicItem */
             foreach ($systemicItems as $systemicItem) {
                 $systemicItem->delete();
@@ -872,14 +834,8 @@ class SystemicMapController extends CrudResourceController
         }
 
         /** @var Simple $systemicMapsR */
-        $systemicMapsR = SystemicMap::find(
-            [
-                'conditions' => '	id = ?1',
-                'bind' => [
-                    1 => $id,
-                ],
-            ]
-        );
+        $systemicMapsR = SystemicMap::find((int) $id);
+
         $systemicR = '';
         if ($systemicMapsR->count() > 0) {
             /** @var SystemicMap $systemicMapR */
@@ -901,8 +857,6 @@ class SystemicMapController extends CrudResourceController
 
         $non_ch = [];
         foreach ($results_dist as $key => $value) {
-//            $first_name_f = $value['first_name'];
-//            $last_name_f = $value['last_name'];
             $non_ch[] = $value['id'];
         }
         $sql = 'SELECT to_item as id FROM `systemic_map_chain` '
@@ -971,14 +925,7 @@ class SystemicMapController extends CrudResourceController
                 $groupTitle = '';
                 $groupColorValue = null;
                 if (isset($item['groupId'])) {
-                    $groupColor = Group::findFirst(
-                        [
-                            'conditions' => 'id = ?1',
-                            'bind' => [
-                                1 => $item['groupId'],
-                            ],
-                        ]
-                    );
+                    $groupColor = Group::findFirst((int) $item['groupId']);
                     if ($groupColor instanceof Group && $groupColor->color !== null) {
                         $groupColorValue = $groupColor->color;
                     }
@@ -1077,136 +1024,7 @@ class SystemicMapController extends CrudResourceController
             //todo
         }
         return $hex;//todo
-        // validate hex string
-
-//        $hex = preg_replace('/[^0-9a-f]/i', '', $hex);
-//        $new_hex = '#';
-//
-//        if (strlen($hex) < 6) {
-//            $hex = $hex[0] + $hex[0] + $hex[1] + $hex[1] + $hex[2] + $hex[2];
-//        }
-//
-//        // convert to decimal and change luminosity
-//        for ($i = 0; $i < 3; ++$i) {
-//            $dec = hexdec(substr($hex, $i * 2, 2));
-//            $dec = min(max(0, $dec + $dec * $percent), 255);
-//            $new_hex .= str_pad(dechex($dec), 2, 0, STR_PAD_LEFT);
-//        }
-//
-//        return $new_hex;
     }
-
-//    protected function createActionListGroup2()
-//    {
-//        $creatorId = $this->getAuthenticatedId();
-//        if (null === $creatorId) {
-//            $response = [
-//                'code' => 0,
-//                'status' => 'Error',
-//                'data' => ['User not authenticated']
-//            ];
-//            return $this->createArrayResponse($response, 'data');
-//        }
-//
-//        $creator = static::getUserDetails($creatorId);
-//        $creatorInfo = null;
-//        if ($creator) {
-//            $creatorInfo = [$creatorId, $creator['account']->role];
-//        }
-//        if ($creator && $creatorInfo[1] !== AclRoles::MANAGER) {
-//            $response = [
-//                'code' => 0,
-//                'status' => 'You cannot delete this systemic item!',
-//            ];
-//        } else {
-//            $data = $this->request->getJsonRawBody();
-//
-//            if ($creator && $creator['organization'] === null) {
-//                $response = [
-//                    'code' => 0,
-//                    'status' => 'Error',
-//                    'data' => "Manager's organization not found!",
-//                ];
-//
-//                return $this->createArrayResponse($response, 'data');
-//            }
-//            $organization_id = $creator ? $creator['organization']->organization_id : 0;
-//
-//            $systemicMaps = SystemicMap::findFirst(
-//                [
-//                    'conditions' => 'id = ?2 AND organization = ?1',
-//                    'bind' => [
-//                        1 => $organization_id,
-//                        2 => $data->systemicMapId,
-//                    ],
-//                ]
-//            );
-//            $systemicMapsArray = [];
-//
-//            if ($systemicMaps instanceof SystemicMap) {
-//                //1.save group details
-//                $action_grp_list = new ActionListGroup();
-//                $action_grp_list->systemic_map_id = $systemicMaps->id;
-//                $action_grp_list->title = $data->title;
-//                $action_grp_list->created_by = $creatorId;
-//                if (isset($data->description)) {
-//                    $action_grp_list->description = $data->description;
-//                }
-//                if ($action_grp_list->save() === false) {
-//                    $messagesErrors = [];
-//                    foreach ($action_grp_list->getMessages() as $message) {
-//                        $messagesErrors[] = $message;
-//                    }
-//                    $response = [
-//                        'code' => 0,
-//                        'status' => 'Error',
-//                        'data' => $messagesErrors,
-//                    ];
-//                } else {
-//                    $action_grp_list_id = $action_grp_list->getWriteConnection()->lastInsertId();
-//
-//                    //  2.copy sam as action list
-//                    $connection = $this->db;
-//                    $sql_dist = 'SELECT s1.id,u.first_name,u.last_name FROM `systemic_map_items` s1 '
-//                        . 'JOIN user u ON s1.userId = u.id '
-//                        . 'WHERE s1.id NOT IN '
-//                        . '(SELECT distinct s2.from_item as id FROM `systemic_map_chain` s2 '
-//                        . 'WHERE s2.from_item IS NOT NULL ) AND s1.systemic_map_id=' . $systemicMaps->id . ';';
-//                    $data_dist = $connection->query($sql_dist);
-//                    $data_dist->setFetchMode(Db::FETCH_ASSOC);
-//                    $results_dist = $data_dist->fetchAll();
-//
-//                    $non_ch = [];
-//                    foreach ($results_dist as $key => $value) {
-//                        $first_name_f = $value['first_name'];
-//                        $last_name_f = $value['last_name'];
-//                        $non_ch[] = $value['id'];
-//                    }
-//                    $sql = 'SELECT to_item as id FROM `systemic_map_chain` WHERE from_item Is NULL AND to_item IN '
-//                        . '(SELECT id FROM systemic_map_items WHERE systemic_map_id=' . $systemicMaps->id . ')';
-//
-//                    $data = $connection->query($sql);
-//                    $data->setFetchMode(Db::FETCH_ASSOC);
-//                    $results = $data->fetchAll();
-//                    $tree = $this->fillArray($results);
-//
-//                    $response = [
-//                        'code' => 1,
-//                        'status' => 'Success',
-//                        'data' => ['systemicMapId' => $action_grp_list_id],
-//                    ];
-//                }
-//            } else {
-//                $response = [
-//                    'code' => 0,
-//                    'status' => 'Error',
-//                    'data' => 'Systemic Map not found',
-//                ];
-//            }
-//        }
-//
-//        return $this->createArrayResponse($response, 'data');
-//    }
 
     /**
      * @return mixed
@@ -1276,14 +1094,8 @@ class SystemicMapController extends CrudResourceController
                     $groupTitle = '';
                     $groupColorValue = null;
                     if (isset($item['groupId'])) {
-                        $groupColor = Group::findFirst(
-                            [
-                                'conditions' => 'id = ?1',
-                                'bind' => [
-                                    1 => $item['groupId'],
-                                ],
-                            ]
-                        );
+                        $groupColor = Group::findFirst((int) $item['groupId']);
+
                         if ($groupColor instanceof Group && $groupColor->color !== null) {
                             $groupColorValue = $groupColor->color;
                         }
@@ -1307,109 +1119,6 @@ class SystemicMapController extends CrudResourceController
         }
         return $tree;
     }
-
-//    protected function createActionListGroup3()
-//    {
-//        $creatorId = $this->getAuthenticatedId();
-//        if (null === $creatorId) {
-//            $response = [
-//                'code' => 0,
-//                'status' => 'Error',
-//                'data' => ['User not authenticated']
-//            ];
-//            return $this->createArrayResponse($response, 'data');
-//        }
-//
-//        $creator = static::getUserDetails($creatorId);
-//        $creatorInfo = null;
-//        if ($creator) {
-//            $creatorInfo = [$creatorId, $creator['account']->role];
-//        }
-//        if ($creator && $creatorInfo[1] !== AclRoles::MANAGER) {
-//            $response = [
-//                'code' => 0,
-//                'status' => 'You cannot delete this systemic item!',
-//            ];
-//        } else {
-//            $data = $this->request->getJsonRawBody();
-//            $connection = $this->db;
-//            $sql_dist = 'SELECT SM.to_item as id FROM `systemic_map_chain` SM '
-//                . 'JOIN systemic_map_items SI ON SI.id = SM.to_item WHERE NOT EXISTS '
-//                . '(SELECT * FROM systemic_map_chain sm2 '
-//                . 'WHERE sm2.from_item = SM.to_item) AND SI.systemic_map_id = ' . $data->systemicMapId . ';';
-//            $data_dist = $connection->query($sql_dist);
-//            $data_dist->setFetchMode(Db::FETCH_ASSOC);
-//            $results_dist = $data_dist->fetchAll();
-//            $out_nodes = [];
-//            $tree = [];
-//
-//            $this->fillArray3($tree, $results_dist);
-//
-//
-//            $a = [
-//                'tree' => $tree,
-//            ];
-//
-//            return $this->createArrayResponse($a, 'data');
-//        }
-//        return $this->createArrayResponse($response, 'data');
-//    }
-
-//    protected function fillArray3(&$tree, $arrayData)
-//    {
-//        foreach ($arrayData as $value_first) {
-//            if (($value_first['id'] != '')) {
-//                $sql = 'SELECT sm.*,u.first_name,u.last_name FROM systemic_map_items sm '
-//                    . 'JOIN user u ON sm.userId = u.id WHERE sm.id=' . $value_first['id'];
-//
-//                $connection = $this->db;
-//                $data = $connection->query($sql);
-//                $data->setFetchMode(Db::FETCH_ASSOC);
-//                $iresults = $data->fetchAll();
-//                foreach ($iresults as &$item) {
-//                    $groupTitle = '';
-//                    $groupColorValue = null;
-//                    if (isset($item['groupId'])) {
-//                        $groupColor = Group::findFirst(
-//                            [
-//                                'conditions' => 'id = ?1',
-//                                'bind' => [
-//                                    1 => $item['groupId'],
-//                                ],
-//                            ]
-//                        );
-//                        if ($groupColor instanceof Group && $groupColor->color !== null) {
-//                            $groupColorValue = $groupColor->color;
-//                        }
-//
-//                        $groupTitle = $groupColor->title;
-//                    }
-////                      $color = [];
-//                    $item['color'] = $groupColorValue;
-//                    $item['groupTitle'] = $groupTitle;
-//
-//                    //  array_push($item,$color);
-//                    $tree[] = $item;
-//                }
-//                unset($item);
-//                foreach ($tree as &$item) {
-//                    $id = $item['id'];
-//                    $sql = 'SELECT from_item as id FROM `systemic_map_chain` WHERE to_item = ' . $id;
-//                    $connection = $this->db;
-//                    $data = $connection->query($sql);
-//                    $data->setFetchMode(Db::FETCH_ASSOC);
-//                    $ids = $data->fetchAll();
-//                    $item['items'] = [];
-//
-//                    // if (!empty($ids)) {
-//                    $this->fillArray3($item['items'], $ids);
-//                    // }
-//                    //  }
-//                }
-//                unset($item);
-//            }
-//        }
-//    }
 
     /**
      * @return mixed
@@ -1688,14 +1397,7 @@ class SystemicMapController extends CrudResourceController
         }
         $organization_id = $creator['organization']->organization_id;
 
-        $user = User::findFirst(
-            [
-                'conditions' => 'id = ?1',
-                'bind' => [
-                    1 => $creatorId,
-                ],
-            ]
-        );
+        $user = User::findFirst($creatorId);
 
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
             $systemicStructureMap = SystemicStructureMap::findFirst(
@@ -1954,15 +1656,8 @@ class SystemicMapController extends CrudResourceController
             foreach ($systemicMapItems as $systemicMapItem) {
                 $groupColorValue = null;
                 if (null !== $systemicMapItem->groupId) {
-                    $groupColor = Group::findFirst(
-                        [
-                            'conditions' => 'id = ?1',
-                            'bind' => [
-                                1 => $systemicMapItem->groupId,
-                            ],
-                        ]
-                    );
-                    // var_dump($groupColorValue = $groupColor->color);die();
+                    $groupColor = Group::findFirst($systemicMapItem->groupId);
+
                     if ($groupColor instanceof Group && $groupColor->color !== null) {
                         $groupColorValue = $groupColor->color;
                     }

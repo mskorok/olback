@@ -5,6 +5,7 @@ namespace App\Bootstrap;
 use App\BootstrapInterface;
 use App\Collections\ExportCollection;
 // use App\Collections\UserCollection;
+use App\Resources\ProcessYearSurveyResource;
 use App\Resources\UserResource;
 use App\Resources\AlbumResource;
 use App\Resources\PhotoResource;
@@ -36,6 +37,7 @@ class CollectionBootstrap implements BootstrapInterface
             ->resource(new AlbumResource('/albums'))
             ->resource(new PhotoResource('/photos'))
             ->resource(new ProcessResource('/process'))
+            ->resource(new ProcessYearSurveyResource('/year-survey'))
             ->resource(new OrganizationResource('/organization'))
             ->resource(new SystemicMapResource('/systemicmap'))
             ->resource(new GroupResource('/group'))

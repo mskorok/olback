@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Constants\Services;
 use App\Model\Answer;
 use App\Model\Process;
+use App\Model\ProcessYearSurvey;
 use App\Model\QuestionGroups;
 use App\Model\SurveyTemplate;
 use App\Traits\Auth;
@@ -45,6 +46,20 @@ class SurveyController extends CrudResourceController
         $survey->isOlset = $data->isOlset;
         $survey->creator = $creator['account']->id;
         $survey->organization_id = $organization;
+        if (property_exists($data, 'showExtraInfoAndTags')) {
+            $survey->showExtraInfoAndTags = $data->showExtraInfoAndTags;
+        } else {
+            $survey->showExtraInfoAndTags = false;
+        }
+        if (property_exists($data, 'tag')) {
+            $survey->tag = $data->tag;
+        }
+        if (property_exists($data, 'extraInfo')) {
+            $survey->extraInfo = $data->extraInfo;
+        } else {
+            $survey->extraInfo = '';
+        }
+
         if ($survey->save() === false) {
             $messagesErrors = [];
             foreach ($survey->getMessages() as $message) {
@@ -214,25 +229,8 @@ class SurveyController extends CrudResourceController
         );
 
         if ($survey instanceof SurveyTemplate) {
-            $surveyQuestion = new SurveyTemplateQuestion();
-            $surveyQuestion->question = $data->question;
-            $surveyQuestion->description = $data->description;
-            $surveyQuestion->answered_type = $data->answered_type;
-            $surveyQuestion->question_order = $data->question_order;
-            $surveyQuestion->survey_id = $id;
-            if (property_exists($data, 'question_group_id')) {
-                $surveyQuestion->question_group_id = $data->question_group_id;
-            }
-            if (property_exists($data, 'showExtraInfoAndTags')) {
-                $surveyQuestion->showExtraInfoAndTags = $data->showExtraInfoAndTags;
-            } else {
-                $surveyQuestion->showExtraInfoAndTags = false;
-            }
-            if (property_exists($data, 'extraInfo')) {
-                $surveyQuestion->extraInfo = $data->extraInfo;
-            } else {
-                $surveyQuestion->extraInfo = '';
-            }
+            $surveyQuestion = $this->createSurveyQuestion($data, $id, true);
+
             if ($surveyQuestion->save() === false) {
                 $messagesErrors = [];
                 foreach ($surveyQuestion->getMessages() as $message) {
@@ -244,11 +242,11 @@ class SurveyController extends CrudResourceController
                     'data' => $messagesErrors,
                 ];
             } else {
-                $surveyId = $surveyQuestion->getWriteConnection()->lastInsertId();
+                $surveyQuestion->refresh();
                 $response = [
                     'code' => 1,
                     'status' => 'Success',
-                    'data' => ['surveyQuestion' => $surveyId],
+                    'data' => ['surveyQuestion' => $surveyQuestion->id],
                 ];
             }
         } else {
@@ -292,14 +290,7 @@ class SurveyController extends CrudResourceController
             return $this->createArrayResponse($response, 'data');
         }
 
-        $survey = Survey::findFirst(
-            [
-                'conditions' => 'id = ?1',
-                'bind' => [
-                    1 => $id
-                ],
-            ]
-        );
+        $survey = Survey::findFirst((int) $id);
 
         if ($survey instanceof Survey) {
             /** @var Simple $surveyQuestion */
@@ -308,13 +299,29 @@ class SurveyController extends CrudResourceController
                     'conditions' => 'survey_id = ?1',
                     'bind' => [
                         1 => $id
-                    ]]
+                    ],
+                    'order' => 'question_group_id'
+                ]
             );
+
+
+            $groups = [];
+            $flag = 0;
+            /** @var SurveyQuestion $item */
+            foreach ($surveyQuestion as $item) {
+                if ($item->question_group_id !== null && $flag < $item->question_group_id) {
+                    $flag = $item->question_group_id;
+                    $groups[$item->id] = [$item->id, 'name' => $item->getQuestionGroup()->name];
+                } else {
+                    $groups[$item->id] = ['id' => $item->id, 'name' => ''];
+                }
+            }
 
             $response = [
                 'code' => 1,
                 'status' => 'Success',
                 'data' => $surveyQuestion,
+                'groups' => $groups,
             ];
         } else {
             $response = [
@@ -400,28 +407,29 @@ class SurveyController extends CrudResourceController
             $step0_ID = 0;
             if ($surveyTemplate instanceof SurveyTemplate) {
                 //create step0
-                $step0 = new Survey();
-                $step0->title = $surveyTemplate->title;
-                $step0->description = $surveyTemplate->description;
-                $step0->isEditable = $surveyTemplate->isEditable;
-                $step0->isOlset = $surveyTemplate->isOlset;
-                $step0->creator = $surveyTemplate->creator;
-                $step0->organization_id = $surveyTemplate->organization_id;
+                try {
+                    $step0_ID = $this->createEvaluationSurvey($surveyTemplate);
+                } catch (\RuntimeException $exception) {
+                    $response = [
+                        'code' => 0,
+                        'status' => 'Error',
+                        'data' => [$exception->getMessage()]
+                    ];
+                    return $this->createArrayResponse($response, 'data');
+                }
 
-                $step0->save();
-
-                $step0_ID = $step0->getWriteConnection()->lastInsertId();
 
                 //create step3_0
-                $step3_0 = new Survey();
-                $step3_0->title = $surveyTemplate->title;
-                $step3_0->description = $surveyTemplate->description;
-                $step3_0->isEditable = $surveyTemplate->isEditable;
-                $step3_0->isOlset = $surveyTemplate->isOlset;
-                $step3_0->creator = $surveyTemplate->creator;
-                $step3_0->organization_id = $surveyTemplate->organization_id;
-                $step3_0->save();
-                $step3_0_ID = $step3_0->getWriteConnection()->lastInsertId();
+                try {
+                    $step3_0_ID = $this->createEvaluationSurvey($surveyTemplate);
+                } catch (\RuntimeException $exception) {
+                    $response = [
+                        'code' => 0,
+                        'status' => 'Error',
+                        'data' => [$exception->getMessage()]
+                    ];
+                    return $this->createArrayResponse($response, 'data');
+                }
             }
 
 
@@ -436,15 +444,16 @@ class SurveyController extends CrudResourceController
             $step3_1_ID = 0;
             if ($surveyTemplate2 instanceof SurveyTemplate) {
                 //create step3_1
-                $step3_1 = new Survey();
-                $step3_1->title = $surveyTemplate2->title;
-                $step3_1->description = $surveyTemplate2->description;
-                $step3_1->isEditable = $surveyTemplate2->isEditable;
-                $step3_1->isOlset = $surveyTemplate2->isOlset;
-                $step3_1->creator = $surveyTemplate2->creator;
-                $step3_1->organization_id = $surveyTemplate2->organization_id;
-                $step3_1->save();
-                $step3_1_ID = $step3_1->getWriteConnection()->lastInsertId();
+                try {
+                    $step3_1_ID = $this->createEvaluationSurvey($surveyTemplate);
+                } catch (\RuntimeException $exception) {
+                    $response = [
+                        'code' => 0,
+                        'status' => 'Error',
+                        'data' => [$exception->getMessage()]
+                    ];
+                    return $this->createArrayResponse($response, 'data');
+                }
             }
 
             //create questions
@@ -460,51 +469,13 @@ class SurveyController extends CrudResourceController
             );
 
             /** @var SurveyTemplateQuestion $temp_question */
-            foreach ($surveyTemplateQuestions as $temp_question) {
-                $question = new SurveyQuestion();
-                $question->question = $temp_question->question;
-                $question->description = $temp_question->description;
-                $question->answered_type = $temp_question->answered_type;
-                $question->question_order = $temp_question->question_order;
-                $question->survey_id = $step0_ID;
-
-                if (property_exists($temp_question, 'question_group_id')) {
-                    $question->question_group_id = $temp_question->question_group_id;
-                }
-                if (property_exists($temp_question, 'showExtraInfoAndTags')) {
-                    $question->showExtraInfoAndTags = $temp_question->showExtraInfoAndTags;
-                } else {
-                    $question->showExtraInfoAndTags = false;
-                }
-                if (property_exists($temp_question, 'extraInfo')) {
-                    $question->extraInfo = $temp_question->extraInfo;
-                } else {
-                    $question->extraInfo = '';
-                }
+            foreach ($surveyTemplateQuestions as $data) {
+                $question = $this->createSurveyQuestion($data, $step0_ID);
                 $question->save();
             }
             /** @var SurveyTemplateQuestion $temp_question */
-            foreach ($surveyTemplateQuestions as $temp_question) {
-                $question = new SurveyQuestion();
-                $question->question = $temp_question->question;
-                $question->description = $temp_question->description;
-                $question->answered_type = $temp_question->answered_type;
-                $question->question_order = $temp_question->question_order;
-                $question->survey_id = $step3_0_ID;
-
-                if (property_exists($temp_question, 'question_group_id')) {
-                    $question->question_group_id = $temp_question->question_group_id;
-                }
-                if (property_exists($temp_question, 'showExtraInfoAndTags')) {
-                    $question->showExtraInfoAndTags = $temp_question->showExtraInfoAndTags;
-                } else {
-                    $question->showExtraInfoAndTags = false;
-                }
-                if (property_exists($temp_question, 'extraInfo')) {
-                    $question->extraInfo = $temp_question->extraInfo;
-                } else {
-                    $question->extraInfo = '';
-                }
+            foreach ($surveyTemplateQuestions as $data) {
+                $question = $this->createSurveyQuestion($data, $step3_0_ID);
                 $question->save();
             }
 
@@ -519,46 +490,32 @@ class SurveyController extends CrudResourceController
             );
 
             /** @var SurveyTemplateQuestion $temp_question2 */
-            foreach ($surveyTemplateQuestions2 as $temp_question2) {
-                $question = new SurveyQuestion();
-                $question->question = $temp_question2->question;
-                $question->description = $temp_question2->description;
-                $question->answered_type = $temp_question2->answered_type;
-                $question->question_order = $temp_question2->question_order;
-                $question->survey_id = $step3_1_ID;
-
-                if (property_exists($temp_question, 'question_group_id')) {
-                    $question->question_group_id = $temp_question->question_group_id;
-                }
-                if (property_exists($temp_question, 'showExtraInfoAndTags')) {
-                    $question->showExtraInfoAndTags = $temp_question->showExtraInfoAndTags;
-                } else {
-                    $question->showExtraInfoAndTags = false;
-                }
-                if (property_exists($temp_question, 'extraInfo')) {
-                    $question->extraInfo = $temp_question->extraInfo;
-                } else {
-                    $question->extraInfo = '';
-                }
+            foreach ($surveyTemplateQuestions2 as $data) {
+                $question = $this->createSurveyQuestion($data, $step3_1_ID);
                 $question->save();
             }
 
 
-            $process = Process::findFirst(
-                [
-                    'conditions' => 'id = ?1',
-                    'bind' => [
-                        1 => $id,
-                    ],
-                ]
-            );
+            $process = Process::findFirst((int) $id);
 
             if ($process instanceof Process) {
                 $process->step0 = $step0_ID;
                 $process->step3_0 = $step3_0_ID;
                 $process->step3_1 = $step3_1_ID;
                 $process->organizationId = $organization;
-                $process->save();
+                if ($process->save()) {
+                    $process->refresh();
+                    try {
+                        $this->initYearProcess($process);
+                    } catch (\RuntimeException $exception) {
+                        $response = [
+                            'code' => 0,
+                            'status' => 'Error',
+                            'data' => [$exception->getMessage()]
+                        ];
+                        return $this->createArrayResponse($response, 'data');
+                    }
+                }
             }
         }
         $response = [
@@ -575,14 +532,8 @@ class SurveyController extends CrudResourceController
      */
     public function changeProcessStatus($id)
     {
-        $proc = Process::findFirst(
-            [
-                'conditions' => 'id = ?1',
-                'bind' => [
-                    1 => $id
-                ],
-            ]
-        );
+        $proc = Process::findFirst((int) $id);
+
         $statusDesc = 'stopped';
         if ($proc instanceof Process) {
             if ($proc->status === 1) {
@@ -727,13 +678,13 @@ class SurveyController extends CrudResourceController
         $config = $this->getDI()->get(Services::CONFIG);
 
         $sql_getProcesses = 'SELECT PR.id,PR.title, PR.`step0`, PR.`step3_0`, PR.`step3_1` FROM `process` PR '
-                . 'INNER JOIN survey S ON PR.`step0`= S.id OR PR.`step3_0`= S.id OR PR.`step3_1`= S.id '
-                . 'WHERE PR.id IN (SELECT  `processId` FROM `process_departments` WHERE `departmentId` '
-                . 'IN (SELECT department_id FROM user_department WHERE user_id =  ' . $creatorId . ' )) OR '
-                . 'PR.id IN (SELECT  `processId` FROM `process_organizations` WHERE `organizationId` '
-                . 'IN (SELECT organization_id FROM user_organization WHERE user_id =  ' . $creatorId . ' )) OR '
-                . 'PR.id IN (SELECT `processId` FROM `process_users` WHERE userId = ' . $creatorId . ' ) '
-                . 'GROUP BY PR.`step0`, PR.`step3_0`, PR.`step3_1`,PR.`id`';
+            . 'INNER JOIN survey S ON PR.`step0`= S.id OR PR.`step3_0`= S.id OR PR.`step3_1`= S.id '
+            . 'WHERE PR.id IN (SELECT  `processId` FROM `process_departments` WHERE `departmentId` '
+            . 'IN (SELECT department_id FROM user_department WHERE user_id =  ' . $creatorId . ' )) OR '
+            . 'PR.id IN (SELECT  `processId` FROM `process_organizations` WHERE `organizationId` '
+            . 'IN (SELECT organization_id FROM user_organization WHERE user_id =  ' . $creatorId . ' )) OR '
+            . 'PR.id IN (SELECT `processId` FROM `process_users` WHERE userId = ' . $creatorId . ' ) '
+            . 'GROUP BY PR.`step0`, PR.`step3_0`, PR.`step3_1`,PR.`id`';
         $connection = $this->db;
         $data = $connection->query($sql_getProcesses);
         $data->setFetchMode(Db::FETCH_ASSOC);
@@ -796,5 +747,88 @@ class SurveyController extends CrudResourceController
             'data' => $processes
         ];
         return $this->createArrayResponse($response, 'data');
+    }
+
+    /**
+     * @param Process $process
+     * @return bool
+     * @throws \RuntimeException
+     */
+    protected function initYearProcess(Process $process): bool
+    {
+        /** @var Simple $models */
+        $models = ProcessYearSurvey::find([
+            'conditions' => 'process_id = ?1',
+            'bind' => [
+                1 => $process->id
+            ],
+        ]);
+        if ($models->count() === 0) {
+            $yearSurvey = new ProcessYearSurvey();
+            $surveyTemplate = SurveyTemplate::findFirst(
+                [
+                    'conditions' => 'tag LIKE "%0#3_0%"',
+                    'bind' => [
+                    ],
+                ]
+            );
+            if ($surveyTemplate instanceof SurveyTemplate) {
+                $surveyId = $this->createEvaluationSurvey($surveyTemplate);
+                $yearSurvey->process_id = $process->id;
+                $yearSurvey->survey_id = $surveyId;
+                $yearSurvey->date = (new \DateTime())->format('Y');
+                if ($yearSurvey->save()) {
+                    return true;
+                }
+                throw new \RuntimeException('Year Survey not created');
+            }
+            throw new \RuntimeException('Template not found');
+        }
+        throw new \RuntimeException('Year Process already created');
+    }
+
+    /**
+     * @param SurveyTemplate $surveyTemplate
+     * @return int
+     * @throws \RuntimeException
+     */
+    protected function createEvaluationSurvey(SurveyTemplate $surveyTemplate): int
+    {
+        $survey = new Survey();
+        $survey->title = $surveyTemplate->title;
+        $survey->description = $surveyTemplate->description;
+        $survey->isEditable = $surveyTemplate->isEditable;
+        $survey->isOlset = $surveyTemplate->isOlset;
+        $survey->creator = $surveyTemplate->creator;
+        $survey->organization_id = $surveyTemplate->organization_id;
+        if (property_exists($surveyTemplate, 'showExtraInfoAndTags')) {
+            $survey->showExtraInfoAndTags = $surveyTemplate->showExtraInfoAndTags;
+        } else {
+            $survey->showExtraInfoAndTags = false;
+        }
+        if (property_exists($surveyTemplate, 'tag')) {
+            $survey->tag = $surveyTemplate->tag;
+        }
+        if (property_exists($surveyTemplate, 'extraInfo')) {
+            $survey->extraInfo = $surveyTemplate->extraInfo;
+        } else {
+            $survey->extraInfo = '';
+        }
+        if ($survey->save()) {
+            $survey->refresh();
+            return $survey->id;
+        }
+        throw new \RuntimeException('Survey not saved template_id=' . $surveyTemplate->id);
+    }
+
+    protected function createSurveyQuestion($data, $id, $template = false)
+    {
+        $surveyQuestion = $template ? new SurveyTemplateQuestion() : new SurveyQuestion();
+        $surveyQuestion->question = $data->question;
+        $surveyQuestion->description = $data->description;
+        $surveyQuestion->answered_type = $data->answered_type;
+        $surveyQuestion->question_order = $data->question_order;
+        $surveyQuestion->survey_id = $id;
+        return $surveyQuestion;
     }
 }

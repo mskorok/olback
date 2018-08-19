@@ -19,6 +19,7 @@ class ProcessTransformer extends ModelTransformer
         'ProcessDepartments',
         'ProcessOrganizations',
         'ProcessUsers',
+        'ProcessYearSurvey',
         'SystemicMap',
         'SystemicStructureMap',
         'Organization',
@@ -40,6 +41,11 @@ class ProcessTransformer extends ModelTransformer
     public function includeProcessUsers($model)
     {
         return $this->collection($model->getProcessUsers(), new ProcessUsersTransformer());
+    }
+
+    public function includeProcessYearSurvey($model)
+    {
+        return $this->collection($model->getProcessYearSurvey(), new ProcessYearSurveyTransformer());
     }
 
     public function includeSystemicMap($model)

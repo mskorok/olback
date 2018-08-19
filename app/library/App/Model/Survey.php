@@ -67,6 +67,27 @@ class Survey extends DateTrackingModel
     public $organization_id;
 
     /**
+     *
+     * @var string
+     * @Column(type="string", length=255, nullable=true)
+     */
+    public $tag;
+
+    /**
+     *
+     * @var integer
+     * @Column(type="integer", length=4, nullable=false)
+     */
+    public $showExtraInfoAndTags;
+
+    /**
+     *
+     * @var string
+     * @Column(type="string", nullable=false)
+     */
+    public $extraInfo;
+
+    /**
      * Initialize method for model.
      */
     public function initialize()
@@ -129,7 +150,9 @@ class Survey extends DateTrackingModel
                 'isEditable' => 'isEditable',
                 'isOlset' => 'isOlset',
                 'creator' => 'creator',
-                'organization_id' => 'organization_id'
+                'organization_id' => 'organization_id',
+                'show_extra_info_and_tags' => 'showExtraInfoAndTags',
+                'extra_info' => 'extraInfo'
             ];
     }
 }

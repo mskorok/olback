@@ -67,20 +67,6 @@ class SurveyTemplateQuestion extends DateTrackingModel
     public $question_group_id;
 
     /**
-     *
-     * @var integer
-     * @Column(type="integer", length=4, nullable=false)
-     */
-    public $showExtraInfoAndTags;
-
-    /**
-     *
-     * @var string
-     * @Column(type="string", nullable=false)
-     */
-    public $extraInfo;
-
-    /**
      * Initialize method for model.
      */
     public function initialize()
@@ -149,8 +135,6 @@ class SurveyTemplateQuestion extends DateTrackingModel
                 'question_order' => 'question_order',
                 'survey_id' => 'survey_id',
                 'question_group_id' => 'question_group_id',
-                'show_extra_info_and_tags' => 'showExtraInfoAndTags',
-                'extra_info' => 'extraInfo'
             ];
     }
 }
