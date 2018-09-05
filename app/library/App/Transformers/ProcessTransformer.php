@@ -13,68 +13,70 @@ use PhalconRest\Transformers\ModelTransformer;
 
 class ProcessTransformer extends ModelTransformer
 {
-    protected $modelClass = Process::class;
+    public function __construct()
+    {
+        $this->modelClass = Process::class;
+        $this->availableIncludes = [
+            'ProcessDepartments',
+            'ProcessOrganizations',
+            'ProcessUsers',
+            'ProcessYearSurvey',
+            'SystemicMap',
+            'SystemicStructureMap',
+            'Organization',
+            'Survey0',
+            'Survey30',
+            'Survey31'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'ProcessDepartments',
-        'ProcessOrganizations',
-        'ProcessUsers',
-        'ProcessYearSurvey',
-        'SystemicMap',
-        'SystemicStructureMap',
-        'Organization',
-        'Survey0',
-        'Survey30',
-        'Survey31'
-    ];
-
-    public function includeProcessDepartments($model)
+    public function includeProcessDepartments(Process $model)
     {
         return $this->collection($model->getProcessDepartments(), new ProcessDepartmentsTransformer());
     }
 
-    public function includeProcessOrganizations($model)
+    public function includeProcessOrganizations(Process $model)
     {
         return $this->collection($model->getProcessOrganizations(), new ProcessOrganizationsTransformer());
     }
 
-    public function includeProcessUsers($model)
+    public function includeProcessUsers(Process $model)
     {
         return $this->collection($model->getProcessUsers(), new ProcessUsersTransformer());
     }
 
-    public function includeProcessYearSurvey($model)
+    public function includeProcessYearSurvey(Process $model)
     {
         return $this->collection($model->getProcessYearSurvey(), new ProcessYearSurveyTransformer());
     }
 
-    public function includeSystemicMap($model)
+    public function includeSystemicMap(Process $model)
     {
         return $this->collection($model->getSystemicMap(), new SystemicMapTransformer());
     }
 
-    public function includeSystemicStructureMap($model)
+    public function includeSystemicStructureMap(Process $model)
     {
         return $this->collection($model->getSystemicStructureMap(), new SystemicStructureMapTransformer());
     }
 
-    public function includeOrganization($model)
+    public function includeOrganization(Process $model)
     {
         return $this->collection($model->getOrganization(), new OrganizationTransformer());
     }
 
-    public function includeSurvey0($model)
+    public function includeSurvey0(Process $model)
     {
         return $this->item($model->getSurvey0(), new SurveyTransformer());
     }
 
-    public function includeSurvey30($model)
+    public function includeSurvey30(Process $model)
     {
-        return $this->item($model->getSurvey3_0(), new SurveyTransformer());
+        return $this->item($model->getSurvey30(), new SurveyTransformer());
     }
 
-    public function includeSurvey31($model)
+    public function includeSurvey31(Process $model)
     {
-        return $this->item($model->getSurvey3_1(), new SurveyTransformer());
+        return $this->item($model->getSurvey31(), new SurveyTransformer());
     }
 }

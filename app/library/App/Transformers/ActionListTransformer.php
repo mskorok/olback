@@ -3,17 +3,19 @@
 namespace App\Transformers;
 
 use App\Model\ActionList;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class ActionListTransformer extends Transformer
+class ActionListTransformer extends ModelTransformer
 {
-    protected $modelClass = ActionList::class;
+    public function __construct()
+    {
+        $this->modelClass = ActionList::class;
+        $this->availableIncludes = [
+            'ActionListGroup'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'ActionListGroup'
-    ];
-
-    public function includeActionListGroup($model)
+    public function includeActionListGroup(ActionList $model)
     {
         return $this->item($model->getActionListGroup(), new ActionListGroupTransformer());
     }

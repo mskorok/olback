@@ -3,22 +3,24 @@
 namespace App\Transformers;
 
 use App\Model\ProcessYearSurvey;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class ProcessYearSurveyTransformer extends Transformer
+class ProcessYearSurveyTransformer extends ModelTransformer
 {
-    protected $modelClass = ProcessYearSurvey::class;
+    public function __construct()
+    {
+        $this->modelClass = ProcessYearSurvey::class;
+        $this->availableIncludes = [
+            'Survey', 'Process'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'Survey', 'Process'
-    ];
-
-    public function includeSurvey($model)
+    public function includeSurvey(ProcessYearSurvey $model)
     {
         return $this->item($model->getSurvey(), new SurveyTransformer);
     }
 
-    public function includeProcess($model)
+    public function includeProcess(ProcessYearSurvey $model)
     {
         return $this->item($model->getProcess(), new ProcessTransformer);
     }

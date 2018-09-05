@@ -3,15 +3,17 @@
 namespace App\Transformers;
 
 use App\Model\SystemicStructureMapChain;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class SystemicStructureMapChainTransformer extends Transformer
+class SystemicStructureMapChainTransformer extends ModelTransformer
 {
-    protected $modelClass = SystemicStructureMapChain::class;
-
-    protected $availableIncludes = [
-        'SystemicStructureMapItemsFrom', 'SystemicStructureMapItemsTo'
-    ];
+    public function __construct()
+    {
+        $this->modelClass = SystemicStructureMapChain::class;
+        $this->availableIncludes = [
+            'SystemicStructureMapItemsFrom', 'SystemicStructureMapItemsTo'
+        ];
+    }
 
     public function includeSystemicStructureMapItemsFrom($model)
     {
@@ -20,6 +22,6 @@ class SystemicStructureMapChainTransformer extends Transformer
 
     public function includeSystemicStructureMapItemsTo($model)
     {
-        return $this->item($model->getSystemicMapStructureMapItemsTo(), new SystemicStructureMapItemsTransformer());
+        return $this->item($model->getSystemicStructureMapItemsTo(), new SystemicStructureMapItemsTransformer());
     }
 }

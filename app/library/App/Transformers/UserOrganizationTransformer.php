@@ -3,22 +3,24 @@
 namespace App\Transformers;
 
 use App\Model\UserOrganization;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class UserOrganizationTransformer extends Transformer
+class UserOrganizationTransformer extends ModelTransformer
 {
-    protected $modelClass = UserOrganization::class;
+    public function __construct()
+    {
+        $this->modelClass = UserOrganization::class;
+        $this->availableIncludes = [
+            'Organization', 'User'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'Organization', 'User'
-    ];
-
-    public function includeOrganization($model)
+    public function includeOrganization(UserOrganization $model)
     {
         return $this->item($model->getOrganization(), new OrganizationTransformer());
     }
 
-    public function includeUser($model)
+    public function includeUser(UserOrganization $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
     }

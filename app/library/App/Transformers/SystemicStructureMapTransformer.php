@@ -3,22 +3,24 @@
 namespace App\Transformers;
 
 use App\Model\SystemicStructureMap;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class SystemicStructureMapTransformer extends Transformer
+class SystemicStructureMapTransformer extends ModelTransformer
 {
-    protected $modelClass = SystemicStructureMap::class;
+    public function __construct()
+    {
+        $this->modelClass = SystemicStructureMap::class;
+        $this->availableIncludes = [
+            'Organization', 'Process'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'Organization', 'Process'
-    ];
-
-    public function includeOrganization($model)
+    public function includeOrganization(SystemicStructureMap $model)
     {
         return $this->item($model->getOrganization(), new OrganizationTransformer());
     }
 
-    public function includeProcess($model)
+    public function includeProcess(SystemicStructureMap $model)
     {
         return $this->item($model->getProcess(), new ProcessTransformer());
     }

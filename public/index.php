@@ -79,6 +79,9 @@ try {
     // Set appropriate response value
     $response = $app->di->getShared(App\Constants\Services::RESPONSE);
 
+    $response->setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    $response->setHeader('Access-Control-Allow-Origin', '*');
+
     $returnedValue = $app->getReturnedValue();
 
     if ($returnedValue !== null) {
@@ -99,6 +102,8 @@ try {
     $debugMode = $config->debug ?? APPLICATION_ENV === 'development';
 
     $response->setErrorContent($e, $debugMode);
+    $response->setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    $response->setHeader('Access-Control-Allow-Origin', '*');
 }
 finally {
 

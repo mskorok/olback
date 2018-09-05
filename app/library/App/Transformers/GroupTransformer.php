@@ -7,28 +7,30 @@ use PhalconRest\Transformers\ModelTransformer;
 
 class GroupTransformer extends ModelTransformer
 {
-    protected $modelClass = Group::class;
+    public function __construct()
+    {
+        $this->modelClass = Group::class;
+        $this->availableIncludes = [
+            'SystemicMapItems', 'SystemicStructureMapItems', 'Organization', 'User'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'SystemicMapItems', 'SystemicStructureMapItems', 'Organization', 'User'
-    ];
-
-    public function includeSystemicMapItems($model)
+    public function includeSystemicMapItems(Group $model)
     {
         return $this->collection($model->getSystemicMapItems(), new SystemicMapItemsTransformer);
     }
 
-    public function includeSystemicStructureMapItems($model)
+    public function includeSystemicStructureMapItems(Group $model)
     {
         return $this->collection($model->getSystemicStructureMapItems(), new SystemicStructureMapItemsTransformer);
     }
 
-    public function includeOrganization($model)
+    public function includeOrganization(Group $model)
     {
         return $this->item($model->getOrganization(), new OrganizationTransformer());
     }
 
-    public function includeUser($model)
+    public function includeUser(Group $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
     }

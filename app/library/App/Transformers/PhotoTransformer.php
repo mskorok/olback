@@ -12,13 +12,16 @@ class PhotoTransformer extends ModelTransformer
      * based on your model when you extend ModelTransformer
      * and assign the modelClass property
      */
-    protected $modelClass = Photo::class;
 
-    protected $availableIncludes = [
-        'album'
-    ];
+    public function __construct()
+    {
+        $this->modelClass = Photo::class;
+        $this->availableIncludes = [
+            'album'
+        ];
+    }
 
-    public function includeAlbum($photo)
+    public function includeAlbum(Photo $photo)
     {
         return $this->item($photo->getAlbum(), new AlbumTransformer());
     }

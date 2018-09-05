@@ -311,7 +311,7 @@ class SurveyController extends CrudResourceController
             foreach ($surveyQuestion as $item) {
                 if ($item->question_group_id !== null && $flag < $item->question_group_id) {
                     $flag = $item->question_group_id;
-                    $groups[$item->id] = [$item->id, 'name' => $item->getQuestionGroup()->name];
+                    $groups[$item->id] = [$item->id, 'name' => $item->getQuestionGroups()->name];
                 } else {
                     $groups[$item->id] = ['id' => $item->id, 'name' => ''];
                 }
@@ -623,39 +623,45 @@ class SurveyController extends CrudResourceController
 
     public function helpPage()//todo
     {
-        $data = $this->request->getJsonRawBody();
+//        $data = $this->request->getJsonRawBody();
+//
+//        $to_slug = $data->slug;
+//        $find_help_post = [
+//            'name' => $to_slug,
+//            'post_type' => 'help',
+//            'post_status' => 'publish'
+//        ];
+//
+//        $help_post_result = $find_help_post;//get_posts($find_help_post);
+//
+//        if (empty($help_post_result)) {
+//            $help_post = [
+//                'post_title' => $to_slug,
+//                'post_name' => $to_slug,
+//                'post_type' => 'help',
+//                'post_status' => 'publish'
+//            ];
+//
+//            $help_post_id = $help_post;//wp_insert_post($help_post);
+//
+//            $response = [
+//                'code' => 0,
+//                'status' => 'Success',
+//                'msg' => 'page not exists created just now with id: ' . $help_post_id,
+//            ];
+//
+//            return $this->createArrayResponse($response, 'data');
+//        }
+//        $response = [
+//            'code' => 1,
+//            'status' => 'Success',
+//            'data' => $help_post_result[0]->post_content,
+//        ];
 
-        $to_slug = $data->slug;
-        $find_help_post = [
-            'name' => $to_slug,
-            'post_type' => 'help',
-            'post_status' => 'publish'
-        ];
-
-        $help_post_result = $find_help_post;//get_posts($find_help_post);
-
-        if (empty($help_post_result)) {
-            $help_post = [
-                'post_title' => $to_slug,
-                'post_name' => $to_slug,
-                'post_type' => 'help',
-                'post_status' => 'publish'
-            ];
-
-            $help_post_id = $help_post;//wp_insert_post($help_post);
-
-            $response = [
-                'code' => 0,
-                'status' => 'Success',
-                'msg' => 'page not exists created just now with id: ' . $help_post_id,
-            ];
-
-            return $this->createArrayResponse($response, 'data');
-        }
         $response = [
-            'code' => 1,
-            'status' => 'Success',
-            'data' => $help_post_result[0]->post_content,
+            'code' => 0,
+            'status' => 'No data',
+            'data' => '',
         ];
         return $this->createArrayResponse($response, 'data');
     }

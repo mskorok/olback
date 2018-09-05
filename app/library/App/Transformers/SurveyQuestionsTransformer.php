@@ -3,27 +3,29 @@
 namespace App\Transformers;
 
 use App\Model\SurveyQuestion;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class SurveyQuestionsTransformer extends Transformer
+class SurveyQuestionsTransformer extends ModelTransformer
 {
-    protected $modelClass = SurveyQuestion::class;
+    public function __construct()
+    {
+        $this->modelClass = SurveyQuestion::class;
+        $this->availableIncludes = [
+            'Answers', 'QuestionGroups', 'Survey'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'Answers', 'QuestionGroups', 'Survey'
-    ];
-
-    public function includeQuestionGroups($model)
+    public function includeQuestionGroups(SurveyQuestion $model)
     {
         return $this->item($model->getQuestionGroups(), new QuestionGroupsTransformer());
     }
 
-    public function includeSurvey($model)
+    public function includeSurvey(SurveyQuestion $model)
     {
         return $this->item($model->getSurvey(), new SurveyTransformer());
     }
 
-    public function includeAnswers($album)
+    public function includeAnswers(SurveyQuestion $album)
     {
         return $this->collection($album->getAnswers(), new AnswerTransformer());
     }

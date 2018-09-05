@@ -2,39 +2,40 @@
 
 namespace App\Transformers;
 
-use App\Model\ActionList;
 use App\Model\SystemicMapItems;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class SystemicMapItemsTransformer extends Transformer
+class SystemicMapItemsTransformer extends ModelTransformer
 {
-    protected $modelClass = SystemicMapItems::class;
+    public function __construct()
+    {
+        $this->modelClass = SystemicMapItems::class;
+        $this->availableIncludes = [
+            'SystemicMapChainFrom', 'SystemicMapChainTo', 'Groups', 'SystemicMap', 'User'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'SystemicMapChainFrom', 'SystemicMapChainTo', 'Groups', 'SystemicMap', 'User'
-    ];
-
-    public function includeSystemicMapChainFrom($model)
+    public function includeSystemicMapChainFrom(SystemicMapItems $model)
     {
         return $this->collection($model->getSystemicMapChainFrom(), new SystemicMapChainTransformer());
     }
 
-    public function includeSystemicMapChainTo($model)
+    public function includeSystemicMapChainTo(SystemicMapItems $model)
     {
         return $this->collection($model->getSystemicMapChainTo(), new SystemicMapChainTransformer());
     }
 
-    public function includeGroups($model)
+    public function includeGroups(SystemicMapItems $model)
     {
         return $this->item($model->getGroups(), new GroupTransformer());
     }
 
-    public function includeSystemicMap($model)
+    public function includeSystemicMap(SystemicMapItems $model)
     {
         return $this->item($model->getSystemicMap(), new SystemicMapTransformer());
     }
 
-    public function includeUser($model)
+    public function includeUser(SystemicMapItems $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
     }

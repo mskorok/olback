@@ -3,22 +3,24 @@
 namespace App\Transformers;
 
 use App\Model\SurveyTemplateQuestion;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class SurveyTemplatesQuestionsTransformer extends Transformer
+class SurveyTemplatesQuestionsTransformer extends ModelTransformer
 {
-    protected $modelClass = SurveyTemplateQuestion::class;
+    public function __construct()
+    {
+        $this->modelClass = SurveyTemplateQuestion::class;
+        $this->availableIncludes = [
+            'QuestionGroup', 'Survey'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'QuestionGroup', 'Survey'
-    ];
-
-    public function includeQuestionGroup($model)
+    public function includeQuestionGroup(SurveyTemplateQuestion $model)
     {
         return $this->item($model->getQuestionGroup(), new QuestionGroupsTransformer());
     }
 
-    public function includeSurvey($model)
+    public function includeSurvey(SurveyTemplateQuestion $model)
     {
         return $this->item($model->getSurvey(), new SurveyTransformer());
     }

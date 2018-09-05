@@ -7,21 +7,23 @@ use PhalconRest\Transformers\ModelTransformer;
 
 class SystemicMapChainTransformer extends ModelTransformer
 {
-    protected $modelClass = SystemicMapChain::class;
+    public function __construct()
+    {
+        $this->modelClass = SystemicMapChain::class;
+        $this->availableIncludes = [
+            'SystemicMapItemsFrom', 'SystemicMapItemsTo'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'SystemicMapItemsFrom', 'SystemicMapItemsTo'
-    ];
 
 
-
-    public function includeSystemicMapItemsFrom($model)
+    public function includeSystemicMapItemsFrom(SystemicMapChain $model)
     {
         return $this->item($model->getSystemicMapItemsFrom(), new SystemicMapItemsTransformer());
     }
 
-    public function includeSystemicMapItemsTo($model)
+    public function includeSystemicMapItemsTo(SystemicMapChain $model)
     {
-        return $this->item($model->SystemicMapItemsTo(), new SystemicMapItemsTransformer());
+        return $this->item($model->getSystemicMapItemsTo(), new SystemicMapItemsTransformer());
     }
 }

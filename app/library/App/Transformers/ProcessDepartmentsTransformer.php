@@ -3,22 +3,25 @@
 namespace App\Transformers;
 
 use App\Model\ProcessDepartments;
+use PhalconRest\Transformers\ModelTransformer;
 use PhalconRest\Transformers\Transformer;
 
-class ProcessDepartmentsTransformer extends Transformer
+class ProcessDepartmentsTransformer extends ModelTransformer
 {
-    protected $modelClass = ProcessDepartments::class;
+    public function __construct()
+    {
+        $this->modelClass = ProcessDepartments::class;
+        $this->availableIncludes = [
+            'Departments', 'Process'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'Departments', 'Process'
-    ];
-
-    public function includeDepartments($model)
+    public function includeDepartments(ProcessDepartments $model)
     {
         return $this->item($model->getDepartments(), new DepartmentTransformer());
     }
 
-    public function includeProcess($model)
+    public function includeProcess(ProcessDepartments $model)
     {
         return $this->item($model->getProcess(), new ProcessTransformer());
     }

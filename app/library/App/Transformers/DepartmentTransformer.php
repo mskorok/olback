@@ -3,27 +3,29 @@
 namespace App\Transformers;
 
 use App\Model\Department;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class DepartmentTransformer extends Transformer
+class DepartmentTransformer extends ModelTransformer
 {
-    protected $modelClass = Department::class;
+    public function __construct()
+    {
+        $this->modelClass = Department::class;
+        $this->availableIncludes = [
+            'SystemicMap', 'UserDepartment', 'Organization'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'SystemicMap', 'UserDepartment', 'Organization'
-    ];
-
-    public function includeSystemicMap($model)
+    public function includeSystemicMap(Department$model)
     {
         return $this->collection($model->getSystemicMap(), new SystemicMapTransformer);
     }
 
-    public function includeUserDepartment($model)
+    public function includeUserDepartment(Department$model)
     {
         return $this->collection($model->getUserDepartment(), new UserDepartmentTransformer);
     }
 
-    public function includeOrganization($model)
+    public function includeOrganization(Department$model)
     {
         return $this->item($model->getOrganization(), new OrganizationTransformer());
     }

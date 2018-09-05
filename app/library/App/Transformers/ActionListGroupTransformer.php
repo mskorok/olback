@@ -7,23 +7,25 @@ use PhalconRest\Transformers\ModelTransformer;
 
 class ActionListGroupTransformer extends ModelTransformer
 {
-    protected $modelClass = ActionListGroup::class;
+    public function __construct()
+    {
+        $this->modelClass = ActionListGroup::class;
+        $this->availableIncludes = [
+            'ActionList', 'SystemicMap', 'User'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'ActionList', 'SystemicMap', 'User'
-    ];
-
-    public function includeActivity($model)
+    public function includeActivity(ActionListGroup $model)
     {
         return $this->collection($model->getActionList(), new ActionListTransformer());
     }
 
-    public function includeSystemicMap($model)
+    public function includeSystemicMap(ActionListGroup $model)
     {
         return $this->item($model->getSystemicMap(), new SystemicMapTransformer());
     }
 
-    public function includeUser($model)
+    public function includeUser(ActionListGroup $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
     }

@@ -2,23 +2,26 @@
 
 namespace App\Transformers;
 
-use App\Model\ActionList;
-use PhalconRest\Transformers\Transformer;
+use App\Model\Answer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class AnswerTransformer extends Transformer
+class AnswerTransformer extends ModelTransformer
 {
-    protected $modelClass = ActionList::class;
 
-    protected $availableIncludes = [
-        'SurveyQuestions', 'User'
-    ];
+    public function __construct()
+    {
+        $this->modelClass = Answer::class;
+        $this->availableIncludes = [
+            'SurveyQuestions', 'User'
+        ];
+    }
 
-    public function includeSurveyQuestions($model)
+    public function includeSurveyQuestions(Answer $model)
     {
         return $this->item($model->getSurveyQuestions(), new SurveyQuestionsTransformer());
     }
 
-    public function includeUser($model)
+    public function includeUser(Answer $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
     }

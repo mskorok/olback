@@ -3,37 +3,39 @@
 namespace App\Transformers;
 
 use App\Model\SystemicStructureMapItems;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class SystemicStructureMapItemsTransformer extends Transformer
+class SystemicStructureMapItemsTransformer extends ModelTransformer
 {
-    protected $modelClass = SystemicStructureMapItems::class;
+    public function __construct()
+    {
+        $this->modelClass = SystemicStructureMapItems::class;
+        $this->availableIncludes = [
+            'SystemicStructureMapChainFrom', 'SystemicStructureMapChainTo', 'Groups', 'SystemicStructureMap', 'User'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'SystemicStructureMapChainFrom', 'SystemicStructureMapChainTo', 'Groups', 'SystemicStructureMap', 'User'
-    ];
-
-    public function includeSystemicStructureMapChainFrom($model)
+    public function includeSystemicStructureMapChainFrom(SystemicStructureMapItems $model)
     {
         return $this->item($model->getSystemicStructureMapChainFrom(), new SystemicStructureMapChainTransformer());
     }
 
-    public function includeSystemicStructureMapChainTo($model)
+    public function includeSystemicStructureMapChainTo(SystemicStructureMapItems $model)
     {
         return $this->item($model->getSystemicStructureMapChainTo(), new SystemicStructureMapChainTransformer());
     }
 
-    public function includeGroups($model)
+    public function includeGroups(SystemicStructureMapItems $model)
     {
         return $this->item($model->getGroups(), new GroupTransformer());
     }
 
-    public function includeSystemicStructureMap($model)
+    public function includeSystemicStructureMap(SystemicStructureMapItems $model)
     {
         return $this->item($model->getSystemicStructureMap(), new SystemicStructureMapTransformer());
     }
 
-    public function includeUser($model)
+    public function includeUser(SystemicStructureMapItems $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
     }

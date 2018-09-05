@@ -4,22 +4,25 @@ namespace App\Transformers;
 
 use App\Model\ActionList;
 use App\Model\ProcessUsers;
+use PhalconRest\Transformers\ModelTransformer;
 use PhalconRest\Transformers\Transformer;
 
-class ProcessUsersTransformer extends Transformer
+class ProcessUsersTransformer extends ModelTransformer
 {
-    protected $modelClass = ProcessUsers::class;
+    public function __construct()
+    {
+        $this->modelClass = ProcessUsers::class;
+        $this->availableIncludes = [
+            'Process', 'User'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'Process', 'User'
-    ];
-
-    public function includeProcess($model)
+    public function includeProcess(ProcessUsers $model)
     {
         return $this->item($model->getProcess(), new ProcessTransformer());
     }
 
-    public function includeUser($model)
+    public function includeUser(ProcessUsers $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
     }

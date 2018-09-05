@@ -2,24 +2,25 @@
 
 namespace App\Transformers;
 
-use App\Model\ActionList;
 use App\Model\UserDepartment;
-use PhalconRest\Transformers\Transformer;
+use PhalconRest\Transformers\ModelTransformer;
 
-class UserDepartmentTransformer extends Transformer
+class UserDepartmentTransformer extends ModelTransformer
 {
-    protected $modelClass = UserDepartment::class;
+    public function __construct()
+    {
+        $this->modelClass = UserDepartment::class;
+        $this->availableIncludes = [
+            'Departments', 'User'
+        ];
+    }
 
-    protected $availableIncludes = [
-        'Departments', 'User'
-    ];
-
-    public function includeDepartments($model)
+    public function includeDepartments(UserDepartment $model)
     {
         return $this->item($model->getDepartments(), new DepartmentTransformer());
     }
 
-    public function includeUser($model)
+    public function includeUser(UserDepartment $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
     }
