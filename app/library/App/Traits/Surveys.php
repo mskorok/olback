@@ -36,6 +36,7 @@ trait Surveys
      */
     protected function createEvaluationSurvey(): int
     {
+        $this->extraInfo = 'Evaluation';
         $surveyTemplate = SurveyTemplate::findFirst(
             [
                 'conditions' => 'tag LIKE "%'. $this->evaluationSurvey . '%"',
@@ -52,6 +53,7 @@ trait Surveys
      */
     protected function createAfterActionReviewSurvey(): int
     {
+        $this->extraInfo = 'After Action Review';
         $surveyTemplate = SurveyTemplate::findFirst(
             [
                 'conditions' => 'tag LIKE "%'. $this->aarSurvey . '%"',
@@ -68,6 +70,7 @@ trait Surveys
      */
     protected function createCurrentSituationSurvey(): int
     {
+        $this->extraInfo = 'Current Situation';
         $surveyTemplate = SurveyTemplate::findFirst(
             [
                 'conditions' => 'tag LIKE "%'. $this->currentSituationSurvey . '%"',
@@ -84,6 +87,7 @@ trait Surveys
      */
     protected function createVisionSurvey(): int
     {
+        $this->extraInfo = 'Vision';
         $surveyTemplate = SurveyTemplate::findFirst(
             [
                 'conditions' => 'tag LIKE "%'. $this->visionSurvey . '%"',
@@ -121,12 +125,24 @@ trait Surveys
             '[ProcessYearSurvey].[survey_id] = [Survey].[id]',
             'Survey'
         );
+        $query->leftJoin(
+            Survey::class,
+            '[ProcessYearSurvey].[reality] = [Survey].[id]',
+            'YearReality'
+        );
+        $query->leftJoin(
+            Survey::class,
+            '[ProcessYearSurvey].[reality] = [Survey].[id]',
+            'YearVision'
+        );
         $query->andWhere('[Process].[id] = :id:', ['id' => $id]);
         $query->orderBy('[ProcessYearSurvey].[date]');
         $query->columns([
             '[Process].*',
             '[ProcessYearSurvey].*',
             '[Survey].*',
+            '[YearReality].*',
+            '[YearVision].*',
         ]);
         return $query->getQuery()->execute();
     }

@@ -486,14 +486,15 @@ class SurveyController extends CrudResourceController
                 $response = [
                     'code' => 0,
                     'status' => 'Error',
-                    'data' => $process->getMessages()
+                    'data' => $process->getMessages(),
                 ];
                 return $this->createArrayResponse($response, 'data');
             }
         }
         $response = [
             'code' => 1,
-            'status' => 'Success'
+            'status' => 'Success',
+            'data' => $process
         ];
 
         return $this->createArrayResponse($response, 'data');

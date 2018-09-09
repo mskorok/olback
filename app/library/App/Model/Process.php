@@ -191,9 +191,9 @@ class Process extends DateTrackingModel
                 'step0' => 'step0',
                 'step3_0' => 'step3_0',
                 'step3_1' => 'step3_1',
-                'reality' => 'step3_0',
+                'reality' => 'reality',
                 'vision' => 'vision',
-                'status' => 'reality',
+                'status' => 'status',
                 'organizationId' => 'organizationId',
             ];
     }
