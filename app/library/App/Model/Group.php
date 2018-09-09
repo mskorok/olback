@@ -3,8 +3,8 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
 use League\Fractal\Resource\Collection;
+use Phalcon\Mvc\Model;
 
 /**
  * Group
@@ -17,7 +17,7 @@ use League\Fractal\Resource\Collection;
  * @method Organization getOrganization
  * @method User getUser
  */
-class Group extends DateTrackingModel
+class Group extends Model
 {
 
     /**
@@ -60,7 +60,7 @@ class Group extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('groups');
@@ -75,7 +75,7 @@ class Group extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'groups';
     }
@@ -108,14 +108,14 @@ class Group extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'title' => 'title',
-                'organization' => 'organization',
-                'creatorId' => 'creatorId',
-                'color' => 'color'
-            ];
+        return [
+            'id' => 'id',
+            'title' => 'title',
+            'organization' => 'organization',
+            'creatorId' => 'creatorId',
+            'color' => 'color'
+        ];
     }
 }

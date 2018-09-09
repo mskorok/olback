@@ -66,7 +66,7 @@ class ActionListGroup extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('action_list_group');
@@ -80,7 +80,7 @@ class ActionListGroup extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'action_list_group';
     }
@@ -113,7 +113,7 @@ class ActionListGroup extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
         return parent::columnMap() + [
                 'id' => 'id',

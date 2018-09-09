@@ -3,8 +3,8 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
 use League\Fractal\Resource\Collection;
+use Phalcon\Mvc\Model;
 
 /**
  * Department
@@ -16,7 +16,7 @@ use League\Fractal\Resource\Collection;
  * @method Collection getUserDepartment
  * @method Organization getOrganization
  */
-class Department extends DateTrackingModel
+class Department extends Model
 {
 
     /**
@@ -52,7 +52,7 @@ class Department extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('departments');
@@ -66,7 +66,7 @@ class Department extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'departments';
     }
@@ -99,13 +99,13 @@ class Department extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'title' => 'title',
-                'description' => 'description',
-                'organization_id' => 'organization_id'
-            ];
+        return [
+            'id' => 'id',
+            'title' => 'title',
+            'description' => 'description',
+            'organization_id' => 'organization_id'
+        ];
     }
 }

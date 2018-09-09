@@ -41,7 +41,7 @@ class GroupTemplate extends Model
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('group_template');
@@ -52,7 +52,7 @@ class GroupTemplate extends Model
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'group_template';
     }
@@ -85,7 +85,7 @@ class GroupTemplate extends Model
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
         return [
             'id' => 'id',

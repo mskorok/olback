@@ -5,6 +5,7 @@ namespace App\Model;
 use App\Constants\Services;
 use App\Mvc\DateTrackingModel;
 use League\Fractal\Resource\Collection;
+use App\Model\Survey;
 
 /**
  * Process
@@ -22,6 +23,8 @@ use League\Fractal\Resource\Collection;
  * @method Survey getSurvey0
  * @method Survey getSurvey30
  * @method Survey getSurvey31
+ * @method Survey getReality
+ * @method Survey getVision
  */
 class Process extends DateTrackingModel
 {
@@ -80,6 +83,20 @@ class Process extends DateTrackingModel
     /**
      *
      * @var integer
+     * @Column(type="integer", length=11, nullable=true)
+     */
+    public $reality;
+
+    /**
+     *
+     * @var integer
+     * @Column(type="integer", length=11, nullable=true)
+     */
+    public $vision;
+
+    /**
+     *
+     * @var integer
      * @Column(type="integer", length=1, nullable=false)
      */
     public $status;
@@ -108,7 +125,7 @@ class Process extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('process');
@@ -122,6 +139,8 @@ class Process extends DateTrackingModel
         $this->belongsTo('step0', Survey::class, 'id', ['alias' => 'Survey0']);
         $this->belongsTo('step3_0', Survey::class, 'id', ['alias' => 'Survey30']);
         $this->belongsTo('step3_1', Survey::class, 'id', ['alias' => 'Survey31']);
+        $this->belongsTo('reality', Survey::class, 'id', ['alias' => 'Reality']);
+        $this->belongsTo('vision', Survey::class, 'id', ['alias' => 'Vision']);
     }
 
     /**
@@ -129,7 +148,7 @@ class Process extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'process';
     }
@@ -162,7 +181,7 @@ class Process extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
         return parent::columnMap() + [
                 'id' => 'id',
@@ -172,10 +191,10 @@ class Process extends DateTrackingModel
                 'step0' => 'step0',
                 'step3_0' => 'step3_0',
                 'step3_1' => 'step3_1',
-                'status' => 'status',
+                'reality' => 'step3_0',
+                'vision' => 'vision',
+                'status' => 'reality',
                 'organizationId' => 'organizationId',
-                'created_at' => 'created_at',
-                'updated_at' => 'updated_at'
             ];
     }
 }

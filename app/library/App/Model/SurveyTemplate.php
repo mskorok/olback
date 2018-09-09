@@ -3,7 +3,8 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
+use League\Fractal\Resource\Collection;
+use Phalcon\Mvc\Model;
 
 /**
  * SurveyTemplate
@@ -13,8 +14,9 @@ use App\Mvc\DateTrackingModel;
  * @date 2018-08-03, 06:54:53
  * @method Organization getOrganization
  * @method User getUser
+ * @method Collection getSurveyTemplatesQuestions
  */
-class SurveyTemplate extends DateTrackingModel
+class SurveyTemplate extends Model
 {
 
     /**
@@ -92,7 +94,7 @@ class SurveyTemplate extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('survey_templates');
@@ -102,6 +104,7 @@ class SurveyTemplate extends DateTrackingModel
             'id',
             ['alias' => 'Organization']
         );
+        $this->hasMany('id', SurveyTemplateQuestion::class, 'survey_id', ['alias' => 'SurveyTemplatesQuestions']);
         $this->belongsTo('creator', User::class, 'id', ['alias' => 'User']);
     }
 
@@ -110,7 +113,7 @@ class SurveyTemplate extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'survey_templates';
     }
@@ -143,19 +146,19 @@ class SurveyTemplate extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'title' => 'title',
-                'description' => 'description',
-                'isEditable' => 'isEditable',
-                'isOlset' => 'isOlset',
-                'creator' => 'creator',
-                'organization_id' => 'organization_id',
-                'tag' => 'tag',
-                'show_extra_info_and_tags' => 'showExtraInfoAndTags',
-                'extra_info' => 'extraInfo'
-            ];
+        return [
+            'id' => 'id',
+            'title' => 'title',
+            'description' => 'description',
+            'isEditable' => 'isEditable',
+            'isOlset' => 'isOlset',
+            'creator' => 'creator',
+            'organization_id' => 'organization_id',
+            'tag' => 'tag',
+            'show_extra_info_and_tags' => 'showExtraInfoAndTags',
+            'extra_info' => 'extraInfo'
+        ];
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
+use Phalcon\Mvc\Model;
 
 /**
  * SurveyTemplatesQuestions
@@ -14,7 +14,7 @@ use App\Mvc\DateTrackingModel;
  * @method QuestionGroups getQuestionGroup
  * @method Survey getSurvey
  */
-class SurveyTemplateQuestion extends DateTrackingModel
+class SurveyTemplateQuestion extends Model
 {
 
     /**
@@ -71,7 +71,7 @@ class SurveyTemplateQuestion extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('survey_templates_questions');
@@ -83,7 +83,7 @@ class SurveyTemplateQuestion extends DateTrackingModel
         );
         $this->belongsTo(
             'survey_id',
-            Survey::class,
+            SurveyTemplate::class,
             'id',
             ['alias' => 'Survey']
         );
@@ -94,7 +94,7 @@ class SurveyTemplateQuestion extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'survey_templates_questions';
     }
@@ -127,16 +127,16 @@ class SurveyTemplateQuestion extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'question' => 'question',
-                'description' => 'description',
-                'answered_type' => 'answered_type',
-                'question_order' => 'question_order',
-                'survey_id' => 'survey_id',
-                'question_group_id' => 'question_group_id',
-            ];
+        return [
+            'id' => 'id',
+            'question' => 'question',
+            'description' => 'description',
+            'answered_type' => 'answered_type',
+            'question_order' => 'question_order',
+            'survey_id' => 'survey_id',
+            'question_group_id' => 'question_group_id',
+        ];
     }
 }

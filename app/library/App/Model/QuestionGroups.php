@@ -3,8 +3,8 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
 use League\Fractal\Resource\Collection;
+use Phalcon\Mvc\Model;
 
 /**
  * QuestionGroups
@@ -15,7 +15,7 @@ use League\Fractal\Resource\Collection;
  * @method Collection getSurveyQuestions
  * @method Collection getSurveyTemplatesQuestions
  */
-class QuestionGroups extends DateTrackingModel
+class QuestionGroups extends Model
 {
 
     /**
@@ -44,7 +44,7 @@ class QuestionGroups extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('question_group');
@@ -67,7 +67,7 @@ class QuestionGroups extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'question_group';
     }
@@ -100,12 +100,12 @@ class QuestionGroups extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'name' => 'name',
-                'description' => 'description'
-            ];
+        return [
+            'id' => 'id',
+            'name' => 'name',
+            'description' => 'description'
+        ];
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
+use Phalcon\Mvc\Model;
 
 /**
  * ProcessDepartments
@@ -14,7 +14,7 @@ use App\Mvc\DateTrackingModel;
  * @method Department getDepartments
  * @method Process getProcess
  */
-class ProcessDepartments extends DateTrackingModel
+class ProcessDepartments extends Model
 {
 
     /**
@@ -43,7 +43,7 @@ class ProcessDepartments extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('process_departments');
@@ -56,7 +56,7 @@ class ProcessDepartments extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'process_departments';
     }
@@ -89,13 +89,12 @@ class ProcessDepartments extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'processId' => 'processId',
-                'departmentId' => 'departmentId'
-            ];
+        return [
+            'id' => 'id',
+            'processId' => 'processId',
+            'departmentId' => 'departmentId'
+        ];
     }
-
 }

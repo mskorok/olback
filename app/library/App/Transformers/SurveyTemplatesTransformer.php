@@ -11,7 +11,7 @@ class SurveyTemplatesTransformer extends ModelTransformer
     {
         $this->modelClass = SurveyTemplate::class;
         $this->availableIncludes = [
-            'Organization', 'User'
+            'Organization', 'User', 'SurveyTemplatesQuestions',
         ];
     }
 
@@ -23,5 +23,10 @@ class SurveyTemplatesTransformer extends ModelTransformer
     public function includeUser(SurveyTemplate $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
+    }
+
+    public function includeSurveyTemplatesQuestions(SurveyTemplate $model)
+    {
+        return $this->collection($model->getSurveyTemplatesQuestions(), new SurveyTemplatesQuestionsTransformer());
     }
 }

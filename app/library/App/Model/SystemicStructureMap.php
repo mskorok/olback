@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
+use Phalcon\Mvc\Model;
 
 /**
  * SystemicStructureMap
@@ -14,7 +14,7 @@ use App\Mvc\DateTrackingModel;
  * @method Organization getOrganization
  * @method Process getProcess
  */
-class SystemicStructureMap extends DateTrackingModel
+class SystemicStructureMap extends Model
 {
 
     /**
@@ -85,7 +85,7 @@ class SystemicStructureMap extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('systemic_structure_map');
@@ -104,7 +104,7 @@ class SystemicStructureMap extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'systemic_structure_map';
     }
@@ -137,18 +137,18 @@ class SystemicStructureMap extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'name' => 'name',
-                'by_whom' => 'by_whom',
-                'organization' => 'organization',
-                'lang' => 'lang',
-                'processId' => 'processId',
-                'isActive' => 'isActive',
-                'startDate' => 'startDate',
-                'endDate' => 'endDate'
-            ];
+        return [
+            'id' => 'id',
+            'name' => 'name',
+            'by_whom' => 'by_whom',
+            'organization' => 'organization',
+            'lang' => 'lang',
+            'processId' => 'processId',
+            'isActive' => 'isActive',
+            'startDate' => 'startDate',
+            'endDate' => 'endDate'
+        ];
     }
 }

@@ -11,7 +11,7 @@ class ProcessYearSurveyTransformer extends ModelTransformer
     {
         $this->modelClass = ProcessYearSurvey::class;
         $this->availableIncludes = [
-            'Survey', 'Process'
+            'Survey', 'Process', 'Reality', 'Vision'
         ];
     }
 
@@ -23,5 +23,15 @@ class ProcessYearSurveyTransformer extends ModelTransformer
     public function includeProcess(ProcessYearSurvey $model)
     {
         return $this->item($model->getProcess(), new ProcessTransformer);
+    }
+
+    public function includeReality(ProcessYearSurvey $model)
+    {
+        return $this->item($model->getReality(), new SurveyTransformer);
+    }
+
+    public function includeVision(ProcessYearSurvey $model)
+    {
+        return $this->item($model->getVision(), new SurveyTransformer);
     }
 }

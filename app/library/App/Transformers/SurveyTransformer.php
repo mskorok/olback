@@ -14,8 +14,9 @@ class SurveyTransformer extends ModelTransformer
             'Process0',
             'Process30',
             'Process31',
+            'ProcessReality',
+            'ProcessVision',
             'SurveyQuestions',
-            'SurveyTemplatesQuestions',
             'Organization',
             'User'
         ];
@@ -36,9 +37,34 @@ class SurveyTransformer extends ModelTransformer
         return $this->collection($model->getProcess31(), new ProcessTransformer());
     }
 
+    public function includeProcessReality(Survey $model)
+    {
+        return $this->collection($model->getProcessReality(), new ProcessTransformer());
+    }
+
+    public function includeProcessVision(Survey $model)
+    {
+        return $this->collection($model->getProcessVision(), new ProcessTransformer());
+    }
+
+    public function includeProcessYearSurvey(Survey $model)
+    {
+        return $this->collection($model->getProcessYearSurvey(), new ProcessYearSurveyTransformer());
+    }
+
+    public function includeProcessYearRealitySurvey(Survey $model)
+    {
+        return $this->collection($model->getProcessYearRealitySurvey(), new ProcessYearSurveyTransformer());
+    }
+
+    public function includeProcessYearVisionSurvey(Survey $model)
+    {
+        return $this->collection($model->getProcessYearVisionSurvey(), new ProcessYearSurveyTransformer());
+    }
+
     public function includeSurveyQuestions(Survey $model)
     {
-        return $this->collection($model->getSurveyQuestions(), new ActionListGroupTransformer());
+        return $this->collection($model->getSurveyQuestions(), new SurveyQuestionsTransformer());
     }
 
     public function includeOrganization(Survey $model)
@@ -49,10 +75,5 @@ class SurveyTransformer extends ModelTransformer
     public function includeUser(Survey $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
-    }
-
-    public function includeActionListGroup(Survey $model)
-    {
-        return $this->item($model->getActionListGroup(), new ActionListGroupTransformer());
     }
 }

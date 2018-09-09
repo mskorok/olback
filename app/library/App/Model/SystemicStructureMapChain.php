@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
+use Phalcon\Mvc\Model;
 
 /**
  * SystemicStructureMapChain
@@ -14,7 +14,7 @@ use App\Mvc\DateTrackingModel;
  * @method SystemicStructureMapItems getSystemicStructureMapItemsFrom
  * @method SystemicStructureMapItems getSystemicStructureMapItemsTo
  */
-class SystemicStructureMapChain extends DateTrackingModel
+class SystemicStructureMapChain extends Model
 {
 
     /**
@@ -43,7 +43,7 @@ class SystemicStructureMapChain extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('systemic_structure_map_chain');
@@ -66,7 +66,7 @@ class SystemicStructureMapChain extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'systemic_structure_map_chain';
     }
@@ -99,12 +99,12 @@ class SystemicStructureMapChain extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'from_item' => 'from_item',
-                'to_item' => 'to_item'
-            ];
+        return [
+            'id' => 'id',
+            'from_item' => 'from_item',
+            'to_item' => 'to_item'
+        ];
     }
 }

@@ -5,20 +5,19 @@ namespace App\Controllers;
 use App\Constants\Services;
 use App\Model\Answer;
 use App\Model\Process;
-use App\Model\ProcessYearSurvey;
 use App\Model\QuestionGroups;
 use App\Model\SurveyTemplate;
 use App\Traits\Auth;
+use App\Traits\Surveys;
 use Phalcon\Db;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 use App\Model\Survey;
 use App\Model\SurveyQuestion;
-use App\Model\SurveyTemplateQuestion;
 
 class SurveyController extends CrudResourceController
 {
-    use Auth;
+    use Auth, Surveys;
 
     /**
      * @return mixed
@@ -311,7 +310,7 @@ class SurveyController extends CrudResourceController
             foreach ($surveyQuestion as $item) {
                 if ($item->question_group_id !== null && $flag < $item->question_group_id) {
                     $flag = $item->question_group_id;
-                    $groups[$item->id] = [$item->id, 'name' => $item->getQuestionGroups()->name];
+                    $groups[$item->id] = [$item->id, 'name' => $item->getQuestionGroup()->name];
                 } else {
                     $groups[$item->id] = ['id' => $item->id, 'name' => ''];
                 }
@@ -386,7 +385,7 @@ class SurveyController extends CrudResourceController
 
         $organization = $creator['organization']->organization_id;
 
-        $proc = Process::findFirst(
+        $process = Process::findFirst(
             [
                 'conditions' => 'id = ?1 AND step0 IS NULL',
                 'bind' => [
@@ -394,21 +393,80 @@ class SurveyController extends CrudResourceController
                 ],
             ]
         );
-        if ($proc instanceof Process) {
-            $surveyTemplate = SurveyTemplate::findFirst(
-                [
-                    'conditions' => 'tag LIKE "%0#3_0%"',
-                    'bind' => [
-                    ],
-                ]
-            );
+        if ($process instanceof Process) {
+            //create step0 (initial survey)
+            try {
+                $step0_ID = $this->createEvaluationSurvey();
+            } catch (\RuntimeException $exception) {
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => [$exception->getMessage()]
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
 
-            $step3_0_ID = 0;
-            $step0_ID = 0;
-            if ($surveyTemplate instanceof SurveyTemplate) {
-                //create step0
+            //create step3_0 (evaluation survey)
+            try {
+                $step3_0_ID = $this->createEvaluationSurvey();
+            } catch (\RuntimeException $exception) {
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => [$exception->getMessage()]
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+
+            //create step3_1 (after action review survey)
+            try {
+                $step3_1_ID = $this->createAfterActionReviewSurvey();
+            } catch (\RuntimeException $exception) {
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => [$exception->getMessage()]
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+
+            //create current situation survey
+            try {
+                $reality = $this->createCurrentSituationSurvey();
+            } catch (\RuntimeException $exception) {
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => [$exception->getMessage()]
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+
+            //create vision survey
+            try {
+                $vision = $this->createVisionSurvey();
+            } catch (\RuntimeException $exception) {
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => [$exception->getMessage()]
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+
+
+
+            //update process
+            $process->step0 = $step0_ID;
+            $process->step3_0 = $step3_0_ID;
+            $process->step3_1 = $step3_1_ID;
+            $process->reality = $reality;
+            $process->vision = $vision;
+            $process->organizationId = $organization;
+            if ($process->save()) {
+                $process->refresh();
                 try {
-                    $step0_ID = $this->createEvaluationSurvey($surveyTemplate);
+                    $this->initYearProcesses((int) $id);
                 } catch (\RuntimeException $exception) {
                     $response = [
                         'code' => 0,
@@ -417,105 +475,20 @@ class SurveyController extends CrudResourceController
                     ];
                     return $this->createArrayResponse($response, 'data');
                 }
-
-
-                //create step3_0
-                try {
-                    $step3_0_ID = $this->createEvaluationSurvey($surveyTemplate);
-                } catch (\RuntimeException $exception) {
-                    $response = [
-                        'code' => 0,
-                        'status' => 'Error',
-                        'data' => [$exception->getMessage()]
-                    ];
-                    return $this->createArrayResponse($response, 'data');
-                }
-            }
-
-
-            $surveyTemplate2 = SurveyTemplate::findFirst(
-                [
-                    'conditions' => 'tag LIKE "%3_1%"',
-                    'bind' => [
-                    ],
-                ]
-            );
-
-            $step3_1_ID = 0;
-            if ($surveyTemplate2 instanceof SurveyTemplate) {
-                //create step3_1
-                try {
-                    $step3_1_ID = $this->createEvaluationSurvey($surveyTemplate);
-                } catch (\RuntimeException $exception) {
-                    $response = [
-                        'code' => 0,
-                        'status' => 'Error',
-                        'data' => [$exception->getMessage()]
-                    ];
-                    return $this->createArrayResponse($response, 'data');
-                }
-            }
-
-            //create questions
-
-            /** @var Simple $surveyTemplateQuestions */
-            $surveyTemplateQuestions = SurveyTemplateQuestion::find(
-                [
-                    'conditions' => 'survey_id = ?1 ',
-                    'bind' => [
-                        1 => $surveyTemplate->id
-                    ]
-                ]
-            );
-
-            /** @var SurveyTemplateQuestion $temp_question */
-            foreach ($surveyTemplateQuestions as $data) {
-                $question = $this->createSurveyQuestion($data, $step0_ID);
-                $question->save();
-            }
-            /** @var SurveyTemplateQuestion $temp_question */
-            foreach ($surveyTemplateQuestions as $data) {
-                $question = $this->createSurveyQuestion($data, $step3_0_ID);
-                $question->save();
-            }
-
-            /** @var Simple $surveyTemplateQuestions2 */
-            $surveyTemplateQuestions2 = SurveyTemplateQuestion::find(
-                [
-                    'conditions' => 'survey_id = ?1 ',
-                    'bind' => [
-                        1 => $surveyTemplate2->id
-                    ]
-                ]
-            );
-
-            /** @var SurveyTemplateQuestion $temp_question2 */
-            foreach ($surveyTemplateQuestions2 as $data) {
-                $question = $this->createSurveyQuestion($data, $step3_1_ID);
-                $question->save();
-            }
-
-
-            $process = Process::findFirst((int) $id);
-
-            if ($process instanceof Process) {
-                $process->step0 = $step0_ID;
-                $process->step3_0 = $step3_0_ID;
-                $process->step3_1 = $step3_1_ID;
-                $process->organizationId = $organization;
-                if ($process->save()) {
-                    $process->refresh();
-                    try {
-                        $this->initYearProcess($process);
-                    } catch (\RuntimeException $exception) {
-                        $response = [
-                            'code' => 0,
-                            'status' => 'Error',
-                            'data' => [$exception->getMessage()]
-                        ];
-                        return $this->createArrayResponse($response, 'data');
+            } else {
+                foreach ([$step0_ID, $step3_0_ID, $step3_1_ID, $reality, $vision] as $sid) {
+                    $survey = Survey::findFirst($sid);
+                    if ($survey instanceof Survey) {
+                        $survey->delete();
                     }
                 }
+
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => $process->getMessages()
+                ];
+                return $this->createArrayResponse($response, 'data');
             }
         }
         $response = [
@@ -753,88 +726,5 @@ class SurveyController extends CrudResourceController
             'data' => $processes
         ];
         return $this->createArrayResponse($response, 'data');
-    }
-
-    /**
-     * @param Process $process
-     * @return bool
-     * @throws \RuntimeException
-     */
-    protected function initYearProcess(Process $process): bool
-    {
-        /** @var Simple $models */
-        $models = ProcessYearSurvey::find([
-            'conditions' => 'process_id = ?1',
-            'bind' => [
-                1 => $process->id
-            ],
-        ]);
-        if ($models->count() === 0) {
-            $yearSurvey = new ProcessYearSurvey();
-            $surveyTemplate = SurveyTemplate::findFirst(
-                [
-                    'conditions' => 'tag LIKE "%0#3_0%"',
-                    'bind' => [
-                    ],
-                ]
-            );
-            if ($surveyTemplate instanceof SurveyTemplate) {
-                $surveyId = $this->createEvaluationSurvey($surveyTemplate);
-                $yearSurvey->process_id = $process->id;
-                $yearSurvey->survey_id = $surveyId;
-                $yearSurvey->date = (new \DateTime())->format('Y');
-                if ($yearSurvey->save()) {
-                    return true;
-                }
-                throw new \RuntimeException('Year Survey not created');
-            }
-            throw new \RuntimeException('Template not found');
-        }
-        throw new \RuntimeException('Year Process already created');
-    }
-
-    /**
-     * @param SurveyTemplate $surveyTemplate
-     * @return int
-     * @throws \RuntimeException
-     */
-    protected function createEvaluationSurvey(SurveyTemplate $surveyTemplate): int
-    {
-        $survey = new Survey();
-        $survey->title = $surveyTemplate->title;
-        $survey->description = $surveyTemplate->description;
-        $survey->isEditable = $surveyTemplate->isEditable;
-        $survey->isOlset = $surveyTemplate->isOlset;
-        $survey->creator = $surveyTemplate->creator;
-        $survey->organization_id = $surveyTemplate->organization_id;
-        if (property_exists($surveyTemplate, 'showExtraInfoAndTags')) {
-            $survey->showExtraInfoAndTags = $surveyTemplate->showExtraInfoAndTags;
-        } else {
-            $survey->showExtraInfoAndTags = false;
-        }
-        if (property_exists($surveyTemplate, 'tag')) {
-            $survey->tag = $surveyTemplate->tag;
-        }
-        if (property_exists($surveyTemplate, 'extraInfo')) {
-            $survey->extraInfo = $surveyTemplate->extraInfo;
-        } else {
-            $survey->extraInfo = '';
-        }
-        if ($survey->save()) {
-            $survey->refresh();
-            return $survey->id;
-        }
-        throw new \RuntimeException('Survey not saved template_id=' . $surveyTemplate->id);
-    }
-
-    protected function createSurveyQuestion($data, $id, $template = false)
-    {
-        $surveyQuestion = $template ? new SurveyTemplateQuestion() : new SurveyQuestion();
-        $surveyQuestion->question = $data->question;
-        $surveyQuestion->description = $data->description;
-        $surveyQuestion->answered_type = $data->answered_type;
-        $surveyQuestion->question_order = $data->question_order;
-        $surveyQuestion->survey_id = $id;
-        return $surveyQuestion;
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
+use Phalcon\Mvc\Model;
 
 /**
  * Answer
@@ -14,7 +14,7 @@ use App\Mvc\DateTrackingModel;
  * @method SurveyQuestion getSurveyQuestions
  * @method User getUser
  */
-class Answer extends DateTrackingModel
+class Answer extends Model
 {
 
     /**
@@ -50,7 +50,7 @@ class Answer extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('answers');
@@ -68,7 +68,7 @@ class Answer extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'answers';
     }
@@ -101,13 +101,13 @@ class Answer extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'questionId' => 'questionId',
-                'answer' => 'answer',
-                'userId' => 'userId'
-            ];
+        return [
+            'id' => 'id',
+            'questionId' => 'questionId',
+            'answer' => 'answer',
+            'userId' => 'userId'
+        ];
     }
 }

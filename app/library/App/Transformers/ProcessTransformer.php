@@ -26,7 +26,9 @@ class ProcessTransformer extends ModelTransformer
             'Organization',
             'Survey0',
             'Survey30',
-            'Survey31'
+            'Survey31',
+            'Reality',
+            'Vision'
         ];
     }
 
@@ -78,5 +80,15 @@ class ProcessTransformer extends ModelTransformer
     public function includeSurvey31(Process $model)
     {
         return $this->item($model->getSurvey31(), new SurveyTransformer());
+    }
+
+    public function includeReality(Process $model)
+    {
+        return $this->item($model->getReality(), new SurveyTransformer);
+    }
+
+    public function includeVision(Process $model)
+    {
+        return $this->item($model->getVision(), new SurveyTransformer);
     }
 }

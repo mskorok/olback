@@ -3,8 +3,8 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
 use League\Fractal\Resource\Collection;
+use Phalcon\Mvc\Model;
 
 /**
  * SystemicMap
@@ -18,7 +18,7 @@ use League\Fractal\Resource\Collection;
  * @method Organization getOrganization
  * @method Process getProcess
  */
-class SystemicMap extends DateTrackingModel
+class SystemicMap extends Model
 {
 
     /**
@@ -75,7 +75,7 @@ class SystemicMap extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('systemic_map');
@@ -91,7 +91,7 @@ class SystemicMap extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'systemic_map';
     }
@@ -124,16 +124,16 @@ class SystemicMap extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'name' => 'name',
-                'department' => 'department',
-                'organization' => 'organization',
-                'lang' => 'lang',
-                'processId' => 'processId',
-                'isActive' => 'isActive'
-            ];
+        return [
+            'id' => 'id',
+            'name' => 'name',
+            'department' => 'department',
+            'organization' => 'organization',
+            'lang' => 'lang',
+            'processId' => 'processId',
+            'isActive' => 'isActive'
+        ];
     }
 }

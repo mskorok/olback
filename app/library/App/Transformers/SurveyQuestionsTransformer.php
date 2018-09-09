@@ -17,7 +17,7 @@ class SurveyQuestionsTransformer extends ModelTransformer
 
     public function includeQuestionGroups(SurveyQuestion $model)
     {
-        return $this->item($model->getQuestionGroups(), new QuestionGroupsTransformer());
+        return $this->item($model->getQuestionGroup(), new QuestionGroupsTransformer());
     }
 
     public function includeSurvey(SurveyQuestion $model)

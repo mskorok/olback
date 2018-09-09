@@ -5,12 +5,13 @@ namespace App\Controllers;
 use App\Model\Process;
 use App\Model\ProcessYearSurvey;
 use App\Traits\Auth;
+use App\Traits\Surveys;
 use Phalcon\Mvc\Model;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 
 class ProcessYearSurveyController extends CrudResourceController
 {
-    use Auth;
+    use Auth, Surveys;
 
     /**
      * @param Model $item
@@ -43,5 +44,17 @@ class ProcessYearSurveyController extends CrudResourceController
         $item->date = $old->date;
         $item->process_id = $old->process_id;
         $item->survey_id = $old->survey_id;
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    public function getFullSurveyData($id)
+    {
+        $this->initYearProcesses($id);
+        $collection = $this->fullSurveyData($id);
+        return $this->createArrayResponse($collection, 'data');
     }
 }

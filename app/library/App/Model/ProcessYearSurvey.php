@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
+use Phalcon\Mvc\Model;
 
 /**
  * ProcessYearSurvey
@@ -13,8 +13,10 @@ use App\Mvc\DateTrackingModel;
  * @date 2018-08-19, 10:39:37
  * @method Survey getSurvey
  * @method Process getProcess
+ * @method Survey getReality
+ * @method Survey getVision
  */
-class ProcessYearSurvey extends DateTrackingModel
+class ProcessYearSurvey extends Model
 {
 
     /**
@@ -42,15 +44,15 @@ class ProcessYearSurvey extends DateTrackingModel
 
     /**
      *
-     * @var string
-     * @Column(type="string", nullable=true)
+     * @var integer
+     * @Column(type="integer", length=11, nullable=true)
      */
     public $reality;
 
     /**
      *
-     * @var string
-     * @Column(type="string", nullable=true)
+     * @var integer
+     * @Column(type="integer", length=11, nullable=true)
      */
     public $vision;
 
@@ -64,12 +66,14 @@ class ProcessYearSurvey extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('process_year_survey');
         $this->belongsTo('process_id', Process::class, 'id', ['alias' => 'Process']);
+        $this->belongsTo('reality', Survey::class, 'id', ['alias' => 'Reality']);
         $this->belongsTo('survey_id', Survey::class, 'id', ['alias' => 'Survey']);
+        $this->belongsTo('vision', Survey::class, 'id', ['alias' => 'Vision']);
     }
 
     /**
@@ -77,7 +81,7 @@ class ProcessYearSurvey extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'process_year_survey';
     }
@@ -110,15 +114,15 @@ class ProcessYearSurvey extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'process_id' => 'process_id',
-                'survey_id' => 'survey_id',
-                'reality' => 'reality',
-                'vision' => 'vision',
-                'date' => 'date'
-            ];
+        return [
+            'id' => 'id',
+            'process_id' => 'process_id',
+            'survey_id' => 'survey_id',
+            'reality' => 'reality',
+            'vision' => 'vision',
+            'date' => 'date'
+        ];
     }
 }

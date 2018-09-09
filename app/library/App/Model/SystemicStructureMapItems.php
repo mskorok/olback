@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
+use Phalcon\Mvc\Model;
 
 /**
  * SystemicStructureMapItems
@@ -17,7 +17,7 @@ use App\Mvc\DateTrackingModel;
  * @method SystemicStructureMap getSystemicStructureMap
  * @method User getUser
  */
-class SystemicStructureMapItems extends DateTrackingModel
+class SystemicStructureMapItems extends Model
 {
 
     /**
@@ -145,14 +145,14 @@ class SystemicStructureMapItems extends DateTrackingModel
      */
     public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'systemic_map_id' => 'systemic_map_id',
-                'question' => 'question',
-                'proposal' => 'proposal',
-                'groupId' => 'groupId',
-                'userId' => 'userId',
-                'itemType' => 'itemType'
-            ];
+        return [
+            'id' => 'id',
+            'systemic_map_id' => 'systemic_map_id',
+            'question' => 'question',
+            'proposal' => 'proposal',
+            'groupId' => 'groupId',
+            'userId' => 'userId',
+            'itemType' => 'itemType'
+        ];
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
 use League\Fractal\Resource\Collection;
+use Phalcon\Mvc\Model;
 
 /**
  * SystemicMapItems
@@ -18,7 +18,7 @@ use League\Fractal\Resource\Collection;
  * @method SystemicMap getSystemicMap
  * @method User getUser
  */
-class SystemicMapItems extends DateTrackingModel
+class SystemicMapItems extends Model
 {
 
     /**
@@ -68,7 +68,7 @@ class SystemicMapItems extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('systemic_map_items');
@@ -84,7 +84,7 @@ class SystemicMapItems extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'systemic_map_items';
     }
@@ -117,15 +117,15 @@ class SystemicMapItems extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'systemic_map_id' => 'systemic_map_id',
-                'question' => 'question',
-                'proposal' => 'proposal',
-                'groupId' => 'groupId',
-                'userId' => 'userId'
-            ];
+        return [
+            'id' => 'id',
+            'systemic_map_id' => 'systemic_map_id',
+            'question' => 'question',
+            'proposal' => 'proposal',
+            'groupId' => 'groupId',
+            'userId' => 'userId'
+        ];
     }
 }

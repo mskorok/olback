@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
+use Phalcon\Mvc\Model;
 
 /**
  * ActionList
@@ -13,7 +13,7 @@ use App\Mvc\DateTrackingModel;
  * @date 2018-08-06, 22:12:13
  * @method ActionListGroup getActionListGroup
  */
-class ActionList extends DateTrackingModel
+class ActionList extends Model
 {
 
     /**
@@ -56,7 +56,7 @@ class ActionList extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('action_list');
@@ -68,7 +68,7 @@ class ActionList extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'action_list';
     }
@@ -101,14 +101,14 @@ class ActionList extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'from_item' => 'from_item',
-                'to_item' => 'to_item',
-                'action_list_group' => 'action_list_group',
-                'path_id' => 'path_id'
-            ];
+        return [
+            'id' => 'id',
+            'from_item' => 'from_item',
+            'to_item' => 'to_item',
+            'action_list_group' => 'action_list_group',
+            'path_id' => 'path_id'
+        ];
     }
 }

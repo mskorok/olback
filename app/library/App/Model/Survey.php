@@ -3,8 +3,8 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use App\Mvc\DateTrackingModel;
 use League\Fractal\Resource\Collection;
+use Phalcon\Mvc\Model;
 
 /**
  * Survey
@@ -15,12 +15,17 @@ use League\Fractal\Resource\Collection;
  * @method Collection getProcess0
  * @method Collection getProcess30
  * @method Collection getProcess31
+ * @method Collection getProcessReality
+ * @method Collection getProcessVision
+ * @method Collection getProcessYearSurvey
+ * @method Collection getProcessYearRealitySurvey
+ * @method Collection getProcessYearVisionSurvey
  * @method Collection getSurveyQuestions
  * @method Collection getOrganization
  * @method User getUser
- * @method ActionListGroup getActionListGroup
+ *
  */
-class Survey extends DateTrackingModel
+class Survey extends Model
 {
 
     /**
@@ -98,17 +103,51 @@ class Survey extends DateTrackingModel
     /**
      * Initialize method for model.
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->setSchema($this->getDI()->get(Services::CONFIG)->database->dbname);
         $this->setSource('survey');
+        $this->hasMany('id', Process::class, 'reality', ['alias' => 'ProcessReality']);
         $this->hasMany('id', Process::class, 'step0', ['alias' => 'Process0']);
         $this->hasMany('id', Process::class, 'step3_0', ['alias' => 'Process30']);
         $this->hasMany('id', Process::class, 'step3_1', ['alias' => 'Process31']);
-        $this->hasMany('id', SurveyQuestion::class, 'survey_id', ['alias' => 'SurveyQuestions']);
-        $this->hasMany('id', SurveyTemplateQuestion::class, 'survey_id', ['alias' => 'SurveyTemplatesQuestions']);
-        $this->belongsTo('organization_id', Organization::class, 'id', ['alias' => 'Organization']);
-        $this->belongsTo('creator', User::class, 'id', ['alias' => 'User']);
+        $this->hasMany('id', Process::class, 'vision', ['alias' => 'ProcessVision']);
+        $this->hasMany(
+            'id',
+            ProcessYearSurvey::class,
+            'reality',
+            ['alias' => 'ProcessYearRealitySurvey']
+        );
+        $this->hasMany(
+            'id',
+            ProcessYearSurvey::class,
+            'survey_id',
+            ['alias' => 'ProcessYearSurvey']
+        );
+        $this->hasMany(
+            'id',
+            ProcessYearSurvey::class,
+            'vision',
+            ['alias' => 'ProcessYearVisionSurvey']
+        );
+        $this->hasMany(
+            'id',
+            SurveyQuestion::class,
+            'survey_id',
+            ['alias' => 'SurveyQuestions']
+        );
+        $this->belongsTo(
+            'organization_id',
+            Organization::class,
+            'id',
+            ['alias' => 'Organization']
+        );
+        $this->belongsTo(
+            'creator',
+            User::class,
+            'id',
+            ['alias' => 'User']
+        );
     }
 
     /**
@@ -116,7 +155,7 @@ class Survey extends DateTrackingModel
      *
      * @return string
      */
-    public function getSource()
+    public function getSource(): string
     {
         return 'survey';
     }
@@ -149,19 +188,19 @@ class Survey extends DateTrackingModel
      *
      * @return array
      */
-    public function columnMap()
+    public function columnMap(): array
     {
-        return parent::columnMap() + [
-                'id' => 'id',
-                'title' => 'title',
-                'description' => 'description',
-                'isEditable' => 'isEditable',
-                'isOlset' => 'isOlset',
-                'creator' => 'creator',
-                'organization_id' => 'organization_id',
-                'show_extra_info_and_tags' => 'showExtraInfoAndTags',
-                'extra_info' => 'extraInfo',
-                'tag' => 'tag'
-            ];
+        return [
+            'id' => 'id',
+            'title' => 'title',
+            'description' => 'description',
+            'isEditable' => 'isEditable',
+            'isOlset' => 'isOlset',
+            'creator' => 'creator',
+            'organization_id' => 'organization_id',
+            'show_extra_info_and_tags' => 'showExtraInfoAndTags',
+            'extra_info' => 'extraInfo',
+            'tag' => 'tag'
+        ];
     }
 }
