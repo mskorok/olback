@@ -18,7 +18,7 @@ class GroupResource extends ApiResource
             ->name('Group')
             ->model(Group::class)
             ->expectsJsonData()
-            // ->transformer(OrganizationTransformer::class)ss
+             ->transformer(GroupTransformer::class)
             ->handler(GroupController::class)
             ->itemKey('group')
             ->collectionKey('group')

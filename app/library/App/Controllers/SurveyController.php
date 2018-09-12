@@ -465,16 +465,16 @@ class SurveyController extends CrudResourceController
             $process->organizationId = $organization;
             if ($process->save()) {
                 $process->refresh();
-                try {
-                    $this->initYearProcesses((int) $id);
-                } catch (\RuntimeException $exception) {
-                    $response = [
-                        'code' => 0,
-                        'status' => 'Error',
-                        'data' => [$exception->getMessage()]
-                    ];
-                    return $this->createArrayResponse($response, 'data');
-                }
+//                try {
+//                    $this->initYearProcesses((int) $id);
+//                } catch (\RuntimeException $exception) {
+//                    $response = [
+//                        'code' => 0,
+//                        'status' => 'Error',
+//                        'data' => [$exception->getMessage()]
+//                    ];
+//                    return $this->createArrayResponse($response, 'data');
+//                }
             } else {
                 foreach ([$step0_ID, $step3_0_ID, $step3_1_ID, $reality, $vision] as $sid) {
                     $survey = Survey::findFirst($sid);
@@ -631,11 +631,15 @@ class SurveyController extends CrudResourceController
 //            'status' => 'Success',
 //            'data' => $help_post_result[0]->post_content,
 //        ];
-
+//
+//        $response = [
+//            'code' => 0,
+//            'status' => 'No data',
+//        ];
         $response = [
-            'code' => 0,
-            'status' => 'No data',
-            'data' => '',
+            'code' => 1,
+            'status' => 'Success',
+            'data' => '<div>There will be<br> help data</div>',
         ];
         return $this->createArrayResponse($response, 'data');
     }

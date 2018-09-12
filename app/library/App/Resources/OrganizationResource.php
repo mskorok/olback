@@ -18,7 +18,7 @@ class OrganizationResource extends ApiResource
             ->name('Organization')
             ->model(Organization::class)
             ->expectsJsonData()
-            // ->transformer(OrganizationTransformer::class)
+            ->transformer(OrganizationTransformer::class)
             ->handler(OrganizationController::class)
             ->itemKey('organization')
             ->collectionKey('organization')

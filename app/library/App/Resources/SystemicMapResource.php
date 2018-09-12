@@ -2,13 +2,13 @@
 
 namespace App\Resources;
 
+use App\Transformers\SystemicMapTransformer;
 use PhalconRest\Api\ApiResource;
 use PhalconRest\Api\ApiEndpoint;
 use App\Model\SystemicMap;
 use App\Controllers\SystemicMapController;
 use App\Constants\AclRoles;
 
-//a
 class SystemicMapResource extends ApiResource
 {
     public function initialize()
@@ -17,7 +17,7 @@ class SystemicMapResource extends ApiResource
             ->name('SystemicMap')
             ->model(SystemicMap::class)
             ->expectsJsonData()
-            // ->transformer(OrganizationTransformer::class)
+             ->transformer(SystemicMapTransformer::class)
             ->handler(SystemicMapController::class)
             ->itemKey('systemicmap')
             ->collectionKey('systemicmap')

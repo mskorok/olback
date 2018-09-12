@@ -2,6 +2,7 @@
 
 namespace App\Resources;
 
+use App\Transformers\DepartmentTransformer;
 use PhalconRest\Api\ApiResource;
 use PhalconRest\Api\ApiEndpoint;
 use App\Model\Department;
@@ -17,7 +18,7 @@ class DepartmentResource extends ApiResource
           ->name('Department')
           ->model(Department::class)
           ->expectsJsonData()
-          // ->transformer(OrganizationTransformer::class)
+           ->transformer(DepartmentTransformer::class)
           ->handler(DepartmentController::class)
           ->itemKey('department')
           ->collectionKey('department')

@@ -2,12 +2,13 @@
 
 namespace App\Resources;
 
+use App\Constants\AclRoles;
+use App\Controllers\ProcessController;
+use PhalconApi\Constants\PostedDataMethods;
 use PhalconRest\Api\ApiEndpoint;
 use PhalconRest\Api\ApiResource;
 use App\Model\Process;
 use App\Transformers\ProcessTransformer;
-use App\Constants\AclRoles;
-use PhalconRest\Mvc\Controllers\CrudResourceController;
 
 class ProcessResource extends ApiResource
 {
@@ -21,13 +22,27 @@ class ProcessResource extends ApiResource
             ->transformer(ProcessTransformer::class)
             ->itemKey('process')
             ->collectionKey('process')
-//            ->deny(AclRoles::UNAUTHORIZED)
-            ->handler(CrudResourceController::class)
+            ->deny(AclRoles::UNAUTHORIZED)
+            ->handler(ProcessController::class)
 
             ->endpoint(ApiEndpoint::all())
             ->endpoint(ApiEndpoint::create())
             ->endpoint(ApiEndpoint::find())
             ->endpoint(ApiEndpoint::update())
-            ->endpoint(ApiEndpoint::remove());
+            ->endpoint(ApiEndpoint::remove())
+            ->endpoint(
+                ApiEndpoint::post('/current/{id}', 'addCurrentReality')
+                    ->allow(AclRoles::MANAGER)
+                    ->allow(AclRoles::ADMINISTRATOR)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('Current Reality')
+            )
+            ->endpoint(
+                ApiEndpoint::post('/initial/{id}', 'addInitialIntentions')
+                    ->allow(AclRoles::MANAGER)
+                    ->allow(AclRoles::ADMINISTRATOR)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('Initial Intentions')
+            );
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Resources;
 
+use App\Transformers\SurveyTransformer;
 use PhalconRest\Api\ApiResource;
 use PhalconRest\Api\ApiEndpoint;
 use App\Model\Survey;
-use App\Model\SurveyQuestion;
 use App\Controllers\SurveyController;
 use App\Constants\AclRoles;
 
@@ -17,7 +17,7 @@ class SurveyResource extends ApiResource
             ->name('Survey')
             ->model(Survey::class)
             ->expectsJsonData()
-            // ->transformer(OrganizationTransformer::class)
+             ->transformer(SurveyTransformer::class)
             ->handler(SurveyController::class)
             ->itemKey('survey')
             ->collectionKey('survey')

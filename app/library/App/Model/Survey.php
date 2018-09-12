@@ -5,6 +5,7 @@ namespace App\Model;
 use App\Constants\Services;
 use League\Fractal\Resource\Collection;
 use Phalcon\Mvc\Model;
+use App\Model\SystemicMapItems;
 
 /**
  * Survey
@@ -21,6 +22,7 @@ use Phalcon\Mvc\Model;
  * @method Collection getProcessYearRealitySurvey
  * @method Collection getProcessYearVisionSurvey
  * @method Collection getSurveyQuestions
+ * @method Collection getSystemicMapItems
  * @method Collection getOrganization
  * @method User getUser
  *
@@ -135,6 +137,12 @@ class Survey extends Model
             SurveyQuestion::class,
             'survey_id',
             ['alias' => 'SurveyQuestions']
+        );
+        $this->hasMany(
+            'id',
+            SystemicMapItems::class,
+            'survey',
+            ['alias' => 'SystemicMapItems']
         );
         $this->belongsTo(
             'organization_id',

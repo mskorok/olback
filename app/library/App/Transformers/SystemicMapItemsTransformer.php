@@ -11,7 +11,7 @@ class SystemicMapItemsTransformer extends ModelTransformer
     {
         $this->modelClass = SystemicMapItems::class;
         $this->availableIncludes = [
-            'SystemicMapChainFrom', 'SystemicMapChainTo', 'Groups', 'SystemicMap', 'User'
+            'SystemicMapChainFrom', 'SystemicMapChainTo', 'Groups', 'SystemicMap', 'User', 'Survey'
         ];
     }
 
@@ -38,5 +38,10 @@ class SystemicMapItemsTransformer extends ModelTransformer
     public function includeUser(SystemicMapItems $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
+    }
+
+    public function includeSurvey(SystemicMapItems $model)
+    {
+        return $this->item($model->getSurvey(), new SurveyTransformer());
     }
 }

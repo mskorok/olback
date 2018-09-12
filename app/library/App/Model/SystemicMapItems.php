@@ -17,6 +17,7 @@ use Phalcon\Mvc\Model;
  * @method Group getGroups
  * @method SystemicMap getSystemicMap
  * @method User getUser
+ * @method Survey getSurvey
  */
 class SystemicMapItems extends Model
 {
@@ -66,6 +67,13 @@ class SystemicMapItems extends Model
     public $userId;
 
     /**
+     *
+     * @var integer
+     * @Column(type="integer", length=11, nullable=true)
+     */
+    public $survey;
+
+    /**
      * Initialize method for model.
      */
     public function initialize(): void
@@ -75,6 +83,7 @@ class SystemicMapItems extends Model
         $this->hasMany('id', SystemicMapChain::class, 'from_item', ['alias' => 'SystemicMapChainFrom']);
         $this->hasMany('id', SystemicMapChain::class, 'to_item', ['alias' => 'SystemicMapChainTo']);
         $this->belongsTo('groupId', Group::class, 'id', ['alias' => 'Groups']);
+        $this->belongsTo('survey', Survey::class, 'id', ['alias' => 'Survey']);
         $this->belongsTo('systemic_map_id', SystemicMap::class, 'id', ['alias' => 'SystemicMap']);
         $this->belongsTo('userId', User::class, 'id', ['alias' => 'User']);
     }
@@ -125,7 +134,8 @@ class SystemicMapItems extends Model
             'question' => 'question',
             'proposal' => 'proposal',
             'groupId' => 'groupId',
-            'userId' => 'userId'
+            'userId' => 'userId',
+            'survey' => 'survey'
         ];
     }
 }

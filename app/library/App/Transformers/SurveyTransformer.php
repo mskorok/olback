@@ -16,7 +16,11 @@ class SurveyTransformer extends ModelTransformer
             'Process31',
             'ProcessReality',
             'ProcessVision',
+            'ProcessYearRealitySurvey',
+            'ProcessYearSurvey',
+            'ProcessYearVisionSurvey',
             'SurveyQuestions',
+            'SystemicMapItems',
             'Organization',
             'User'
         ];
@@ -65,6 +69,11 @@ class SurveyTransformer extends ModelTransformer
     public function includeSurveyQuestions(Survey $model)
     {
         return $this->collection($model->getSurveyQuestions(), new SurveyQuestionsTransformer());
+    }
+
+    public function includeSystemicMapItems(Survey $model)
+    {
+        return $this->collection($model->getSystemicMapItems(), new SystemicMapItemsTransformer());
     }
 
     public function includeOrganization(Survey $model)
