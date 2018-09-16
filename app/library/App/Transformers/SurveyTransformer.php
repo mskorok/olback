@@ -28,27 +28,27 @@ class SurveyTransformer extends ModelTransformer
 
     public function includeProcess0(Survey $model)
     {
-        return $this->collection($model->getProcess0(), new ProcessTransformer());
+        return $this->item($model->getProcess0(), new ProcessTransformer());
     }
 
     public function includeProcess30(Survey $model)
     {
-        return $this->collection($model->getProcess30(), new ProcessTransformer());
+        return $this->item($model->getProcess30(), new ProcessTransformer());
     }
 
     public function includeProcess31(Survey $model)
     {
-        return $this->collection($model->getProcess31(), new ProcessTransformer());
+        return $this->item($model->getProcess31(), new ProcessTransformer());
     }
 
     public function includeProcessReality(Survey $model)
     {
-        return $this->collection($model->getProcessReality(), new ProcessTransformer());
+        return $this->item($model->getProcessReality(), new ProcessTransformer());
     }
 
     public function includeProcessVision(Survey $model)
     {
-        return $this->collection($model->getProcessVision(), new ProcessTransformer());
+        return $this->item($model->getProcessVision(), new ProcessTransformer());
     }
 
     public function includeProcessYearSurvey(Survey $model)

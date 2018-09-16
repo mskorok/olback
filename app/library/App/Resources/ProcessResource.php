@@ -38,11 +38,25 @@ class ProcessResource extends ApiResource
                     ->description('Current Reality')
             )
             ->endpoint(
+                ApiEndpoint::post('/shared/{id}', 'addSharedVision')
+                    ->allow(AclRoles::MANAGER)
+                    ->allow(AclRoles::ADMINISTRATOR)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('Shared Vision')
+            )
+            ->endpoint(
                 ApiEndpoint::post('/initial/{id}', 'addInitialIntentions')
                     ->allow(AclRoles::MANAGER)
                     ->allow(AclRoles::ADMINISTRATOR)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                     ->description('Initial Intentions')
+            )
+            ->endpoint(
+                ApiEndpoint::get('/awe/{id}', 'getActions')
+                    ->allow(AclRoles::MANAGER)
+                    ->allow(AclRoles::ADMINISTRATOR)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('Get Systemic MapI tems')
             );
     }
 }

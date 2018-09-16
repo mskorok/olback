@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Constants\Services;
 use App\Model\Process;
 use App\Model\SystemicStructureMap;
 use App\Model\SystemicStructureMapChain;
@@ -420,11 +421,16 @@ class SystemicMapController extends CrudResourceController
             $dp = $data->proposal;
         }
 
+        $config = $this->getDI()->get(Services::CONFIG);
+
         $systemicItem = new SystemicMapItems();
         $systemicItem->systemic_map_id = $data->systemic_map_id;
         $systemicItem->question = $data->question;
         $systemicItem->proposal = $dp;
-        $systemicItem->groupId = $data->groupId;
+        if (!isset($data->groupId) || empty($data->groupId)) {
+            $data->groupId = $config->settings->default->group;
+        }
+        $systemicItem->groupId = (int) $data->groupId;
         $systemicItem->userId = $creatorId;
         if ($systemicItem->save() === false) {
             $messagesErrors = [];
@@ -867,6 +873,16 @@ class SystemicMapController extends CrudResourceController
         $data->setFetchMode(Db::FETCH_ASSOC);
         $results = $data->fetchAll();
         $tree = $this->fillArray($results);
+        if (\count($tree) === 0) {
+            $a = [
+                'tree' => $tree,
+                'htmlCode' => '',
+                'systemic_map_title' => $systemicR,
+            ];
+
+            return $this->createArrayResponse($a, 'data');
+        }
+
         $this->html = '
 
         <li class="dd-item dd3-item item' . $tree[0]['id'] . " generals-item \" style='color:" . $tree[0]['color']

@@ -292,6 +292,19 @@ class SurveyController extends CrudResourceController
         $survey = Survey::findFirst((int) $id);
 
         if ($survey instanceof Survey) {
+            $process = $survey->getProcess0();
+            if (!($process instanceof Process)) {
+                $process = $survey->getProcess30();
+                if (!($process instanceof Process)) {
+                    $process = $survey->getProcess31();
+                    if (!($process instanceof Process)) {
+                        $process = $survey->getProcessReality();
+                        if (!($process instanceof Process)) {
+                            $process = $survey->getProcessVision();
+                        }
+                    }
+                }
+            }
             /** @var Simple $surveyQuestion */
             $surveyQuestion = SurveyQuestion::find(
                 [
@@ -321,6 +334,8 @@ class SurveyController extends CrudResourceController
                 'status' => 'Success',
                 'data' => $surveyQuestion,
                 'groups' => $groups,
+                'process' => $process,
+                'isActionAAR' => !($process instanceof Process)
             ];
         } else {
             $response = [
@@ -350,8 +365,15 @@ class SurveyController extends CrudResourceController
 
         $data = $this->request->getJsonRawBody();
 
+
         foreach ($data as $answer) {
-            $answerModel = new Answer();
+            $oldAnswer = Answer::findFirst([
+                'conditions' => 'questionId = ?1',
+                'bind' => [
+                    1 => $answer->questionId
+                ],
+            ]);
+            $answerModel = $oldAnswer instanceof Answer ? $oldAnswer : new Answer();
             $answerModel->answer = $answer->answer;
             $answerModel->userId = $creator['account']->id;
             $answerModel->questionId = $answer->questionId;

@@ -61,6 +61,13 @@ class Process extends DateTrackingModel
 
     /**
      *
+     * @var string
+     * @Column(type="string", nullable=false)
+     */
+    public $SharedVision;
+
+    /**
+     *
      * @var integer
      * @Column(type="integer", length=11, nullable=true)
      */
@@ -188,6 +195,7 @@ class Process extends DateTrackingModel
                 'title' => 'title',
                 'CurrentReality' => 'CurrentReality',
                 'InitialIntentions' => 'InitialIntentions',
+                'SharedVision' => 'SharedVision',
                 'step0' => 'step0',
                 'step3_0' => 'step3_0',
                 'step3_1' => 'step3_1',

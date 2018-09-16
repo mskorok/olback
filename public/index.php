@@ -81,6 +81,7 @@ try {
 
     $response->setHeader('Access-Control-Allow-Headers', 'Content-Type');
     $response->setHeader('Access-Control-Allow-Origin', '*');
+//    $response->setHeader('X-Frame-Options', 'SAMEORIGIN');
 
     $returnedValue = $app->getReturnedValue();
 
@@ -104,6 +105,7 @@ try {
     $response->setErrorContent($e, $debugMode);
     $response->setHeader('Access-Control-Allow-Headers', 'Content-Type');
     $response->setHeader('Access-Control-Allow-Origin', '*');
+//    $response->setHeader('X-Frame-Options', 'SAMEORIGIN');
 }
 finally {
 

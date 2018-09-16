@@ -9,6 +9,9 @@
 namespace App\Controllers;
 
 use App\Model\Process;
+use App\Model\SystemicMap;
+use App\Model\SystemicMapItems;
+use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 
 class ProcessController extends CrudResourceController
@@ -19,6 +22,24 @@ class ProcessController extends CrudResourceController
         if ($process instanceof Process) {
             $data = $this->request->getJsonRawBody();
             $process->CurrentReality = $data->text;
+            if ($process->save()) {
+                return $this->createOkResponse();
+            }
+        }
+        $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => 'Process with id='.$id.' not exist',
+        ];
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function addSharedVision($id)
+    {
+        $process = Process::findFirst((int)$id);
+        if ($process instanceof Process) {
+            $data = $this->request->getJsonRawBody();
+            $process->SharedVision = $data->text;
             if ($process->save()) {
                 return $this->createOkResponse();
             }
@@ -45,6 +66,54 @@ class ProcessController extends CrudResourceController
             'code' => 0,
             'status' => 'Error',
             'data' => 'Process with id='.$id.' not exist',
+        ];
+        return $this->createArrayResponse($response, 'data');
+    }
+
+
+    public function getActions($id)
+    {
+        $process = Process::findFirst((int)$id);
+        if ($process instanceof Process) {
+            /** @var Simple $maps */
+            $maps = $process->getSystemicMap();
+            if ($maps->count() > 0) {
+                $items = [];
+                $aar = [];
+                /** @var SystemicMap $map */
+                foreach ($maps as $map) {
+                    /** @var Simple $mapItems */
+                    $mapItems = $map->getSystemicMapItems();
+                    /** @var SystemicMapItems $item */
+                    foreach ($mapItems as $item) {
+                        if ($item->survey === null) {
+                            $items[] = $item;
+                        } else {
+                            $aar[] = $item->getSurvey();
+                        }
+                    }
+                }
+
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success',
+                    'data' => $items,
+                    'aar' => $aar
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'Map not found'
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
+
+        $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => 'Process not found'
         ];
         return $this->createArrayResponse($response, 'data');
     }

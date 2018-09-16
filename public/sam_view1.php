@@ -51,7 +51,7 @@
 
         $curl = curl_init();
 
-//        $url = 'http://144.76.5.203/olsetapp/systemicmap/getItem/';//dev
+        //        $url = 'http://144.76.5.203/olsetapp/systemicmap/getItem/';//dev
         $url = 'http://olback.gr/systemicmap/getItem/';//local
 
         curl_setopt_array($curl, [
@@ -82,53 +82,11 @@
 
 
         window.onload = function () {
-
-
-            /*
-            function onElementHeightChange(elm, callback){
-                var lastHeight = elm.clientHeight, newHeight;
-                (function run(){
-                    newHeight = elm.clientHeight;
-                    if( lastHeight != newHeight )
-                        callback();
-                    lastHeight = newHeight;
-
-                    if( elm.onElementHeightChangeTimer )
-                        clearTimeout(elm.onElementHeightChangeTimer);
-
-                    elm.onElementHeightChangeTimer = setTimeout(run, 200);
-                })();
-            }
-
-
-            onElementHeightChange(document.body, function(){
-                //alert('Body height changed');
-                if (document.body.clientWidth==0) location.reload();
-            });
-            */
-            /*
-            var rInt=setTimeout(function(){
-
-              if (document.body.clientWidth==0)
-              {
-            //    clearInterval(rInt);
-                location.reload();
-            //    force.size([300, 300]);
-            //    force.size([document.body.clientWidth, document.body.clientHeight]);
-              }
-              else
-              {
-            //    setTimeout(function(){clearInterval(rInt);},2000);
-                //clearInterval(rInt);
-              }
-            }, 1000);
-            */
             var json = {};
             json = <?php
-                echo json_encode(json_decode($response)->data->data);
-                ?> ;
+            echo json_encode(json_decode($response)->data->data);
+            ?> ;
 
-//console.log(document.body.clientWidth);
             var width = document.body.clientWidth,
                 height = width,
                 circleRadius = width * 0.055,
@@ -148,15 +106,13 @@
                     json.nodes[i].x = width / 2;
                     json.nodes[i].y = height / 2;
                     json.nodes[i].fixed = true
-                }
-                else {
+                } else {
                     json.nodes[i].x = width / 2 + random() * circleRadius * json.nodes[i].group;
                     json.nodes[i].y = height / 2 + random() * circleRadius * json.nodes[i].group;
                 }
             }
             var k = Math.sqrt(json.nodes.length / (width * height));
             var color = d3.scale.category20();
-
             var force = d3.layout.force()
             //.friction(0.9)
                 .charge(-8 / k)
@@ -169,9 +125,15 @@
                 .attr("height", height)
                 .attr("id", "graph");
 
-            force.nodes(json.nodes)
-                .links(json.links)
-                .start();
+            if (json.nodes.length > 1) {
+                force.nodes(json.nodes)
+                    .links(json.links)
+                    .start();
+            } else {
+                force.nodes(json.nodes)
+                    // .links(json.links)
+                    .start();
+            }
 
             for (i = 0; i < 25; i++) {
                 force.tick();
