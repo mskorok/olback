@@ -93,14 +93,14 @@ class Survey extends Model
      * @var integer
      * @Column(type="integer", length=4, nullable=false)
      */
-    public $showExtraInfoAndTags;
+    public $show_extra_info_and_tags;
 
     /**
      *
      * @var string
      * @Column(type="string", nullable=false)
      */
-    public $extraInfo;
+    public $extra_info;
 
     /**
      * Initialize method for model.
@@ -206,8 +206,8 @@ class Survey extends Model
             'isOlset' => 'isOlset',
             'creator' => 'creator',
             'organization_id' => 'organization_id',
-            'show_extra_info_and_tags' => 'showExtraInfoAndTags',
-            'extra_info' => 'extraInfo',
+            'show_extra_info_and_tags' => 'show_extra_info_and_tags',
+            'extra_info' => 'extra_info',
             'tag' => 'tag'
         ];
     }

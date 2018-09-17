@@ -100,6 +100,11 @@ class SurveyResource extends ApiResource
                 ->allow(AclRoles::USER, AclRoles::MANAGER, AclRoles::AUTHORIZED)
                 ->deny(AclRoles::UNAUTHORIZED)
                 ->description('get survey question')
+            )->endpoint(
+                ApiEndpoint::get('/action/aar/create/{id}', 'createActionAAR')
+                    ->allow(AclRoles::USER, AclRoles::MANAGER, AclRoles::AUTHORIZED)
+                    ->deny(AclRoles::UNAUTHORIZED)
+                    ->description('Create Action AAR')
             );
     }
 }

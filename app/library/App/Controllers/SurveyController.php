@@ -7,6 +7,7 @@ use App\Model\Answer;
 use App\Model\Process;
 use App\Model\QuestionGroups;
 use App\Model\SurveyTemplate;
+use App\Model\SystemicMapItems;
 use App\Traits\Auth;
 use App\Traits\Surveys;
 use Phalcon\Db;
@@ -45,18 +46,18 @@ class SurveyController extends CrudResourceController
         $survey->isOlset = $data->isOlset;
         $survey->creator = $creator['account']->id;
         $survey->organization_id = $organization;
-        if (property_exists($data, 'showExtraInfoAndTags')) {
-            $survey->showExtraInfoAndTags = $data->showExtraInfoAndTags;
+        if (property_exists($data, 'show_extra_info_and_tags')) {
+            $survey->show_extra_info_and_tags = $data->show_extra_info_and_tags;
         } else {
-            $survey->showExtraInfoAndTags = false;
+            $survey->show_extra_info_and_tags = false;
         }
         if (property_exists($data, 'tag')) {
             $survey->tag = $data->tag;
         }
-        if (property_exists($data, 'extraInfo')) {
-            $survey->extraInfo = $data->extraInfo;
+        if (property_exists($data, 'extra_info')) {
+            $survey->extra_info = $data->extra_info;
         } else {
-            $survey->extraInfo = '';
+            $survey->extra_info = '';
         }
 
         if ($survey->save() === false) {
@@ -416,6 +417,7 @@ class SurveyController extends CrudResourceController
             ]
         );
         if ($process instanceof Process) {
+            $this->processId = $process->id;
             //create step0 (initial survey)
             try {
                 $step0_ID = $this->createEvaluationSurvey();
@@ -519,6 +521,49 @@ class SurveyController extends CrudResourceController
             'data' => $process
         ];
 
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function createActionAAR($id)
+    {
+        $action = SystemicMapItems::findFirst((int) $id);
+
+        if (!($action instanceof SystemicMapItems)) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'Action not found'
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
+
+        try {
+            $this->extra_info = 'Action id = '.$action->id.' After Action Review for actions';
+            $surveyId = $this->createAfterActionReviewSurvey();
+        } catch (\RuntimeException $exception) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => [$exception->getMessage()]
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
+
+        $action->survey = $surveyId;
+
+        if ($action->save()) {
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+                'data' => $surveyId
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
+        $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => 'Action not saved'
+        ];
         return $this->createArrayResponse($response, 'data');
     }
 
