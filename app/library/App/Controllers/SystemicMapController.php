@@ -223,6 +223,8 @@ class SystemicMapController extends CrudResourceController
         );
         $systemicMapsArray = [];
         $linksArray = [];
+        $i = 0;
+        $map = [];
         if ($systemicMapItems->count() > 0) {
             /** @var SystemicMapItems $systemicMapItem */
             foreach ($systemicMapItems as $systemicMapItem) {
@@ -235,15 +237,6 @@ class SystemicMapController extends CrudResourceController
                     }
                 }
 
-                $systemicMapsArray[] = [
-                    'id' => $systemicMapItem->id,
-                    'systemic_map_id' => $systemicMapItem->systemic_map_id,
-                    'name' => $systemicMapItem->question,
-                    'proposal' => $systemicMapItem->proposal,
-                    'group' => (int)$systemicMapItem->groupId,
-                    'groupColor' => $groupColorValue,
-                ];
-
                 /** @var Simple $chains */
                 $chains = SystemicMapChain::find(
                     [
@@ -254,13 +247,41 @@ class SystemicMapController extends CrudResourceController
                     ]
                 );
 
+                $systemicMapsArray[] = [
+                    'id' => $systemicMapItem->id,
+                    'systemic_map_id' => $systemicMapItem->systemic_map_id,
+                    'name' => $systemicMapItem->question,
+                    'proposal' => $systemicMapItem->proposal,
+                    'group' => (int)$systemicMapItem->groupId,
+                    'groupColor' => $groupColorValue,
+                    'count' => $i,
+                    'chains' => $chains
+                ];
+
+                $map[$systemicMapItem->id] = $i;
+
+                $i++;
+            }
+
+
+            foreach ($systemicMapsArray as $item) {
+                /** @var array $chains */
+                $chains = $item['chains'];
                 /** @var SystemicMapChain $chain */
                 foreach ($chains as $chain) {
-                    $linksArray[] = [
-                        'source' => $this->findItemIndexForId($systemicMapsArray, (int)$chain->from_item),
-                        'target' => $this->findItemIndexForId($systemicMapsArray, (int)$chain->to_item),
-                        'value' => 2,
-                    ];
+                    if ($chain->from_item === null) {
+                        $linksArray[] = [
+                            'source' => 0,
+                            'target' => 0,
+                            'value' => 2,
+                        ];
+                    } else {
+                        $linksArray[] = [
+                            'source' => $map[$chain->from_item],
+                            'target' => $map[$chain->to_item],
+                            'value' => 2,
+                        ];
+                    }
                 }
             }
         }
@@ -272,6 +293,74 @@ class SystemicMapController extends CrudResourceController
 
         return $this->createArrayResponse($response, 'data');
     }
+
+
+//    public function getSystemicItemOld($id)
+//    {
+//        //echo $id;die();
+//        $systemicMaps = SystemicMapItems::find(
+//            [
+//                'conditions' => '     systemic_map_id = ?1',
+//                'bind' => [
+//                    1 => $id,
+//                ],
+//            ]
+//        );
+//        $systemicMapsArray = array();
+//        $linksArray = array();
+//        if ($systemicMaps) {
+//            foreach ($systemicMaps as $systemicMap) {
+//                $groupColorValue = null;
+//                if (isset($systemicMap->groupId)) {
+//                    $groupColor = Group::findFirst(
+//                        [
+//                            'conditions' => 'id = ?1',
+//                            'bind' => [
+//                                1 => $systemicMap->groupId,
+//                            ],
+//                        ]
+//                    );
+//                    // var_dump($groupColorValue = $groupColor->color);die();
+//                    if ($groupColor->color != null) {
+//                        $groupColorValue = $groupColor->color;
+//                    }
+//                }
+//
+//                $systemicMapsArray[] = array(
+//                    'id' => $systemicMap->id,
+//                    'systemic_map_id' => $systemicMap->systemic_map_id,
+//                    'name' => $systemicMap->question,
+//                    'proposal' => $systemicMap->proposal,
+//                    'group' => intval($systemicMap->groupId),
+//                    'groupColor' => $groupColorValue,
+//                );
+//
+//                $chains = SystemicMapChain::find(
+//                    [
+//                        'conditions' => 'to_item =?1',
+//                        'bind' => [
+//                            1 => $systemicMap->id,
+//                        ],
+//                    ]
+//                );
+//                // echo "dada";die();
+//                foreach ($chains as $chain) {
+//                    $linksArray[] = array(
+//                        'source' => $this->findItemIndexForId($systemicMapsArray, intval($chain->from_item)),
+//                        'target' => $this->findItemIndexForId($systemicMapsArray, intval($chain->to_item)),
+//                        'value' => 2,
+//                    );
+//                }
+//            }
+//        }
+//        $response = [
+//            'code' => 1,
+//            'status' => 'Success',
+//            'data' => array('nodes' => $systemicMapsArray, 'links' => $linksArray),
+//        ];
+//
+//        return $this->createArrayResponse($response, 'data');
+//    }
 
     /**
      * @return mixed

@@ -3,9 +3,8 @@
 namespace App\Model;
 
 use App\Constants\Services;
+use App\Mvc\DateTrackingModel;
 use League\Fractal\Resource\Collection;
-use Phalcon\Mvc\Model;
-use App\Model\SystemicMapItems;
 
 /**
  * Survey
@@ -27,7 +26,7 @@ use App\Model\SystemicMapItems;
  * @method User getUser
  *
  */
-class Survey extends Model
+class Survey extends DateTrackingModel
 {
 
     /**
@@ -198,17 +197,17 @@ class Survey extends Model
      */
     public function columnMap(): array
     {
-        return [
-            'id' => 'id',
-            'title' => 'title',
-            'description' => 'description',
-            'isEditable' => 'isEditable',
-            'isOlset' => 'isOlset',
-            'creator' => 'creator',
-            'organization_id' => 'organization_id',
-            'show_extra_info_and_tags' => 'show_extra_info_and_tags',
-            'extra_info' => 'extra_info',
-            'tag' => 'tag'
-        ];
+        return parent::columnMap() + [
+                'id' => 'id',
+                'title' => 'title',
+                'description' => 'description',
+                'isEditable' => 'isEditable',
+                'isOlset' => 'isOlset',
+                'creator' => 'creator',
+                'organization_id' => 'organization_id',
+                'show_extra_info_and_tags' => 'show_extra_info_and_tags',
+                'extra_info' => 'extra_info',
+                'tag' => 'tag'
+            ];
     }
 }

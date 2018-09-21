@@ -3,7 +3,7 @@
 namespace App\Model;
 
 use App\Constants\Services;
-use Phalcon\Mvc\Model;
+use App\Mvc\DateTrackingModel;
 
 /**
  * Answer
@@ -14,7 +14,7 @@ use Phalcon\Mvc\Model;
  * @method SurveyQuestion getSurveyQuestions
  * @method User getUser
  */
-class Answer extends Model
+class Answer extends DateTrackingModel
 {
 
     /**
@@ -103,11 +103,11 @@ class Answer extends Model
      */
     public function columnMap(): array
     {
-        return [
-            'id' => 'id',
-            'questionId' => 'questionId',
-            'answer' => 'answer',
-            'userId' => 'userId'
-        ];
+        return parent::columnMap() + [
+                'id' => 'id',
+                'questionId' => 'questionId',
+                'answer' => 'answer',
+                'userId' => 'userId'
+            ];
     }
 }

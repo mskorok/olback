@@ -87,6 +87,66 @@
             echo json_encode(json_decode($response)->data->data);
             ?> ;
 
+            // json = {
+            //     "nodes": [
+            //         {
+            //             "id": "1",
+            //             "systemic_map_id": "1",
+            //             "name": "QT 1 ?",
+            //             "proposal": "QT 1 Answ.",
+            //             "group": 10000,
+            //             "groupColor": "#ffffff"
+            //         }, {
+            //             "id": "2",
+            //             "systemic_map_id": "1",
+            //             "name": "QT 2?",
+            //             "proposal": "QT Answ.",
+            //             "group": 2,
+            //             "groupColor": "#c0e5e0"
+            //         }, {
+            //             "id": "3",
+            //             "systemic_map_id": "1",
+            //             "name": "QT1 3?",
+            //             "proposal": "QT Answ 3.",
+            //             "group": 4,
+            //             "groupColor": "#dec0e5"
+            //         }, {
+            //             "id": "4",
+            //             "systemic_map_id": "1",
+            //             "name": "QT1 3?",
+            //             "proposal": "QT Answ 4.",
+            //             "group": 5,
+            //             "groupColor": "#a3b"
+            //         }
+            //         , {
+            //             "id": "5",
+            //             "systemic_map_id": "1",
+            //             "name": "QT1 5?",
+            //             "proposal": "QT Answ 5.",
+            //             "group": 4,
+            //             "groupColor": "#00ff00"
+            //         }, {
+            //             "id": "6",
+            //             "systemic_map_id": "1",
+            //             "name": "QT1 6?",
+            //             "proposal": "QT Answ 6.",
+            //             "group": 5,
+            //             "groupColor": "#0000ff"
+            //         }
+            //     ],
+            //     "links": [
+            //         {"source": 0, "target": 0, "value": 2},
+            //         {"source": 0, "target": 1, "value": 2},
+            //         {"source": 1, "target": 2, "value": 2},
+            //
+            //         {"source": 0, "target": 3, "value": 3},
+            //         {"source": 0, "target": 4, "value": 2},
+            //         {"source": 1, "target": 4, "value": 3},
+            //         {"source": 2, "target": 5, "value": 3}
+            //     ]
+            // };
+
+
             var width = document.body.clientWidth,
                 height = width,
                 circleRadius = width * 0.055,
@@ -131,7 +191,7 @@
                     .start();
             } else {
                 force.nodes(json.nodes)
-                    // .links(json.links)
+                // .links(json.links)
                     .start();
             }
 
