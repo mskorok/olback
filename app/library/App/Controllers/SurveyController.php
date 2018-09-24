@@ -8,7 +8,9 @@ use App\Model\Process;
 use App\Model\QuestionGroups;
 use App\Model\SurveyTemplate;
 use App\Model\SystemicMapItems;
+use App\Model\User;
 use App\Traits\Auth;
+use App\Traits\CheckSteps;
 use App\Traits\Surveys;
 use Phalcon\Db;
 use Phalcon\Mvc\Model\Resultset\Simple;
@@ -18,7 +20,7 @@ use App\Model\SurveyQuestion;
 
 class SurveyController extends CrudResourceController
 {
-    use Auth, Surveys;
+    use Auth, Surveys, CheckSteps;
 
     /**
      * @return mixed
@@ -713,10 +715,12 @@ class SurveyController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
-    public function availableUserSurveys()
+    public function availableUserSurveys()//todo
     {
         $creatorId = $this->getAuthenticatedId();
+        $user = $this->getAuthenticated();
         if (null === $creatorId) {
             $response = [
                 'code' => 0,
@@ -728,14 +732,16 @@ class SurveyController extends CrudResourceController
 
         $config = $this->getDI()->get(Services::CONFIG);
 
-        $sql_getProcesses = 'SELECT PR.id,PR.title, PR.`step0`, PR.`step3_0`, PR.`step3_1` FROM `process` PR '
+        $sql_getProcesses = 'SELECT PR.id, PR.title, PR.`step0`, PR.`step3_0`, PR.`step3_1`,'
+            . 'PR.`reality`, PR.`vision` FROM `process` PR '
             . 'INNER JOIN survey S ON PR.`step0`= S.id OR PR.`step3_0`= S.id OR PR.`step3_1`= S.id '
+            . 'OR PR.`reality`= S.id OR PR.`vision`= S.id '
             . 'WHERE PR.id IN (SELECT  `processId` FROM `process_departments` WHERE `departmentId` '
             . 'IN (SELECT department_id FROM user_department WHERE user_id =  ' . $creatorId . ' )) OR '
             . 'PR.id IN (SELECT  `processId` FROM `process_organizations` WHERE `organizationId` '
             . 'IN (SELECT organization_id FROM user_organization WHERE user_id =  ' . $creatorId . ' )) OR '
             . 'PR.id IN (SELECT `processId` FROM `process_users` WHERE userId = ' . $creatorId . ' ) '
-            . 'GROUP BY PR.`step0`, PR.`step3_0`, PR.`step3_1`,PR.`id`';
+            . 'GROUP BY PR.`step0`, PR.`step3_0`, PR.`step3_1`, PR.`reality`, PR.`vision`, PR.`id`';
         $connection = $this->db;
         $data = $connection->query($sql_getProcesses);
         $data->setFetchMode(Db::FETCH_ASSOC);
@@ -769,6 +775,30 @@ class SurveyController extends CrudResourceController
             $data_isCompleted_step3_1->setFetchMode(Db::FETCH_ASSOC);
             $iresults_isCompleted_step3_1 = $data_isCompleted_step3_1->fetchAll();
 
+            $sql_isCompleted_reality = 'SELECT count(A.id) as countAnswers,S.title FROM `answers` A '
+                . 'INNER JOIN survey_questions SQ ON A.questionId = SQ.id '
+                . 'INNER JOIN survey S ON SQ.survey_id = S.id  WHERE A.userId ='
+                . $config->application->admin . ' AND SQ.survey_id = '
+                . $val['reality'] . ';';
+            $data_isCompleted_reality = $connection->query($sql_isCompleted_reality);
+            $data_isCompleted_reality->setFetchMode(Db::FETCH_ASSOC);
+            $iresults_isCompleted_reality = $data_isCompleted_reality->fetchAll();
+
+            $sql_isCompleted_vision = 'SELECT count(A.id) as countAnswers,S.title FROM `answers` A '
+                . 'INNER JOIN survey_questions SQ ON A.questionId = SQ.id '
+                . 'INNER JOIN survey S ON SQ.survey_id = S.id  WHERE A.userId ='
+                . $config->application->admin . ' AND SQ.survey_id = '
+                . $val['vision'] . ';';
+            $data_isCompleted_vision = $connection->query($sql_isCompleted_vision);
+            $data_isCompleted_vision->setFetchMode(Db::FETCH_ASSOC);
+            $iresults_isCompleted_vision = $data_isCompleted_vision->fetchAll();
+
+            if ($user instanceof User) {
+                $demographicsSurvey = $this->getDemographicsSurvey($user);
+            } else {
+                throw new \RuntimeException('User not authenticated');
+            }
+
 
             $processes[] = [
                 'processId' => $val['id'],
@@ -788,6 +818,23 @@ class SurveyController extends CrudResourceController
                         'id' => $val['step3_1'],
                         'title' => $iresults_isCompleted_step3_1[0]['title'],
                         'isCompleted' => $iresults_isCompleted_step3_1[0]['countAnswers'] > 0 ? 1 : 0
+                    ],
+                    'reality' => [
+                        'id' => $val['reality'],
+                        'title' => $iresults_isCompleted_reality[0]['title'],
+                        'isCompleted' => $iresults_isCompleted_reality[0]['countAnswers'] > 0 ? 1 : 0
+                    ],
+                    'vision' => [
+                        'id' => $val['vision'],
+                        'title' => $iresults_isCompleted_vision[0]['title'],
+                        'isCompleted' => $iresults_isCompleted_vision[0]['countAnswers'] > 0 ? 1 : 0
+                    ],
+                    'demographics' => [
+                        'id' => $demographicsSurvey instanceof Survey ? $demographicsSurvey->id : null,
+                        'title' => $demographicsSurvey instanceof Survey ? $demographicsSurvey->title : '',
+                        'isCompleted' => $demographicsSurvey instanceof Survey
+                            ? $this->getDemographicsAnswers($demographicsSurvey)
+                            : false
                     ]
                 ]
             ];

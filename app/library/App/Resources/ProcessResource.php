@@ -32,31 +32,37 @@ class ProcessResource extends ApiResource
             ->endpoint(ApiEndpoint::remove())
             ->endpoint(
                 ApiEndpoint::post('/current/{id}', 'addCurrentReality')
-                    ->allow(AclRoles::MANAGER)
-                    ->allow(AclRoles::ADMINISTRATOR)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
                     ->description('Current Reality')
             )
             ->endpoint(
                 ApiEndpoint::post('/shared/{id}', 'addSharedVision')
-                    ->allow(AclRoles::MANAGER)
-                    ->allow(AclRoles::ADMINISTRATOR)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
                     ->description('Shared Vision')
             )
             ->endpoint(
                 ApiEndpoint::post('/initial/{id}', 'addInitialIntentions')
-                    ->allow(AclRoles::MANAGER)
-                    ->allow(AclRoles::ADMINISTRATOR)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
                     ->description('Initial Intentions')
             )
             ->endpoint(
                 ApiEndpoint::get('/awe/{id}', 'getActions')
-                    ->allow(AclRoles::MANAGER)
-                    ->allow(AclRoles::ADMINISTRATOR)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('Get Systemic MapI tems')
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
+                    ->description('Get Systemic Map Items')
+            )->endpoint(
+                ApiEndpoint::get('/check/step/{id}', 'checkStep')
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
+                    ->description('Check next unfilled step')
+            )->endpoint(
+                ApiEndpoint::get('/data/{id}', 'getProcessData')
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
+                    ->description('Get Full Process Data')
             );
     }
 }

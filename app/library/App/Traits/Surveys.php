@@ -8,6 +8,7 @@
 
 namespace App\Traits;
 
+use App\Constants\Services;
 use App\Model\Process;
 use App\Model\ProcessYearSurvey;
 use App\Model\Survey;
@@ -21,16 +22,18 @@ trait Surveys
 {
     protected $extra_info;
 
-    protected $evaluationSurvey = '0#3_0';
-
-    protected $aarSurvey = '3_1';
-
-    protected $currentSituationSurvey = '_CS_';
-
-    protected $visionSurvey = '_VS_';
-
     protected $processId;
 
+
+    /**
+     * @return bool
+     */
+    protected function createDemographicsSurvey(): bool//todo
+    {
+        $config = $this->getDI()->get(Services::CONFIG);
+        $config->survey->demographics;
+        return true;
+    }
 
     /**
      * @return int
@@ -42,9 +45,11 @@ trait Surveys
             $this->extra_info = 'Process = ' . $this->processId . 'Evaluation';
         }
 
+        $config = $this->getDI()->get(Services::CONFIG);
+
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $this->evaluationSurvey . '%"',
+                'conditions' => 'tag LIKE "%'. $config->survey->evaluation . '%"',
                 'bind' => [
                 ],
             ]
@@ -62,9 +67,11 @@ trait Surveys
             $this->extra_info = 'Process = ' . $this->processId . 'After Action Review';
         }
 
+        $config = $this->getDI()->get(Services::CONFIG);
+
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $this->aarSurvey . '%"',
+                'conditions' => 'tag LIKE "%'. $config->survey->aar . '%"',
                 'bind' => [
                 ],
             ]
@@ -82,9 +89,11 @@ trait Surveys
             $this->extra_info = 'Process = ' . $this->processId . 'Current Situation';
         }
 
+        $config = $this->getDI()->get(Services::CONFIG);
+
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $this->currentSituationSurvey . '%"',
+                'conditions' => 'tag LIKE "%'. $config->survey->CRS . '%"',
                 'bind' => [
                 ],
             ]
@@ -102,9 +111,11 @@ trait Surveys
             $this->extra_info = 'Process = ' . $this->processId . 'Vision';
         }
 
+        $config = $this->getDI()->get(Services::CONFIG);
+
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $this->visionSurvey . '%"',
+                'conditions' => 'tag LIKE "%'. $config->survey->VS . '%"',
                 'bind' => [
                 ],
             ]

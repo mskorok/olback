@@ -18,6 +18,7 @@ use Phalcon\Validation\Validator\Email as EmailValidator;
  * @method Collection getAnswers
  * @method Collection getGroups
  * @method Collection getOrganization
+ * @method Collection getPis
  * @method Collection getProcessUsers
  * @method Collection getSurvey
  * @method Collection getSurveyTemplates
@@ -134,6 +135,7 @@ class User extends DateTrackingModel
         $this->hasMany('id', Answer::class, 'userId', ['alias' => 'Answers']);
         $this->hasMany('id', Group::class, 'creatorId', ['alias' => 'Groups']);
         $this->hasMany('id', Organization::class, 'userId', ['alias' => 'Organization']);
+        $this->hasMany('id', Pis::class, 'user_id', ['alias' => 'Pis']);
         $this->hasMany('id', ProcessUsers::class, 'userId', ['alias' => 'ProcessUsers']);
         $this->hasMany('id', Survey::class, 'creator', ['alias' => 'Survey']);
         $this->hasMany('id', SurveyTemplate::class, 'creator', ['alias' => 'SurveyTemplates']);

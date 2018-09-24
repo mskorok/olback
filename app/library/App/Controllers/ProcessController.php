@@ -11,11 +11,46 @@ namespace App\Controllers;
 use App\Model\Process;
 use App\Model\SystemicMap;
 use App\Model\SystemicMapItems;
+use App\Model\User;
+use App\Traits\Auth;
+use App\Traits\CheckSteps;
+use App\Traits\Surveys;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 
 class ProcessController extends CrudResourceController
 {
+    use Auth, CheckSteps, Surveys;
+
+    public function getProcessData($id)
+    {
+        $process = Process::findFirst((int) $id);
+        if ($process instanceof Process) {
+            $user = $this->getAuthenticated();
+            if ($user instanceof User) {
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success',
+                    'process' => $process,
+                    'steps' => $this->getCurrentStepPositions($process, $user),
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'User not authorized'
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
+        $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => 'Process not found'
+        ];
+        return $this->createArrayResponse($response, 'data');
+    }
+
     public function addCurrentReality($id)
     {
         $process = Process::findFirst((int)$id);
@@ -110,6 +145,34 @@ class ProcessController extends CrudResourceController
             return $this->createArrayResponse($response, 'data');
         }
 
+        $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => 'Process not found'
+        ];
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function checkStep($id)
+    {
+        $process = Process::findFirst((int) $id);
+        if ($process instanceof Process) {
+            $user = $this->getAuthenticated();
+            if ($user instanceof User) {
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success',
+                    'data' => $this->getCurrentStepPositions($process, $user),
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'User not authorized'
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
         $response = [
             'code' => 0,
             'status' => 'Error',

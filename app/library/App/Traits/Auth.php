@@ -31,7 +31,7 @@ trait Auth
     }
 
     /**
-     * @return null|Model
+     * @return null|User
      *
      */
     public function getAuthenticated()
