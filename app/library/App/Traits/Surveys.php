@@ -15,6 +15,7 @@ use App\Model\Survey;
 use App\Model\SurveyQuestion;
 use App\Model\SurveyTemplate;
 use App\Model\SurveyTemplateQuestion;
+use App\Model\User;
 use Phalcon\Mvc\Model\Query\Builder;
 use Phalcon\Mvc\Model\Resultset\Simple;
 
@@ -26,12 +27,32 @@ trait Surveys
 
 
     /**
+     * @param User $user
      * @return bool
+     * @throws \RuntimeException
      */
-    protected function createDemographicsSurvey(): bool//todo
+    protected function createDemographicsSurvey(User $user): bool//todo
     {
         $config = $this->getDI()->get(Services::CONFIG);
-        $config->survey->demographics;
+        $survey = Survey::findFirst([
+            'conditions' => 'creator = ?1 AND tag = ?2',
+            'bind' => [
+                1 => $user->id,
+                2 => $config->application->survey->demographics,
+            ],
+        ]);
+        if (!($survey instanceof Survey)) {
+            $this->extra_info = 'User = ' . $user->id . ' Demographics';
+            $surveyTemplate = SurveyTemplate::findFirst(
+                [
+                    'conditions' => 'tag LIKE "%'. $config->application->survey->demographics . '%"',
+                    'bind' => [
+                    ],
+                ]
+            );
+            return $this->_createSurvey($surveyTemplate);
+        }
+
         return true;
     }
 
@@ -42,14 +63,14 @@ trait Surveys
     protected function createEvaluationSurvey(): int
     {
         if ($this->extra_info === null) {
-            $this->extra_info = 'Process = ' . $this->processId . 'Evaluation';
+            $this->extra_info = 'Process = ' . $this->processId . ' Evaluation';
         }
 
         $config = $this->getDI()->get(Services::CONFIG);
 
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $config->survey->evaluation . '%"',
+                'conditions' => 'tag LIKE "%'. $config->application->survey->evaluation . '%"',
                 'bind' => [
                 ],
             ]
@@ -64,14 +85,14 @@ trait Surveys
     protected function createAfterActionReviewSurvey(): int
     {
         if ($this->extra_info === null) {
-            $this->extra_info = 'Process = ' . $this->processId . 'After Action Review';
+            $this->extra_info = 'Process = ' . $this->processId . ' After Action Review';
         }
 
         $config = $this->getDI()->get(Services::CONFIG);
 
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $config->survey->aar . '%"',
+                'conditions' => 'tag LIKE "%'. $config->application->survey->aar . '%"',
                 'bind' => [
                 ],
             ]
@@ -86,14 +107,14 @@ trait Surveys
     protected function createCurrentSituationSurvey(): int
     {
         if ($this->extra_info === null) {
-            $this->extra_info = 'Process = ' . $this->processId . 'Current Situation';
+            $this->extra_info = 'Process = ' . $this->processId . ' Current Situation';
         }
 
         $config = $this->getDI()->get(Services::CONFIG);
 
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $config->survey->CRS . '%"',
+                'conditions' => 'tag LIKE "%'. $config->application->survey->CRS . '%"',
                 'bind' => [
                 ],
             ]
@@ -108,14 +129,14 @@ trait Surveys
     protected function createVisionSurvey(): int
     {
         if ($this->extra_info === null) {
-            $this->extra_info = 'Process = ' . $this->processId . 'Vision';
+            $this->extra_info = 'Process = ' . $this->processId . ' Vision';
         }
 
         $config = $this->getDI()->get(Services::CONFIG);
 
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $config->survey->VS . '%"',
+                'conditions' => 'tag LIKE "%'. $config->application->survey->VS . '%"',
                 'bind' => [
                 ],
             ]
@@ -132,6 +153,7 @@ trait Surveys
         $surveyQuestion->description = $data->description;
         $surveyQuestion->answered_type = $data->answered_type;
         $surveyQuestion->question_order = $data->question_order;
+        $surveyQuestion->question_group_id = $data->question_group_id;
         $surveyQuestion->survey_id = $id;
         return $surveyQuestion;
     }
@@ -213,10 +235,12 @@ trait Surveys
         if (!$this->_checkYear($year, $yearSurveys)) {
             $yearSurvey = new ProcessYearSurvey();
 
-            $this->extra_info = 'Year Survey';
+            $this->extra_info = 'Year Survey Evaluation' . $year->format('Y-m-d');
             $yearSurvey->process_id = $process->id;
             $yearSurvey->survey_id = $this->createEvaluationSurvey();
+            $this->extra_info = 'Year Survey CRS' . $year->format('Y-m-d');
             $yearSurvey->reality = $this->createCurrentSituationSurvey();
+            $this->extra_info = 'Year Survey VS' . $year->format('Y-m-d');
             $yearSurvey->vision = $this->createVisionSurvey();
             $yearSurvey->date = $year->format('Y-m-d H:i:s');
             if (!$yearSurvey->save()) {
@@ -263,8 +287,9 @@ trait Surveys
                 $survey->tag = $surveyTemplate->tag;
             }
             $survey->extra_info = $this->extra_info ?: $surveyTemplate->extra_info;
-
+            $this->extra_info = null;
             if ($survey->save()) {
+                $this->extra_info = null;
                 $survey->refresh();
                 /** @var Simple $surveyTemplateQuestions */
                 $surveyTemplateQuestions = SurveyTemplateQuestion::find(
@@ -284,9 +309,13 @@ trait Surveys
                 }
                 return $survey->id;
             }
-
-            throw new \RuntimeException('Survey not saved template_id=' . $surveyTemplate->id);
+            $this->extra_info = null;
+            throw new \RuntimeException(
+                'Survey not saved template_id=' . $surveyTemplate->id
+                . ' messages = ' . serialize($survey->getMessages())
+            );
         }
+        $this->extra_info = null;
         throw new \RuntimeException('Survey template not found');
     }
 

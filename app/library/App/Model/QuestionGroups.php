@@ -14,6 +14,7 @@ use Phalcon\Mvc\Model;
  * @date 2018-08-03, 07:39:01
  * @method Collection getSurveyQuestions
  * @method Collection getSurveyTemplatesQuestions
+ * @method Collection getOptionAnswer
  */
 class QuestionGroups extends Model
 {

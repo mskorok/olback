@@ -22,6 +22,11 @@ class ProcessController extends CrudResourceController
 {
     use Auth, CheckSteps, Surveys;
 
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \RuntimeException
+     */
     public function getProcessData($id)
     {
         $process = Process::findFirst((int) $id);
@@ -153,6 +158,11 @@ class ProcessController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \RuntimeException
+     */
     public function checkStep($id)
     {
         $process = Process::findFirst((int) $id);

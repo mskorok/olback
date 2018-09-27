@@ -24,6 +24,7 @@ trait CheckSteps
      * @param Process $process
      * @param User $user
      * @return array
+     * @throws \RuntimeException
      */
     protected function getCurrentStepPositions(Process $process, User $user): array
     {
@@ -35,11 +36,8 @@ trait CheckSteps
             ],
         ]);
 
-        $demographicsSurvey = $this->getDemographicsSurvey($user);
 
-        $hasDemographics = $demographicsSurvey instanceof Survey
-            ? $this->getDemographicsAnswers($demographicsSurvey)
-            : false;
+        $hasDemographics = $this->checkDemographics($user);
 
         $hasInitial = false;
         $hasCRS = false;
@@ -71,7 +69,8 @@ trait CheckSteps
             'hasCRS' => $hasCRS,
             'hasVS' => $hasVS,
             'hasEvaluation' => $hasEvaluation,
-            'hasAAR' => $hasAAR
+            'hasAAR' => $hasAAR,
+            'demographicsSurvey' => $this->getDemographicsSurvey($user)
         ];
     }
 
@@ -83,17 +82,17 @@ trait CheckSteps
     protected function checkDemographics(User $user): bool
     {
         $config = $this->getDI()->get(Services::CONFIG);
-        $surveys = Survey::findFirst([
+        $survey = Survey::findFirst([
             'conditions' => 'creator = ?1 AND tag = ?2',
             'bind' => [
                 1 => $user->id,
-                2 => $config->survey->demographics,
+                2 => $config->application->survey->demographics,
             ],
         ]);
-        if ($surveys instanceof Survey) {
+        if ($survey instanceof Survey) {
             return true;
         }
-        if ($this->createDemographicsSurvey()) {
+        if ($this->createDemographicsSurvey($user)) {
             return false;
         }
         throw new \RuntimeException('Demographics Survey not created');
@@ -175,7 +174,7 @@ trait CheckSteps
 
         /** @var Simple $result */
         $result = $query->getQuery()->execute();
-        return $result->count() === (int)$config->survey->demographics;
+        return $result->count() === (int)$config->application->survey->demographics;
     }
 
     /**
@@ -190,7 +189,7 @@ trait CheckSteps
             'conditions' => 'creator = ?1 AND tag = ?2',
             'bind' => [
                 1 => $user->id,
-                2 => $config->survey->demographics,
+                2 => $config->application->survey->demographics,
             ],
         ]);
     }

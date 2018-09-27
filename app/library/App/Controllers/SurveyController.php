@@ -2,8 +2,10 @@
 
 namespace App\Controllers;
 
+use App\Constants\AclRoles;
 use App\Constants\Services;
 use App\Model\Answer;
+use App\Model\OptionAnswer;
 use App\Model\Process;
 use App\Model\QuestionGroups;
 use App\Model\SurveyTemplate;
@@ -292,6 +294,8 @@ class SurveyController extends CrudResourceController
             return $this->createArrayResponse($response, 'data');
         }
 
+        $config = $this->getDI()->get(Services::CONFIG);
+
         $survey = Survey::findFirst((int) $id);
 
         if ($survey instanceof Survey) {
@@ -320,15 +324,40 @@ class SurveyController extends CrudResourceController
             );
 
 
+            $user = User::findFirst((int) $creatorId);
             $groups = [];
             $flag = 0;
             /** @var SurveyQuestion $item */
             foreach ($surveyQuestion as $item) {
                 if ($item->question_group_id !== null && $flag < $item->question_group_id) {
                     $flag = $item->question_group_id;
-                    $groups[$item->id] = [$item->id, 'name' => $item->getQuestionGroup()->name];
+                    $role = $user->role === AclRoles::ADMINISTRATOR || $user->role === AclRoles::MANAGER
+                        ? AclRoles::MANAGER
+                        : AclRoles::USER;
+//                    $options = OptionAnswer::query()
+//                        ->where('group_id = :id:')
+//                        ->andWhere('role = :role:')
+//                        ->bind([
+//                            'id' => $item->question_group_id,
+//                            'role' => $role
+//                        ])
+//                        ->execute();
+                    $options = OptionAnswer::find([
+                        'conditions' => 'group_id = :id: AND role = :role:',
+                        'bind' => [
+                            'id' => $item->question_group_id,
+                            'role' => $role
+                        ]
+                    ]);
+                    $groups[$item->id] = [
+                        $item->id,
+                        'name' => $item->getQuestionGroup()->name,
+                        'options' => $options,
+                        'group' => $item->question_group_id,
+                        'role' => $role
+                    ];
                 } else {
-                    $groups[$item->id] = ['id' => $item->id, 'name' => ''];
+                    $groups[$item->id] = ['id' => $item->id, 'name' => '', 'options' =>[]];
                 }
             }
 
@@ -339,6 +368,8 @@ class SurveyController extends CrudResourceController
                 'groups' => $groups,
                 'process' => $process,
                 'isActionAAR' => !($process instanceof Process)
+                    && $survey->tag !== $config->application->survey->demographics,
+                'isDemographics' => $survey->tag === $config->application->survey->demographics
             ];
         } else {
             $response = [
@@ -422,6 +453,7 @@ class SurveyController extends CrudResourceController
             $this->processId = $process->id;
             //create step0 (initial survey)
             try {
+                $this->extra_info = 'Process = ' . $this->processId . ' Initial';
                 $step0_ID = $this->createEvaluationSurvey();
             } catch (\RuntimeException $exception) {
                 $response = [
@@ -647,7 +679,7 @@ class SurveyController extends CrudResourceController
         $creator = static::getUserDetails($creatorId);
 
         $organization = $creator['organization']->organization_id;
-        $sql = 'SELECT questionId,question,answer,question_order,survey_id,userId FROM survey S '
+        $sql = 'SELECT questionId, question, answer, question_order, survey_id, userId FROM survey S '
             . 'INNER JOIN survey_questions SQ ON S.id = SQ.survey_id  LEFT JOIN answers A ON SQ.id = A.questionId '
             . 'WHERE S.organization_id = ' . $organization . ' AND S.id = ' . $id . '  ';
         $connection = $this->db;

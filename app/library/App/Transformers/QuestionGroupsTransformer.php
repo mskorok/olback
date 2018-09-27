@@ -11,7 +11,7 @@ class QuestionGroupsTransformer extends ModelTransformer
     {
         $this->modelClass = QuestionGroups::class;
         $this->availableIncludes = [
-            'SurveyQuestions', 'SurveyTemplatesQuestions'
+            'SurveyQuestions', 'SurveyTemplatesQuestions', 'OptionAnswer'
         ];
     }
 
@@ -23,5 +23,10 @@ class QuestionGroupsTransformer extends ModelTransformer
     public function includeSurveyTemplatesQuestions(QuestionGroups $model)
     {
         return $this->collection($model->getSurveyTemplatesQuestions(), new SurveyTemplatesQuestionsTransformer());
+    }
+
+    public function includeOptionAnswer(QuestionGroups $model)
+    {
+        return $this->collection($model->getOptionAnswer(), new OptionAnswerTransformer());
     }
 }
