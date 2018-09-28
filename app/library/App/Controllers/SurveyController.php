@@ -296,7 +296,7 @@ class SurveyController extends CrudResourceController
 
         $config = $this->getDI()->get(Services::CONFIG);
 
-        $survey = Survey::findFirst((int) $id);
+        $survey = Survey::findFirst((int)$id);
 
         if ($survey instanceof Survey) {
             $process = $survey->getProcess0();
@@ -324,7 +324,7 @@ class SurveyController extends CrudResourceController
             );
 
 
-            $user = User::findFirst((int) $creatorId);
+            $user = User::findFirst((int)$creatorId);
             $groups = [];
             $flag = 0;
             /** @var SurveyQuestion $item */
@@ -357,7 +357,7 @@ class SurveyController extends CrudResourceController
                         'role' => $role
                     ];
                 } else {
-                    $groups[$item->id] = ['id' => $item->id, 'name' => '', 'options' =>[]];
+                    $groups[$item->id] = ['id' => $item->id, 'name' => '', 'options' => []];
                 }
             }
 
@@ -369,7 +369,8 @@ class SurveyController extends CrudResourceController
                 'process' => $process,
                 'isActionAAR' => !($process instanceof Process)
                     && $survey->tag !== $config->application->survey->demographics,
-                'isDemographics' => $survey->tag === $config->application->survey->demographics
+                'isDemographics' => $survey->tag === $config->application->survey->demographics,
+                'survey' => $survey
             ];
         } else {
             $response = [
@@ -382,8 +383,9 @@ class SurveyController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
-    public function createAnswer()
+    public function createAnswer($id)
     {
         $creatorId = $this->getAuthenticatedId();
         if (null === $creatorId) {
@@ -399,6 +401,13 @@ class SurveyController extends CrudResourceController
 
         $data = $this->request->getJsonRawBody();
 
+        $survey = Survey::findFirst((int)$id);
+
+        if (!($survey instanceof Survey)) {
+            throw new \RuntimeException('Survey not found');
+        }
+
+        $config = $this->getDI()->get(Services::CONFIG)->application->survey;
 
         foreach ($data as $answer) {
             $oldAnswer = Answer::findFirst([
@@ -407,7 +416,12 @@ class SurveyController extends CrudResourceController
                     1 => $answer->questionId
                 ],
             ]);
-            $answerModel = $oldAnswer instanceof Answer ? $oldAnswer : new Answer();
+            if (\in_array($survey->tag, [$config->evaluation, $config->aar], true)) {
+                $answerModel = new Answer();
+            } else {
+                $answerModel = $oldAnswer instanceof Answer ? $oldAnswer : new Answer();
+            }
+
             $answerModel->answer = $answer->answer;
             $answerModel->userId = $creator['account']->id;
             $answerModel->questionId = $answer->questionId;
@@ -454,7 +468,7 @@ class SurveyController extends CrudResourceController
             //create step0 (initial survey)
             try {
                 $this->extra_info = 'Process = ' . $this->processId . ' Initial';
-                $step0_ID = $this->createEvaluationSurvey();
+                $step0_ID = $this->createInitSurvey();
             } catch (\RuntimeException $exception) {
                 $response = [
                     'code' => 0,
@@ -513,7 +527,6 @@ class SurveyController extends CrudResourceController
             }
 
 
-
             //update process
             $process->step0 = $step0_ID;
             $process->step3_0 = $step3_0_ID;
@@ -560,7 +573,7 @@ class SurveyController extends CrudResourceController
 
     public function createActionAAR($id)
     {
-        $action = SystemicMapItems::findFirst((int) $id);
+        $action = SystemicMapItems::findFirst((int)$id);
 
         if (!($action instanceof SystemicMapItems)) {
             $response = [
@@ -572,7 +585,7 @@ class SurveyController extends CrudResourceController
         }
 
         try {
-            $this->extra_info = 'Action id = '.$action->id.' After Action Review for actions';
+            $this->extra_info = 'Action id = ' . $action->id . ' After Action Review for actions';
             $surveyId = $this->createAfterActionReviewSurvey();
         } catch (\RuntimeException $exception) {
             $response = [
@@ -607,7 +620,7 @@ class SurveyController extends CrudResourceController
      */
     public function changeProcessStatus($id)
     {
-        $proc = Process::findFirst((int) $id);
+        $proc = Process::findFirst((int)$id);
 
         $statusDesc = 'stopped';
         if ($proc instanceof Process) {

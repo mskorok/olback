@@ -82,6 +82,28 @@ trait Surveys
      * @return int
      * @throws \RuntimeException
      */
+    protected function createInitSurvey(): int
+    {
+        if ($this->extra_info === null) {
+            $this->extra_info = 'Process = ' . $this->processId . ' Evaluation';
+        }
+
+        $config = $this->getDI()->get(Services::CONFIG);
+
+        $surveyTemplate = SurveyTemplate::findFirst(
+            [
+                'conditions' => 'tag LIKE "%'. $config->application->survey->init . '%"',
+                'bind' => [
+                ],
+            ]
+        );
+        return $this->_createSurvey($surveyTemplate);
+    }
+
+    /**
+     * @return int
+     * @throws \RuntimeException
+     */
     protected function createAfterActionReviewSurvey(): int
     {
         if ($this->extra_info === null) {

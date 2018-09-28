@@ -48,6 +48,29 @@ trait Auth
     }
 
     /**
+     * @return UserOrganization|null|Model\ResultInterface
+     */
+    public function getAuthOrganization()
+    {
+        $user = $this->getAuthenticated();
+        if ($user instanceof User) {
+            $organization = UserOrganization::findFirst(
+                [
+                    'conditions' => 'user_id = ?1',
+                    'bind' => [
+                        1 => $user->id,
+                    ],
+                ]
+            );
+
+            if ($organization instanceof UserOrganization) {
+                return $organization;
+            }
+        }
+        return null;
+    }
+
+    /**
      * @param $userId
      * @return array|null
      */

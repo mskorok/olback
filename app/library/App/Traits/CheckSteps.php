@@ -76,6 +76,7 @@ trait CheckSteps
 
     /**
      * @param User $user
+     *
      * @return bool
      * @throws \RuntimeException
      */
@@ -90,7 +91,7 @@ trait CheckSteps
             ],
         ]);
         if ($survey instanceof Survey) {
-            return true;
+            return $this->getDemographicsAnswers($survey);
         }
         if ($this->createDemographicsSurvey($user)) {
             return false;
@@ -174,7 +175,7 @@ trait CheckSteps
 
         /** @var Simple $result */
         $result = $query->getQuery()->execute();
-        return $result->count() === (int)$config->application->survey->demographics;
+        return $result->count() === (int) $config->application->survey->demographicsCount;
     }
 
     /**
@@ -199,6 +200,7 @@ trait CheckSteps
      * @param User $user
      * @param $step
      * @return bool
+     *
      */
     private function _checkQuery(Process $process, User $user, $step): bool
     {
@@ -228,6 +230,26 @@ trait CheckSteps
         $query->andWhere('[Process].[id] = :pid:', ['pid' => $process->id]);
         /** @var Simple $result */
         $result = $query->getQuery()->execute();
-        return $result->count() !== 0;
+        $config = $this->getDI()->get(Services::CONFIG);
+        switch ($step) {
+            case 'step0':
+                $res = $result->count() === (int) $config->application->survey->initCount;
+                break;
+            case 'reality':
+                $res = $result->count() === (int) $config->application->survey->realityCount;
+                break;
+            case 'vision':
+                $res = $result->count() === (int) $config->application->survey->visionCount;
+                break;
+            case 'step3_0':
+                $res = $result->count() >= (int) $config->application->survey->evaluationCount;
+                break;
+            case 'step3_1':
+                $res = $result->count() >= (int) $config->application->survey->aarCount;
+                break;
+            default:
+                $res = false;
+        }
+        return $res;
     }
 }

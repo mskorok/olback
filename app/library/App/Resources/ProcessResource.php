@@ -4,7 +4,6 @@ namespace App\Resources;
 
 use App\Constants\AclRoles;
 use App\Controllers\ProcessController;
-use PhalconApi\Constants\PostedDataMethods;
 use PhalconRest\Api\ApiEndpoint;
 use PhalconRest\Api\ApiResource;
 use App\Model\Process;
@@ -52,7 +51,12 @@ class ProcessResource extends ApiResource
                 ApiEndpoint::get('/awe/{id}', 'getActions')
                     ->allow(AclRoles::USER)
                     ->deny(AclRoles::UNAUTHORIZED)
-                    ->description('Get Systemic Map Items')
+                    ->description('Get Actions for Awesomplete')
+            )->endpoint(
+                ApiEndpoint::get('/pis/{id}', 'createPIS')
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
+                    ->description('Create PIS')
             )->endpoint(
                 ApiEndpoint::get('/check/step/{id}', 'checkStep')
                     ->allow(AclRoles::USER)

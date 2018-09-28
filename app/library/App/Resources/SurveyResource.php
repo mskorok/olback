@@ -71,7 +71,7 @@ class SurveyResource extends ApiResource
                 ->description('update survey')
             )
             ->endpoint(
-                ApiEndpoint::post('/answers', 'createAnswer')
+                ApiEndpoint::post('/answers/{id}', 'createAnswer')
                 ->allow(AclRoles::MANAGER)
                 ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                 ->description('create answer')

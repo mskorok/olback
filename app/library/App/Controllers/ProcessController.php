@@ -8,6 +8,7 @@
 
 namespace App\Controllers;
 
+use App\Model\Pis;
 use App\Model\Process;
 use App\Model\SystemicMap;
 use App\Model\SystemicMapItems;
@@ -173,6 +174,44 @@ class ProcessController extends CrudResourceController
                     'code' => 1,
                     'status' => 'Success',
                     'data' => $this->getCurrentStepPositions($process, $user),
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'User not authorized'
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
+        $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => 'Process not found'
+        ];
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function createPIS($id)
+    {
+        $process = Process::findFirst((int) $id);
+        if ($process instanceof Process) {
+            $user = $this->getAuthenticated();
+            if ($user instanceof User) {
+                $pis = new Pis();
+                $pis->process_id = $process->id;
+                $pis->user_id = $user->id;
+                if ($pis->save()) {
+                    $response = [
+                        'code' => 1,
+                        'status' => 'Success',
+                    ];
+                    return $this->createArrayResponse($response, 'data');
+                }
+                $response = [
+                    'code' => 0,
+                    'status' => 'Error',
+                    'data' => 'PIS'
                 ];
                 return $this->createArrayResponse($response, 'data');
             }
