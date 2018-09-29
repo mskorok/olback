@@ -24,9 +24,9 @@ class ProcessTransformer extends ModelTransformer
             'SystemicMap',
             'SystemicStructureMap',
             'Organization',
-            'Survey0',
-            'Survey30',
-            'Survey31',
+            'SurveyInitial',
+            'SurveyEvaluation',
+            'SurveyAAR',
             'Reality',
             'Vision'
         ];
@@ -67,19 +67,19 @@ class ProcessTransformer extends ModelTransformer
         return $this->collection($model->getOrganization(), new OrganizationTransformer());
     }
 
-    public function includeSurvey0(Process $model)
+    public function includeSurveyInitial(Process $model)
     {
-        return $this->item($model->getSurvey0(), new SurveyTransformer());
+        return $this->item($model->getSurveyInitial(), new SurveyTransformer());
     }
 
-    public function includeSurvey30(Process $model)
+    public function includeSurveyEvaluation(Process $model)
     {
-        return $this->item($model->getSurvey30(), new SurveyTransformer());
+        return $this->item($model->getSurveyEvaluation(), new SurveyTransformer());
     }
 
-    public function includeSurvey31(Process $model)
+    public function includeSurveyAAR(Process $model)
     {
-        return $this->item($model->getSurvey31(), new SurveyTransformer());
+        return $this->item($model->getSurveyAAR(), new SurveyTransformer());
     }
 
     public function includeReality(Process $model)

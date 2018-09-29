@@ -382,6 +382,7 @@ class SurveyController extends CrudResourceController
     }
 
     /**
+     * @param $id
      * @return mixed
      * @throws \RuntimeException
      */

@@ -3,15 +3,19 @@
 namespace App\Controllers;
 
 use App\Constants\AclRoles;
+use App\Model\Organization;
+use App\Model\Process;
 use App\Model\User;
 use App\Traits\Auth;
 use App\Traits\Processes;
+use App\Traits\Stats;
 use Phalcon\Db;
+use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CollectionController;
 
 class StatisticsController extends CollectionController
 {
-    use Auth, Processes;
+    use Auth, Processes, Stats;
 
     /**
      * @return mixed
@@ -46,8 +50,8 @@ class StatisticsController extends CollectionController
 // GROUP BY status
 
         $sql_dist_org = 'SELECT COUNT(id) as count, '
-            . 'CASE WHEN status = 0 THEN "stopped" ELSE "running" END as status FROM `process` WHERE organizationId = '
-            . $organization . ' GROUP BY status';
+            . '(CASE WHEN status = 0 THEN "stopped" ELSE "running" END) as status '
+            . 'FROM `process` WHERE organizationId = ' . $organization . ' GROUP BY status';
         $data_dist_org = $connection->query($sql_dist_org);
         $data_dist_org->setFetchMode(Db::FETCH_ASSOC);
         $countOrganizations = $data_dist_org->fetchAll();
@@ -99,7 +103,7 @@ class StatisticsController extends CollectionController
         $data_dist_answer->setFetchMode(Db::FETCH_ASSOC);
         $countAnswers = $data_dist_answer->fetchAll();
 
-        $sql_dist_GROUP = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals,QG.name '
+        $sql_dist_GROUP = 'SELECT ROUND(AVG(answer)-3,2) as average, COUNT(A.id)as totals, QG.name '
             . 'FROM `answers` A INNER JOIN survey_questions SQ ON A.questionId = SQ.id '
             . 'INNER JOIN survey S ON S.id = SQ.survey_id INNER JOIN question_group QG ON QG.id = SQ.question_group_id '
             . 'WHERE SQ.answered_type = 2 AND S.id = '.$id.' GROUP BY SQ.question_group_id ';
@@ -177,5 +181,37 @@ class StatisticsController extends CollectionController
         ];
 
         return $this->createArrayResponse($response, 'data');
+    }
+
+
+    /**
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    public function getDashboardIndices()
+    {
+        $user = $this->getAuthenticated();
+        if ($user instanceof User) {
+            $organization = $user->getOrganization();
+            if ($organization instanceof Organization) {
+                /** @var Simple $processes */
+                $processes = $organization->getProcess();
+                $results = [];
+                /** @var Process $process */
+                foreach ($processes as $process) {
+                    $indexCompare = $this->getOlsetIndexCompare($process);
+                    $userCompare = $this->getParticipatedUsersCompare($process);
+                    $results = ['index' => $indexCompare, 'user' => $userCompare];
+                }
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success',
+                    'data' => $results,
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+            throw new \RuntimeException('Organization not found');
+        }
+        throw new  \RuntimeException('User not authorized');
     }
 }

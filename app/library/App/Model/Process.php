@@ -20,9 +20,9 @@ use League\Fractal\Resource\Collection;
  * @method Collection getSystemicMap
  * @method Collection getSystemicStructureMap
  * @method Collection getOrganization
- * @method Survey getSurvey0
- * @method Survey getSurvey30
- * @method Survey getSurvey31
+ * @method Survey getSurveyInitial
+ * @method Survey getSurveyEvaluation
+ * @method Survey getSurveyAAR
  * @method Survey getReality
  * @method Survey getVision
  */
@@ -144,9 +144,9 @@ class Process extends DateTrackingModel
         $this->hasMany('id', SystemicMap::class, 'processId', ['alias' => 'SystemicMap']);
         $this->hasMany('id', SystemicStructureMap::class, 'processId', ['alias' => 'SystemicStructureMap']);
         $this->belongsTo('organizationId', Organization::class, 'id', ['alias' => 'Organization']);
-        $this->belongsTo('step0', Survey::class, 'id', ['alias' => 'Survey0']);
-        $this->belongsTo('step3_0', Survey::class, 'id', ['alias' => 'Survey30']);
-        $this->belongsTo('step3_1', Survey::class, 'id', ['alias' => 'Survey31']);
+        $this->belongsTo('step0', Survey::class, 'id', ['alias' => 'SurveyInitial']);
+        $this->belongsTo('step3_0', Survey::class, 'id', ['alias' => 'SurveyEvaluation']);
+        $this->belongsTo('step3_1', Survey::class, 'id', ['alias' => 'SurveyAAR']);
         $this->belongsTo('reality', Survey::class, 'id', ['alias' => 'Reality']);
         $this->belongsTo('vision', Survey::class, 'id', ['alias' => 'Vision']);
     }
