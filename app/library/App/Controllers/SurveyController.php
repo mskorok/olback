@@ -13,6 +13,8 @@ use App\Model\SystemicMapItems;
 use App\Model\User;
 use App\Traits\Auth;
 use App\Traits\CheckSteps;
+use App\Traits\Processes;
+use App\Traits\Stats;
 use App\Traits\Surveys;
 use Phalcon\Db;
 use Phalcon\Mvc\Model\Resultset\Simple;
@@ -22,7 +24,7 @@ use App\Model\SurveyQuestion;
 
 class SurveyController extends CrudResourceController
 {
-    use Auth, Surveys, CheckSteps;
+    use Auth, Surveys, CheckSteps, Stats, Processes;
 
     /**
      * @return mixed
@@ -845,10 +847,18 @@ class SurveyController extends CrudResourceController
                 throw new \RuntimeException('User not authenticated');
             }
 
+            $process = Process::findFirst((int) $val['id']);
+            if (!$this->processFinished($process)) {
+                continue;
+            }
 
             $processes[] = [
                 'processId' => $val['id'],
                 'process_title' => $val['title'],
+                'process' => $process,
+                'index' => $this->getOlsetIndexesCompare($process),
+                'user' => $this->getParticipatedUsersCompare($process),
+                'absolute' => $this->getAbsoluteOlsetIndexCompare($process),
                 'surveys' => [
                     'step0' => [
                         'id' => $val['step0'],

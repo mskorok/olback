@@ -47,7 +47,7 @@ class UserTransformer extends ModelTransformer
 
     public function includeOrganization(User $model)
     {
-        return $this->collection($model->getOrganization(), new OrganizationTransformer());
+        return $this->item($model->getOrganization(), new OrganizationTransformer());
     }
 
     public function includeProcessUsers(User $model)

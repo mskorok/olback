@@ -22,6 +22,20 @@ trait CheckSteps
 {
     /**
      * @param Process $process
+     * @return bool
+     * @throws \RuntimeException
+     */
+    protected function processFinished(Process $process): bool
+    {
+        $user = $this->getAuthenticated();
+        if ($user instanceof User) {
+            return $this->checkEvaluation($process, $user);
+        }
+        throw new \RuntimeException('User not authenticated');
+    }
+
+    /**
+     * @param Process $process
      * @param User $user
      * @return array
      * @throws \RuntimeException

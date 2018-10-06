@@ -62,7 +62,7 @@ class SurveyResource extends ApiResource
                 ApiEndpoint::get('/getAvailableSurveys', 'availableUserSurveys')
                 ->allow(AclRoles::MANAGER)
                 ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                ->description('getAvailableSurveys')
+                ->description('Get Available Surveys Data')
             )
             ->endpoint(
                 ApiEndpoint::put('/{id}', 'updateSurveyDefinition')

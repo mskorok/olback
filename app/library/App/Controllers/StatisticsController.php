@@ -33,14 +33,15 @@ class StatisticsController extends CollectionController
         }
         $creator = static::getUserDetails($creatorId);
 
-        $process = $this->getProcessByUser($creator['account']);
+        $process = $this->getFirstProcessByUser($creator['account']);
 
-        $organization = $creator['organization']->organization_id;
+
+        $organizationId = $creator['organization']->organization_id;
         $connection = $this->db;
         $sql_dist = 'SELECT COUNT(U.id) AS count, role FROM `user` U '
             . 'INNER JOIN user_organization UO ON U.id = UO.user_id '
             . 'WHERE (U.role = \'' . AclRoles::MANAGER . '\' OR U.role = \'' . AclRoles::USER
-            . '\' ) AND UO.organization_id = '.$organization
+            . '\' ) AND UO.organization_id = '.$organizationId
             .' GROUP BY role';
         $data_dist = $connection->query($sql_dist);
         $data_dist->setFetchMode(Db::FETCH_ASSOC);
@@ -51,10 +52,28 @@ class StatisticsController extends CollectionController
 
         $sql_dist_org = 'SELECT COUNT(id) as count, '
             . '(CASE WHEN status = 0 THEN "stopped" ELSE "running" END) as status '
-            . 'FROM `process` WHERE organizationId = ' . $organization . ' GROUP BY status';
+            . 'FROM `process` WHERE organizationId = ' . $organizationId . ' GROUP BY status';
         $data_dist_org = $connection->query($sql_dist_org);
         $data_dist_org->setFetchMode(Db::FETCH_ASSOC);
         $countOrganizations = $data_dist_org->fetchAll();
+
+        /** @var Organization $organization */
+        $organization = Organization::findFirst((int) $organizationId);
+
+
+        $processes = $organization instanceof Organization ? $organization->getProcess() : [];
+
+        $statusRunningCount = 0;
+        $statusStoppedCount = 0;
+
+        /** @var Process $model */
+        foreach ($processes as $model) {
+            if ((int)$model->status === 1) {
+                $statusRunningCount++;
+            } else {
+                $statusStoppedCount++;
+            }
+        }
 
         $response = [
             'code' => 1,
@@ -62,7 +81,9 @@ class StatisticsController extends CollectionController
             'data' => [
                 'count_users' => $countUsers,
                 'count_organizations' => $countOrganizations,
-                'process' => $process
+                'process' => $process,
+                'running' => $statusRunningCount,
+                'stopped' => $statusStoppedCount
             ],
         ];
 
@@ -199,14 +220,19 @@ class StatisticsController extends CollectionController
                 $results = [];
                 /** @var Process $process */
                 foreach ($processes as $process) {
-                    $indexCompare = $this->getOlsetIndexCompare($process);
-                    $userCompare = $this->getParticipatedUsersCompare($process);
-                    $results = ['index' => $indexCompare, 'user' => $userCompare];
+                    $results[] = [
+                        'process' => $process,
+                        'index' => $this->getOlsetIndexesCompare($process),
+                        'user' => $this->getParticipatedUsersCompare($process),
+                        'absolute' => $this->getAbsoluteOlsetIndexCompare($process)
+                    ];
                 }
                 $response = [
                     'code' => 1,
                     'status' => 'Success',
                     'data' => $results,
+                    'organization' => $organization,
+                    'user' => $user
                 ];
                 return $this->createArrayResponse($response, 'data');
             }

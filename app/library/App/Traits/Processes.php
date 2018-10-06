@@ -23,7 +23,7 @@ trait Processes
      * @param User $user
      * @return ModelInterface | null
      */
-    public function getProcessByUser(User $user)
+    public function getFirstProcessByUser(User $user)
     {
         $query = new Builder();
         $query->addFrom(Process::class, 'Process');

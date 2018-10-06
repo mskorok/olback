@@ -22,29 +22,49 @@ trait Stats
 {
     /**
      * @param Process $process
-     * @return int
+     * @return float
      * @throws \RuntimeException
      */
-    protected function getOlsetIndexCompare(Process $process): int
+    protected function getOlsetIndexesCompare(Process $process): float
     {
         $initialSurvey = $process->getSurveyInitial();
         $evaluationSurvey = $process->getSurveyEvaluation();
         $answersCount = $this->getEvaluationSurveyAnswersCount($evaluationSurvey);
         if ($answersCount > 1) {
-            $answers = $this->getIndexDiffFromEvaluationSurvey($evaluationSurvey);
+            $diff = $this->getIndexDiffFromEvaluationSurvey($evaluationSurvey);
         } elseif ($answersCount === 0) {
-            $answers = 0;
+            $diff = 0;
         } else {
-            $answers = $this->getIndexDiffFromSurveys($initialSurvey, $evaluationSurvey);
+            $diff = $this->getIndexDiffFromSurveys($initialSurvey, $evaluationSurvey);
         }
-        return $answers;
+        return $diff;
     }
 
     /**
      * @param Process $process
-     * @return int
+     * @return float
+     * @throws \RuntimeException
      */
-    protected function getParticipatedUsersCompare(Process $process): int
+    protected function getAbsoluteOlsetIndexCompare(Process $process): float
+    {
+        $initialSurvey = $process->getSurveyInitial();
+        $evaluationSurvey = $process->getSurveyEvaluation();
+        $answersCount = $this->getEvaluationSurveyAnswersCount($evaluationSurvey);
+        if ($answersCount > 1) {
+            $ratio = $this->getIndexRatioFromEvaluationSurvey($evaluationSurvey);
+        } elseif ($answersCount === 0) {
+            $ratio = 0;
+        } else {
+            $ratio = $this->getIndexRatioFromSurveys($initialSurvey, $evaluationSurvey);
+        }
+        return $ratio;
+    }
+
+    /**
+     * @param Process $process
+     * @return float
+     */
+    protected function getParticipatedUsersCompare(Process $process): float
     {
         /** @var Organization $organization */
         $organization = $process->getOrganization();
@@ -73,14 +93,14 @@ trait Stats
             }
         }
 
-        return \count($users) > 0 ? \count($answeredUsers)/\count($users) : 0;
+        return \count($users) > 0 ? round(\count($answeredUsers) / \count($users), 2) : 0;
     }
 
     /**
      * @param Survey $survey
-     * @return int
+     * @return float
      */
-    private function getEvaluationSurveyAnswersCount(Survey $survey): int
+    private function getEvaluationSurveyAnswersCount(Survey $survey): float
     {
         /** @var Simple $surveyQuestions */
         $surveyQuestions = $survey->getSurveyQuestions();
@@ -92,58 +112,172 @@ trait Stats
         return $questionAnswers->count();
     }
 
+
     /**
      * @param Survey $survey
-     * @return int
+     * @return float
      * @throws \RuntimeException
      */
-    private function getIndexDiffFromEvaluationSurvey(Survey $survey): int
+    private function getIndexRatioFromEvaluationSurvey(Survey $survey): float
     {
-        /** @var Simple $surveyQuestions */
-        $surveyQuestions = $survey->getSurveyQuestions();
-
-        /** @var SurveyQuestion $surveyQuestion */
-        /** @var Simple $questionAnswers */
-        $answers = [];
-        /** @var SurveyQuestion $surveyQuestion */
-        foreach ($surveyQuestions as $surveyQuestion) {
-            /** @var Answer $answer */
-            /** @var Simple $questionAnswers */
-            $questionAnswers = $surveyQuestion->getAnswers();
-            $lastAnswer = $questionAnswers->getLast();
-            if (!($lastAnswer instanceof Answer)) {
-                throw new \RuntimeException('Last Answer not found');
-            }
-            $count = $questionAnswers->count();
-            $index = --$count;
-            $previousAnswer = $questionAnswers->offsetGet($index);
-            if (!($previousAnswer instanceof Answer)) {
-                throw new \RuntimeException('Previous Answer not found');
-            }
-            $answers = [$previousAnswer, $lastAnswer];
-        }
-        return $this->calculateOlsetIndex($answers);
+        $answers = $this->answersFromEvaluationSurvey($survey);
+        return $this->calculateOlsetIndexRatio($answers);
     }
 
     /**
      * @param Survey $initial
      * @param Survey $evaluation
-     * @return int
+     * @return float
      * @throws \RuntimeException
      */
-    private function getIndexDiffFromSurveys(Survey $initial, Survey $evaluation): int
+    private function getIndexRatioFromSurveys(Survey $initial, Survey $evaluation): float
+    {
+        $answers = $this->answersFromSurveys($initial, $evaluation);
+
+        return $this->calculateOlsetIndexRatio($answers);
+    }
+
+    /**
+     * @param Survey $survey
+     * @return float
+     * @throws \RuntimeException
+     */
+    private function getIndexDiffFromEvaluationSurvey(Survey $survey): float
+    {
+        $answers = $this->answersFromEvaluationSurvey($survey);
+        return $this->calculateOlsetIndexDiff($answers);
+    }
+
+    /**
+     * @param Survey $initial
+     * @param Survey $evaluation
+     * @return float
+     * @throws \RuntimeException
+     */
+    private function getIndexDiffFromSurveys(Survey $initial, Survey $evaluation): float
+    {
+        $answers = $this->answersFromSurveys($initial, $evaluation);
+        return $this->calculateOlsetIndexDiff($answers);
+    }
+
+    /**
+     * @param array $answers
+     * @return float
+     * @throws \RuntimeException
+     */
+    private function calculateOlsetIndex(array $answers): float
+    {
+        $config = $this->getDI()->get(Services::CONFIG);
+        $score = 0;
+        /** @var Answer $answer */
+        foreach ($answers as $answer) {
+            switch ((int) $answer->answer) {
+                case 1:
+                    $score += -2;
+                    break;
+                case 2:
+                    $score += -1;
+                    break;
+                case 3:
+                    $score += 0.4;
+                    break;
+                case 4:
+                    $score++;
+                    break;
+                case 5:
+                    $score += 2;
+                    break;
+                default:
+                    throw new \RuntimeException('Answer score not found');
+            }
+        }
+
+        return $score/$config->application->survey->evaluationCount;
+    }
+
+    /**
+     * @param array $answers
+     * @return float
+     * @throws \RuntimeException
+     */
+    private function calculateOlsetIndexDiff(array $answers): float
+    {
+        $firstIndex = $this->calculateOlsetIndex($answers[0]);
+        $secondIndex = $this->calculateOlsetIndex($answers[1]);
+        return round($secondIndex - $firstIndex, 2);
+    }
+
+    /**
+     * @param array $answers
+     * @return float
+     * @throws \RuntimeException
+     */
+    private function calculateAbsoluteOlsetIndex(array $answers): float
+    {
+        $config = $this->getDI()->get(Services::CONFIG);
+        $score = 0;
+        /** @var Answer $answer */
+        foreach ($answers as $answer) {
+            switch ((int) $answer->answer) {
+                case 1:
+                    $score += -2;
+                    break;
+                case 2:
+                    $score += -1;
+                    break;
+                case 3:
+                    $score += 0.4;
+                    break;
+                case 4:
+                    $score++;
+                    break;
+                case 5:
+                    $score += 2;
+                    break;
+                default:
+                    throw new \RuntimeException('Answer score not found');
+            }
+        }
+
+
+        return $score/$config->application->survey->evaluationCount + 2;
+    }
+
+    /**
+     * @param array $answers
+     * @return float
+     * @throws \RuntimeException
+     */
+    private function calculateOlsetIndexRatio(array $answers): float
+    {
+        $firstIndex = $this->calculateAbsoluteOlsetIndex($answers[0]);
+        $secondIndex = $this->calculateAbsoluteOlsetIndex($answers[1]);
+        return round($secondIndex/$firstIndex, 2);
+    }
+
+    /**
+     * @param Survey $initial
+     * @param Survey $evaluation
+     * @return array
+     * @throws \RuntimeException
+     */
+    private function answersFromSurveys(Survey $initial, Survey $evaluation): array
     {
         /** @var Simple $surveyQuestionsInitial */
         $surveyQuestionsInitial = $initial->getSurveyQuestions();
         /** @var Simple $surveyQuestionsEvaluation */
         $surveyQuestionsEvaluation = $evaluation->getSurveyQuestions();
-        $answers = [];
+
         $evaluationAnswers = [];
         /** @var SurveyQuestion $model */
         foreach ($surveyQuestionsEvaluation as $model) {
             /** @var Simple $answersCollection */
             $answersCollection = $model->getAnswers();
-            $evaluationAnswers[] = $answersCollection->getFirst();
+            $firstAnswer = $answersCollection->getFirst();
+            if (!($firstAnswer instanceof Answer)) {
+                throw new \RuntimeException('Evaluation Answer not found question='.$model->id);
+            }
+            $evaluationAnswers[] = $firstAnswer;
         }
 
         $config = $this->getDI()->get(Services::CONFIG);
@@ -154,32 +288,59 @@ trait Stats
         foreach ($surveyQuestionsInitial as $model) {
             /** @var Simple $answersCollection */
             $answersCollection = $model->getAnswers();
-            $initAnswers[] = $answersCollection->getFirst();
+            $firstAnswer = $answersCollection->getFirst();
+            if (!($firstAnswer instanceof Answer)) {
+                throw new \RuntimeException('Initial Answer not found question='.$model->id);
+            }
+            $initAnswers[] = $firstAnswer;
         }
 
         if (\count($initAnswers) !== \count($evaluationAnswers)) {
-            throw new \RuntimeException('Questions not answered initial='.$initial->id.' evaluation='.$evaluation->id);
+            throw new \RuntimeException(
+                'Questions not answered initial=' . $initial->id . ' evaluation=' . $evaluation->id
+            );
         }
 
         if ($config->application->survey->evaluationCount !== \count($evaluationAnswers)) {
-            throw new \RuntimeException('Not answered questions initial='.$initial->id.' evaluation='.$evaluation->id);
+            throw new \RuntimeException(
+                'Not answered questions initial=' . $initial->id . ' evaluation=' . $evaluation->id
+            );
         }
-
-        $count = $config->application->survey->evaluationCount;
-
-        for ($i=0; $i < $count; $i++) {
-            $answers = [$initAnswers[$i], $evaluationAnswers[$i]];
-        }
-
-        return $this->calculateOlsetIndex($answers);
+        return [$initAnswers, $evaluationAnswers];
     }
 
     /**
-     * @param array $answers
-     * @return int
+     * @param Survey $survey
+     * @return array
+     * @throws \RuntimeException
      */
-    private function calculateOlsetIndex(array $answers): int
+    private function answersFromEvaluationSurvey(Survey $survey): array
     {
-        return 1;
+        /** @var Simple $surveyQuestions */
+        $surveyQuestions = $survey->getSurveyQuestions();
+
+        /** @var SurveyQuestion $surveyQuestion */
+        /** @var Simple $questionAnswers */
+        $previousAnswers = [];
+        $lastAnswers = [];
+        /** @var SurveyQuestion $surveyQuestion */
+        foreach ($surveyQuestions as $surveyQuestion) {
+            /** @var Answer $answer */
+            /** @var Simple $questionAnswers */
+            $questionAnswers = $surveyQuestion->getAnswers();
+            $lastAnswer = $questionAnswers->getLast();
+            if (!($lastAnswer instanceof Answer)) {
+                throw new \RuntimeException('Last Answer not found');
+            }
+            $count = $questionAnswers->count();
+            $index = $count -2;
+            $previousAnswer = $questionAnswers->offsetGet($index);
+            if (!($previousAnswer instanceof Answer)) {
+                throw new \RuntimeException('Previous Answer not found');
+            }
+            $previousAnswers[] = $previousAnswer;
+            $lastAnswers[] = $lastAnswer;
+        }
+        return [$previousAnswers, $lastAnswers];
     }
 }

@@ -25,9 +25,16 @@ class StatisticsResource extends ApiResource
             ->deny(AclRoles::UNAUTHORIZED, AclRoles::USER)
             ->endpoint(
                 ApiEndpoint::get('/dashboard', 'getDashboardStats')
+//                    ->allow(AclRoles::UNAUTHORIZED)
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                     ->description('get dashboard statistics')
+            )
+            ->endpoint(
+                ApiEndpoint::get('/dashboard/indices', 'getDashboardIndices')
+                    ->allow(AclRoles::MANAGER)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('get dashboard data for processes')
             )
             ->endpoint(
                 ApiEndpoint::get('/getReportsBySurvey/{id}', 'getReportsBySurvey')
