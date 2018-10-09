@@ -19,6 +19,7 @@ class StatisticsController extends CollectionController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getDashboardStats()
     {

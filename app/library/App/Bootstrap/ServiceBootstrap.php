@@ -2,6 +2,7 @@
 
 namespace App\Bootstrap;
 
+use App\Services\OlsetIndex;
 use Phalcon\Config;
 use PhalconRest\Api;
 use Phalcon\DiInterface;
@@ -129,5 +130,12 @@ class ServiceBootstrap implements BootstrapInterface
          * @description PhalconRest - \PhalconRest\User\Service
          */
         $di->setShared(Services::USER_SERVICE, new UserService);
+
+        /**
+         * @description OLSET index manager
+         */
+        $di->setShared(Services::OLSET_INDEX, function () use ($di, $config) {
+            return  new OlsetIndex($di, $config);
+        });
     }
 }

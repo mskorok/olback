@@ -4,14 +4,21 @@ namespace App\Controllers;
 
 use App\Constants\Services;
 use App\Model\Process;
+use App\Traits\Auth;
+use App\Traits\Reports;
 use App\Traits\Stats;
 use PhalconRest\Mvc\Controllers\CollectionController;
 
 class ReportController extends CollectionController
 {
 
-    use Stats;
+    use Stats, Reports, Auth;
 
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \RuntimeException
+     */
     public function singleReport($id)
     {
         $process = Process::findFirst((int) $id);
@@ -20,7 +27,7 @@ class ReportController extends CollectionController
                 'code' => 1,
                 'status' => 'Success',
                 'data' => [
-
+                    'report' => $this->getSingleReport($process)
                 ],
             ];
             return $this->createArrayResponse($response, 'data');
@@ -34,6 +41,11 @@ class ReportController extends CollectionController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \RuntimeException
+     */
     public function groupReport($id)
     {
         $process = Process::findFirst((int) $id);
@@ -42,7 +54,7 @@ class ReportController extends CollectionController
                 'code' => 1,
                 'status' => 'Success',
                 'data' => [
-
+                    'report' => $this->getGroupReport($process)
                 ],
             ];
             return $this->createArrayResponse($response, 'data');
@@ -59,25 +71,29 @@ class ReportController extends CollectionController
     /**
      * @param $id
      * @return string
+     * @throws \RuntimeException
      */
-    public function renderSingleReport($id): string
+    public function renderGroupReport($id): string
     {
         $process = Process::findFirst((int) $id);
+        $data = $this->getGroupReportData($process);
         /** @var \Phalcon\Mvc\View\Simple $view */
         $view = $this->getDI()->get(Services::VIEW);
-        return $view->render('report/single', ['process' => $process]);
+        return $view->render('report/group', ['data' => $data]);
     }
 
 
     /**
      * @param $id
      * @return string
+     * @throws \RuntimeException
      */
     public function renderSingleGroup($id): string
     {
         $process = Process::findFirst((int) $id);
+        $data = $this->getSingleReportData($process);
         /** @var \Phalcon\Mvc\View\Simple $view */
         $view = $this->getDI()->get(Services::VIEW);
-        return $view->render('report/single', ['process' => $process]);
+        return $view->render('report/single', ['data' => $data]);
     }
 }

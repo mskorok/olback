@@ -16,6 +16,7 @@ use App\Model\Survey;
 use App\Model\SurveyQuestion;
 use App\Model\User;
 use App\Model\UserOrganization;
+use App\Services\OlsetIndex;
 use Phalcon\Mvc\Model\Resultset\Simple;
 
 trait Stats
@@ -96,6 +97,8 @@ trait Stats
         return \count($users) > 0 ? round(\count($answeredUsers) / \count($users), 2) : 0;
     }
 
+
+
     /**
      * @param Survey $survey
      * @return float
@@ -165,45 +168,14 @@ trait Stats
      * @return float
      * @throws \RuntimeException
      */
-    private function calculateOlsetIndex(array $answers): float
-    {
-        $config = $this->getDI()->get(Services::CONFIG);
-        $score = 0;
-        /** @var Answer $answer */
-        foreach ($answers as $answer) {
-            switch ((int) $answer->answer) {
-                case 1:
-                    $score += -2;
-                    break;
-                case 2:
-                    $score += -1;
-                    break;
-                case 3:
-                    $score += 0.4;
-                    break;
-                case 4:
-                    $score++;
-                    break;
-                case 5:
-                    $score += 2;
-                    break;
-                default:
-                    throw new \RuntimeException('Answer score not found');
-            }
-        }
-
-        return $score/$config->application->survey->evaluationCount;
-    }
-
-    /**
-     * @param array $answers
-     * @return float
-     * @throws \RuntimeException
-     */
     private function calculateOlsetIndexDiff(array $answers): float
     {
-        $firstIndex = $this->calculateOlsetIndex($answers[0]);
-        $secondIndex = $this->calculateOlsetIndex($answers[1]);
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        /** @var OlsetIndex $service */
+        $service = $di->getService(Services::OLSET_INDEX);
+        $firstIndex = $service->calculateOlsetIndex($answers[0]);
+        $secondIndex = $service->calculateOlsetIndex($answers[1]);
         return round($secondIndex - $firstIndex, 2);
     }
 
@@ -214,29 +186,15 @@ trait Stats
      */
     private function calculateAbsoluteOlsetIndex(array $answers): float
     {
-        $config = $this->getDI()->get(Services::CONFIG);
-        $score = 0;
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
+        /** @var OlsetIndex $service */
+        $service = $di->getService(Services::OLSET_INDEX);
+        $score = 0.00;
         /** @var Answer $answer */
         foreach ($answers as $answer) {
-            switch ((int) $answer->answer) {
-                case 1:
-                    $score += -2;
-                    break;
-                case 2:
-                    $score += -1;
-                    break;
-                case 3:
-                    $score += 0.4;
-                    break;
-                case 4:
-                    $score++;
-                    break;
-                case 5:
-                    $score += 2;
-                    break;
-                default:
-                    throw new \RuntimeException('Answer score not found');
-            }
+            $score += $service->getAnswerScore($answer);
         }
 
 
@@ -263,6 +221,9 @@ trait Stats
      */
     private function answersFromSurveys(Survey $initial, Survey $evaluation): array
     {
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
         /** @var Simple $surveyQuestionsInitial */
         $surveyQuestionsInitial = $initial->getSurveyQuestions();
         /** @var Simple $surveyQuestionsEvaluation */
@@ -279,8 +240,6 @@ trait Stats
             }
             $evaluationAnswers[] = $firstAnswer;
         }
-
-        $config = $this->getDI()->get(Services::CONFIG);
 
 
         $initAnswers = [];

@@ -3,11 +3,13 @@
 namespace App\Auth;
 
 use App\Constants\Services;
+use App\Model\User;
 use Phalcon\Di;
+use PhalconApi\Auth\AccountType;
 
-class UsernameAccountType implements \PhalconApi\Auth\AccountType
+class UsernameAccountType implements AccountType
 {
-    const NAME = "username";
+    const NAME = 'username';
 
     public function login($data)
     {
@@ -17,8 +19,8 @@ class UsernameAccountType implements \PhalconApi\Auth\AccountType
         $username = $data[Manager::LOGIN_DATA_USERNAME];
         $password = $data[Manager::LOGIN_DATA_PASSWORD];
 
-        /** @var \App\Model\User $user */
-        $user = \App\Model\User::findFirst([
+        /** @var User $user */
+        $user = User::findFirst([
             'conditions' => 'username = :username:',
             'bind' => ['username' => $username]
         ]);
@@ -34,9 +36,13 @@ class UsernameAccountType implements \PhalconApi\Auth\AccountType
         return (string)$user->id;
     }
 
-    public function authenticate($identity)
+    /**
+     * @param string $identity
+     * @return bool
+     */
+    public function authenticate($identity): bool
     {
-        return \App\Model\User::count([
+        return User::count([
             'conditions' => 'id = :id:',
             'bind' => ['id' => (int)$identity]
         ]) > 0;

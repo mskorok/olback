@@ -180,6 +180,10 @@ trait Surveys
         return $surveyQuestion;
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     protected function fullSurveyData($id)
     {
         $query = new Builder();

@@ -12,6 +12,7 @@ class OrganizationTransformer extends ModelTransformer
         $this->modelClass = Organization::class;
         $this->availableIncludes = [
             'Departments',
+            'GroupReport',
             'Groups',
             'Process',
             'Survey',
@@ -27,6 +28,11 @@ class OrganizationTransformer extends ModelTransformer
     public function includeDepartments(Organization $model)
     {
         return $this->collection($model->getDepartments(), new DepartmentTransformer);
+    }
+
+    public function includeGroupReport(Organization $model)
+    {
+        return $this->collection($model->getGroupReport(), new GroupReportTransformer);
     }
 
     public function includeGroups(Organization $model)

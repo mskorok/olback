@@ -28,6 +28,7 @@ class SystemicMapController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getSystemicMap()
     {
@@ -87,6 +88,7 @@ class SystemicMapController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getSystemicMapByProcess($id)
     {
@@ -147,6 +149,7 @@ class SystemicMapController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getSystemicStructureMapByProcess($id)
     {
@@ -364,6 +367,7 @@ class SystemicMapController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createSystemicMap()
     {
@@ -567,6 +571,7 @@ class SystemicMapController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function updateSystemicMap($id)
     {
@@ -633,6 +638,7 @@ class SystemicMapController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function updateSystemicItem($id)
     {
@@ -729,6 +735,7 @@ class SystemicMapController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function deleteSystemicMap($id)
     {
@@ -815,6 +822,7 @@ class SystemicMapController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function deleteSystemicItem($id)
     {
@@ -915,6 +923,7 @@ class SystemicMapController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getSystemicItemTree($id)
     {
@@ -1133,6 +1142,7 @@ class SystemicMapController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createActionListGroup()
     {
@@ -1227,6 +1237,7 @@ class SystemicMapController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     protected function createActionListGroup4()
     {
@@ -1377,6 +1388,7 @@ class SystemicMapController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createSystemicStructureMap()
     {
@@ -1477,6 +1489,7 @@ class SystemicMapController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function updateSystemicStructureMap($id)
     {
@@ -1647,6 +1660,7 @@ class SystemicMapController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function deleteSystemicStructureItem($id)
     {
@@ -1808,6 +1822,7 @@ class SystemicMapController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function updateSystemicStructureItem($id)
     {
@@ -1944,6 +1959,7 @@ class SystemicMapController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createStructureChain()
     {

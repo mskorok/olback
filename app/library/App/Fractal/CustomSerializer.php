@@ -6,7 +6,12 @@ use League\Fractal\Serializer\ArraySerializer;
 
 class CustomSerializer extends ArraySerializer
 {
-    public function collection($resourceKey, array $data)
+    /**
+     * @param string $resourceKey
+     * @param array $data
+     * @return array
+     */
+    public function collection($resourceKey, array $data): array
     {
         if ($resourceKey === null) {
             return $data;
@@ -15,7 +20,12 @@ class CustomSerializer extends ArraySerializer
         return [$resourceKey ?: 'data' => $data];
     }
 
-    public function item($resourceKey, array $data)
+    /**
+     * @param string $resourceKey
+     * @param array $data
+     * @return array
+     */
+    public function item($resourceKey, array $data): array
     {
         if ($resourceKey === null) {
             return $data;

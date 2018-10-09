@@ -31,8 +31,8 @@ trait Auth
     }
 
     /**
-     * @return null|User
-     *
+     * @return User|Model\ResultInterface
+     * @throws \RuntimeException
      */
     public function getAuthenticated()
     {
@@ -44,11 +44,12 @@ trait Auth
             $userId = $session ? $session->getIdentity() : null;
             return User::findFirst($userId);
         }
-        return null;
+        throw new \RuntimeException('User not authenticated');
     }
 
     /**
      * @return UserOrganization|null|Model\ResultInterface
+     * @throws \RuntimeException
      */
     public function getAuthOrganization()
     {
@@ -72,9 +73,10 @@ trait Auth
 
     /**
      * @param $userId
-     * @return array|null
+     * @return array
+     * @throws \RuntimeException
      */
-    public static function getUserDetails($userId)
+    public static function getUserDetails($userId): array
     {
         $user = User::findFirst(
             [
@@ -99,6 +101,6 @@ trait Auth
             }
             return ['account' => $user, 'organization' => null];
         }
-        return null;
+        throw new \RuntimeException('User not authenticated');
     }
 }

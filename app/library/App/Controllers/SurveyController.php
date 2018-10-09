@@ -14,6 +14,7 @@ use App\Model\User;
 use App\Traits\Auth;
 use App\Traits\CheckSteps;
 use App\Traits\Processes;
+use App\Traits\Reports;
 use App\Traits\Stats;
 use App\Traits\Surveys;
 use Phalcon\Db;
@@ -24,10 +25,11 @@ use App\Model\SurveyQuestion;
 
 class SurveyController extends CrudResourceController
 {
-    use Auth, Surveys, CheckSteps, Stats, Processes;
+    use Auth, Surveys, CheckSteps, Stats, Processes, Reports;
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createSurveyDefinition()
     {
@@ -90,6 +92,7 @@ class SurveyController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getSurveyDefinition()
     {
@@ -126,6 +129,7 @@ class SurveyController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function updateSurveyDefinition($id)
     {
@@ -205,6 +209,7 @@ class SurveyController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createQuestion($id)
     {
@@ -431,6 +436,14 @@ class SurveyController extends CrudResourceController
             $answerModel->save();
         }
 
+        if ($survey->tag === $config->application->survey->evaluation) {
+            $process = $survey->getProcess30();
+            if ($process instanceof Process) {
+                $this->createSingleReport($process);
+                $this->createGroupReport($process);
+            }
+        }
+
 
         $response = [
             'code' => 1,
@@ -442,6 +455,7 @@ class SurveyController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function initProcess($id)
     {
@@ -680,6 +694,7 @@ class SurveyController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getSurveyAnswers($id)
     {

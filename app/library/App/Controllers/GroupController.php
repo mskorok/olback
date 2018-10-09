@@ -15,6 +15,7 @@ class GroupController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getGroups()
     {
@@ -72,6 +73,7 @@ class GroupController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createGroup()
     {
@@ -129,6 +131,7 @@ class GroupController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function updateGroup($id)
     {
@@ -208,6 +211,7 @@ class GroupController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function deleteGroup($id)
     {

@@ -192,6 +192,11 @@ class ProcessController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \RuntimeException
+     */
     public function createPIS($id)
     {
         $process = Process::findFirst((int) $id);

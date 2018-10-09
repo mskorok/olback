@@ -3,12 +3,18 @@
 namespace App\Auth;
 
 use App\Constants\Services;
+use App\Model\User;
 use Phalcon\Di;
+use PhalconApi\Auth\AccountType;
 
-class EmailAccountType implements \PhalconApi\Auth\AccountType
+class EmailAccountType implements AccountType
 {
-    const NAME = "username";
+    const NAME = 'username';
 
+    /**
+     * @param array $data
+     * @return null|string
+     */
     public function login($data)
     {
         /** @var \Phalcon\Security $security */
@@ -17,8 +23,8 @@ class EmailAccountType implements \PhalconApi\Auth\AccountType
         $email = $data[Manager::LOGIN_DATA_EMAIL];
         $password = $data[Manager::LOGIN_DATA_PASSWORD];
 
-        /** @var \App\Model\User $user */
-        $user = \App\Model\User::findFirst([
+        /** @var User $user */
+        $user = User::findFirst([
             'conditions' => 'email = :email:',
             'bind' => ['email' => $email]
         ]);
@@ -34,9 +40,13 @@ class EmailAccountType implements \PhalconApi\Auth\AccountType
         return (string)$user->id;
     }
 
-    public function authenticate($identity)
+    /**
+     * @param string $identity
+     * @return bool
+     */
+    public function authenticate($identity): bool
     {
-        return \App\Model\User::count([
+        return User::count([
             'conditions' => 'id = :id:',
             'bind' => ['id' => (int)$identity]
         ]) > 0;

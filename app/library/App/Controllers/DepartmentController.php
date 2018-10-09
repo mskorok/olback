@@ -16,6 +16,7 @@ class DepartmentController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createDepartment()
     {
@@ -60,6 +61,7 @@ class DepartmentController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getDepartment()
     {
@@ -245,6 +247,7 @@ class DepartmentController extends CrudResourceController
     /**
      * @param $departmentId
      * @return mixed
+     * @throws \RuntimeException
      */
     public function deleteDepartment($departmentId)
     {

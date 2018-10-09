@@ -16,6 +16,7 @@ class UserTransformer extends ModelTransformer
             'Groups',
             'Organization',
             'ProcessUsers',
+            'SingleReport',
             'Survey',
             'SurveyTemplates',
             'SystemicMapItems',
@@ -53,6 +54,11 @@ class UserTransformer extends ModelTransformer
     public function includeProcessUsers(User $model)
     {
         return $this->collection($model->getProcessUsers(), new ProcessUsersTransformer());
+    }
+
+    public function includeSingleReport(User $model)
+    {
+        return $this->collection($model->getSingleReport(), new SingleReportTransformer());
     }
 
     public function includeSurvey(User $model)
