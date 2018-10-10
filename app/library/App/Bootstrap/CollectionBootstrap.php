@@ -6,6 +6,7 @@ use App\BootstrapInterface;
 use App\Collections\ExportCollection;
 // use App\Collections\UserCollection;
 use App\Resources\ProcessYearSurveyResource;
+use App\Resources\ReportResource;
 use App\Resources\UserResource;
 use App\Resources\AlbumResource;
 use App\Resources\PhotoResource;
@@ -33,16 +34,18 @@ class CollectionBootstrap implements BootstrapInterface
         $api
             ->collection(new ExportCollection('/export'))
             // ->collection(new UserCollection('/user'))
-            ->resource(new UserResource('/users'))
+
             ->resource(new AlbumResource('/albums'))
+            ->resource(new DepartmentResource('/department'))
+            ->resource(new GroupResource('/group'))
+            ->resource(new OrganizationResource('/organization'))
             ->resource(new PhotoResource('/photos'))
             ->resource(new ProcessResource('/process'))
             ->resource(new ProcessYearSurveyResource('/year-survey'))
-            ->resource(new OrganizationResource('/organization'))
+            ->resource(new ReportResource('/report'))
             ->resource(new SystemicMapResource('/systemicmap'))
-            ->resource(new GroupResource('/group'))
-            ->resource(new DepartmentResource('/department'))
             ->resource(new SurveyResource('/survey'))
-            ->resource(new StatisticsResource('/statistics'));
+            ->resource(new StatisticsResource('/statistics'))
+            ->resource(new UserResource('/users'));
     }
 }

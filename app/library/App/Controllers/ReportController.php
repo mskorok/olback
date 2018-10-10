@@ -77,6 +77,7 @@ class ReportController extends CollectionController
     {
         $process = Process::findFirst((int) $id);
         $data = $this->getGroupReportData($process);
+        return $this->createArrayResponse($data, 'data');
         /** @var \Phalcon\Mvc\View\Simple $view */
         $view = $this->getDI()->get(Services::VIEW);
         return $view->render('report/group', ['data' => $data]);
@@ -92,6 +93,7 @@ class ReportController extends CollectionController
     {
         $process = Process::findFirst((int) $id);
         $data = $this->getSingleReportData($process);
+        return $this->createArrayResponse($data, 'data');
         /** @var \Phalcon\Mvc\View\Simple $view */
         $view = $this->getDI()->get(Services::VIEW);
         return $view->render('report/single', ['data' => $data]);
