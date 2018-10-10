@@ -13,6 +13,7 @@ use App\Constants\Services;
 use App\Model\Answer;
 use App\Model\GroupReport;
 use App\Model\Process;
+use App\Model\QuestionGroups;
 use App\Model\SingleReport;
 use App\Model\Survey;
 use App\Model\SurveyQuestion;
@@ -88,19 +89,18 @@ trait Reports
         $scoresGroupsArray = $this->getScoresGroupsArray($answers);
         $scoresOrderArray = $this->getScoresOrderArray($answers);
 
-        $graphScoresGroupArray = $this->getGraphArray($scoresGroupsArray);
-        $graphScoresOrderArray = $this->getGraphArray($scoresOrderArray);
-
         return [
             'reportStartDate'       => $reportStartDate,
             'reportEndDate'         => $reportEndDate,
             'personName'            => $personName,
+            'role'                  => $user->role,
             'organizationName'      => $organizationName,
-            'index'                 => $index,
-            'scoresGroupsArray'     => $scoresGroupsArray,
-            'scoresOrderArray'      => $scoresOrderArray,
-            'graphScoresOrderArray' => $graphScoresOrderArray,
-            'graphScoresGroupArray' => $graphScoresGroupArray
+            'groups'                => $this->getReportGroups(),
+            'index'                 => $this->transformScore($index),
+            'scoresGroupsArray'     => $this->transformScoresArray($scoresGroupsArray),
+            'scoresOrderArray'      => $this->transformScoresArray($scoresOrderArray),
+            'groupsGraph'           => $this->getGraphArray($scoresGroupsArray),
+            'orderGraph'            => $this->getGraphArray($scoresOrderArray)
 
         ];
     }
@@ -124,21 +124,79 @@ trait Reports
         $scoresGroupsArray = $this->getGroupScoresGroupsArray($answers);
         $scoresOrderArray = $this->getGroupScoresOrderArray($answers);
 
-        $graphScoresGroupsArray = $this->getGraphArray($scoresGroupsArray);
-        $graphScoresOrderArray = $this->getGraphArray($scoresOrderArray);
-
         return [
             'reportStartDate'        => $reportStartDate,
             'reportEndDate'          => $reportEndDate,
             'personName'             => $personName,
+            'countByRoles'           => $this->getParticipants($process),
             'organizationName'       => $organizationName,
-            'index'                  => $index,
-            'scoresGroupsArray'      => $scoresGroupsArray,
-            'scoresOrderArray'       => $scoresOrderArray,
-            'graphScoresGroupsArray' => $graphScoresGroupsArray,
-            'graphScoresOrderArray'  => $graphScoresOrderArray
+            'groups'                 => $this->getReportGroups(),
+            'index'                  => $this->transformScore($index),
+            'scoresGroupsArray'      => $this->transformScoresArray($scoresGroupsArray),
+            'scoresOrderArray'       => $this->transformScoresArray($scoresOrderArray),
+            'groupsGraph'            => $this->getGraphArray($scoresGroupsArray),
+            'orderGraph'             => $this->getGraphArray($scoresOrderArray)
 
         ];
+    }
+
+    /**
+     * @param Process $process
+     * @return array
+     */
+    protected function getParticipants(Process $process): array
+    {
+        /** @var Survey $survey */
+        $survey = $process->getSurveyEvaluation();
+        /** @var Simple $questions */
+        $questions = $survey->getSurveyQuestions();
+        $ids = [];
+        /** @var SurveyQuestion $question */
+        foreach ($questions as $question) {
+            /** @var Simple $answers */
+            $answers = $question->getAnswers();
+            /** @var Answer $answer */
+            foreach ($answers as $answer) {
+                $ids[] = $answer->userId;
+            }
+        }
+        $ids = array_unique($ids);
+        $users = [];
+        foreach ($ids as $id) {
+            $user = User::findFirst((int) $id);
+            if ($user instanceof User) {
+                $users[] = $user;
+            }
+        }
+        return $this->countByRoles($users);
+    }
+
+    /**
+     * @param int $limit
+     * @return array
+     */
+    protected function getReportGroups($limit = 7): array
+    {
+        return QuestionGroups::find([
+            'limit' => array('number' => $limit, 'offset' => 0)
+        ])->toArray();
+    }
+
+    /**
+     * @param array $users
+     * @return array
+     */
+    protected function countByRoles(array $users): array
+    {
+        $res = [];
+        foreach ($users as $user) {
+            if (!isset($res[$user->role])) {
+                $res[$user->role] = 1;
+            } else {
+                $res[$user->role]++;
+            }
+        }
+        return $res;
     }
 
     /**
@@ -481,161 +539,251 @@ trait Reports
     private function getGraphArray(array $answers): array
     {
         $graph = [];
+
+        foreach ($answers as $group => $score) {
+            $graph[$group] = $this->getSingleGraphArray($score);
+        }
+        return $graph;
+    }
+
+    /**
+     * @param array $array
+     * @return array
+     * @throws \RuntimeException
+     */
+    private function transformScoresArray(array $array): array
+    {
+        $res = [];
+        foreach ($array as $key => $value) {
+            $res[$key] = ['score' => $value, 'color' => $this->getColor($value)];
+        }
+        return $res;
+    }
+
+    /**
+     * @param $score
+     * @return array
+     * @throws \RuntimeException
+     */
+    private function transformScore($score): array
+    {
+        return [
+            'score' => $score,
+            'graph' => $this->getSingleGraphArray($score),
+            'color' => $this->getColor($score)
+        ];
+    }
+
+    /**
+     * @param $score
+     * @return array
+     * @throws \RuntimeException
+     */
+    private function getSingleGraphArray($score): array
+    {
         /** @var  \Phalcon\DiInterface $di */
         $di = $this->getDI();
         $config = $di->get(Services::CONFIG);
-        $white = $config->application->report->white;
-        $red = $config->application->report->red;
-        $blue = $config->application->report->blue;
-        foreach ($answers as $group => $score) {
+        $white = $config->application->report->bg->white;
+        $red = $config->application->report->bg->red;
+        $blue = $config->application->report->bg->blue;
+//        $whiteColor = $config->application->report->bg->white;
+        $first = [
+            1 => [
+                'color' => '',
+                'width' => 99,
+                'value' => '',
+                'bg' => ''
+            ],
+            2 => [
+                'color' => '',
+                'width' => 0,
+                'value' => '',
+                'bg' => ''
+            ]
+        ];
+        $second = [
+            1 => [
+                'color' => '',
+                'width' => 99,
+                'value' => '',
+                'bg' => ''
+            ],
+            2 => [
+                'color' => '',
+                'width' => 0,
+                'value' => '',
+                'bg' => ''
+            ]
+        ];
+        $third = [
+            1 => [
+                'color' => '',
+                'width' => 99,
+                'value' => '',
+                'bg' => ''
+            ],
+            2 => [
+                'color' => '',
+                'width' => 0,
+                'value' => '',
+                'bg' => ''
+            ]
+        ];
+        $fourth = [
+            1 => [
+                'color' => '',
+                'width' => 99,
+                'value' => '',
+                'bg' => ''
+            ],
+            2 => [
+                'color' => '',
+                'width' => 0,
+                'value' => '',
+                'bg' => ''
+            ]
+        ];
+        if ($score >= -2 && $score < -1) {
             $first = [
                 1 => [
                     'color' => '',
-                    'width' => 99,
-                    'value' => ''
+                    'width' => 96 - 100 * abs($score + 1),
+                    'value' => $score,
+                    'bg' => ''
                 ],
                 2 => [
                     'color' => '',
-                    'width' => 0,
-                    'value' => ''
+                    'width' => 100 * abs($score + 1),
+                    'value' => '',
+                    'bg' => $red
                 ]
             ];
             $second = [
                 1 => [
                     'color' => '',
                     'width' => 99,
-                    'value' => ''
+                    'value' => '',
+                    'bg' => $red
                 ],
                 2 => [
                     'color' => '',
                     'width' => 0,
-                    'value' => ''
+                    'value' => '',
+                    'bg' => $red
                 ]
             ];
+        } elseif ($score >= -1 && $score < 0) {
+            $second = [
+                1 => [
+                    'color' => '',
+                    'width' => 96 - 100 * abs($score),
+                    'value' => $score,
+                    'bg' => ''
+                ],
+                2 => [
+                    'color' => '',
+                    'width' => 100 * abs($score),
+                    'value' => '',
+                    'bg' => $red
+                ]
+            ];
+        } elseif ((int) $score === 0) {
             $third = [
                 1 => [
                     'color' => '',
                     'width' => 99,
-                    'value' => ''
+                    'value' => $score,
+                    'bg' => ''
                 ],
                 2 => [
                     'color' => '',
                     'width' => 0,
-                    'value' => ''
+                    'value' => '',
+                    'bg' => ''
+                ]
+            ];
+        } elseif ($score > 0  && $score < 1) {
+            $third = [
+                1 => [
+                    'color' => '',
+                    'width' => 100 * abs($score),
+                    'value' => '',
+                    'bg' => $white
+                ],
+                2 => [
+                    'color' => '',
+                    'width' => 96 - 100 * abs($score),
+                    'value' => $score,
+                    'bg' => ''
+                ]
+            ];
+        } elseif ($score >= 1 && $score <= 2) {
+            $third = [
+                1 => [
+                    'color' => '',
+                    'width' => 99,
+                    'value' => '',
+                    'bg' => $blue
+                ],
+                2 => [
+                    'color' => '',
+                    'width' => 0,
+                    'value' => '',
+                    'bg' => $blue
                 ]
             ];
             $fourth = [
                 1 => [
                     'color' => '',
-                    'width' => 99,
-                    'value' => ''
+                    'width' => 100 * abs($score - 1),
+                    'value' => '',
+                    'bg' => $blue
                 ],
                 2 => [
                     'color' => '',
-                    'width' => 0,
-                    'value' => ''
+                    'width' => 96 - 100 * abs($score - 1),
+                    'value' => $score,
+                    'bg' => ''
                 ]
             ];
-            if ($score >= -2 && $score < -1) {
-                $first = [
-                    1 => [
-                        'color' => '',
-                        'width' => 96 - 100 * abs($score + 1),
-                        'value' => $score
-                    ],
-                    2 => [
-                        'color' => $red,
-                        'width' => 100 * abs($score + 1),
-                        'value' => ''
-                    ]
-                ];
-                $second = [
-                    1 => [
-                        'color' => $red,
-                        'width' => 99,
-                        'value' => ''
-                    ],
-                    2 => [
-                        'color' => $red,
-                        'width' => 0,
-                        'value' => ''
-                    ]
-                ];
-            } elseif ($score >= -1 && $score < 0) {
-                $second = [
-                    1 => [
-                        'color' => '',
-                        'width' => 96 - 100 * abs($score),
-                        'value' => $score
-                    ],
-                    2 => [
-                        'color' => $red,
-                        'width' => 100 * abs($score),
-                        'value' => ''
-                    ]
-                ];
-            } elseif ((int) $score === 0) {
-                $third = [
-                    1 => [
-                        'color' => '',
-                        'width' => 99,
-                        'value' => $score
-                    ],
-                    2 => [
-                        'color' => '',
-                        'width' => 0,
-                        'value' => ''
-                    ]
-                ];
-            } elseif ($score > 0  && $score < 1) {
-                $third = [
-                    1 => [
-                        'color' => $white,
-                        'width' => 100 * abs($score),
-                        'value' => ''
-                    ],
-                    2 => [
-                        'color' => '',
-                        'width' => 96 - 100 * abs($score),
-                        'value' => $score
-                    ]
-                ];
-            } elseif ($score >= 1 && $score <= 2) {
-                $third = [
-                    1 => [
-                        'color' => $blue,
-                        'width' => 99,
-                        'value' => ''
-                    ],
-                    2 => [
-                        'color' => $blue,
-                        'width' => 0,
-                        'value' => ''
-                    ]
-                ];
-                $fourth = [
-                    1 => [
-                        'color' => $blue,
-                        'width' => 100 * abs($score - 1),
-                        'value' => ''
-                    ],
-                    2 => [
-                        'color' => '',
-                        'width' => 96 - 100 * abs($score - 1),
-                        'value' => $score
-                    ]
-                ];
-            } else {
-                throw new \RuntimeException('Score is incorrect');
-            }
-            $graph[$group] = [
-                $first,
-                $second,
-                $third,
-                $fourth
-            ];
+        } else {
+            throw new \RuntimeException('Score is incorrect');
         }
-        return $graph;
+
+        return [
+            1 => $first,
+            2 => $second,
+            3 => $third,
+            4 =>$fourth
+        ];
+    }
+
+    /**
+     * @param $score
+     * @return array
+     * @throws \RuntimeException
+     */
+    private function getColor($score): array
+    {
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
+        $white = $config->application->report->bg->white;
+        $red = $config->application->report->bg->red;
+        $blue = $config->application->report->bg->blue;
+        $whiteColor = $config->application->report->bg->white;
+        if ($score >= -2 && $score < 0) {
+            return ['bg' => $red, 'char' => $whiteColor];
+        }
+
+        if ($score >= 0 && $score < 1) {
+            return ['bg' => $white, 'char' => ''];
+        }
+        if ($score >= 1 && $score <= 2) {
+            return ['bg' => $blue, 'char' => ''];
+        }
+        throw new \RuntimeException('Score is incorrect');
     }
 
     /**

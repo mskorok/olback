@@ -5736,15 +5736,20 @@
 
 <BODY>
 <DIV id="page_1">
+    <?php
+    /** @var string $organizationName */
+    /** @var string $reportStartDate */
+    /** @var string $role */
+    /** @var string $personName */
 
+    ?>
 
     <P class="p0 ft0">OLSET AUDIT REPORT</P>
     <P class="p1 ft1">Organizational Learning Self Evaluation Tool (‘OLSET’)</P>
-    <P class="p2 ft3">Organization: <SPAN class="ft2">PILOT 3.</SPAN></P>
-    <P class="p3 ft3">Date of measurement: <SPAN class="ft2">13.12.2016.</SPAN></P>
+    <P class="p2 ft3">Organization: <SPAN class="ft2"><?= $organizationName; ?>.</SPAN></P>
+    <P class="p3 ft3">Date of measurement: <SPAN class="ft2"><?= $reportStartDate; ?></SPAN></P>
     <P class="p3 ft2"><SPAN class="ft3">Participants: </SPAN>
-        <NOBR>Non-managing</NOBR>
-        employee
+        <?= $role; ?>&nbsp;&nbsp;<?= $personName; ?>
     </P>
     <P class="p4 ft2">The findings of this report are confidential. Any data that might be used for research purposes
         are strictly anonymous. We value your privacy and treat all information confidentially so we never pass on your
@@ -5759,7 +5764,7 @@
     <DIV id="id2_1">
         <TABLE cellpadding=0 cellspacing=0 class="t0">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td1"><P class="p8 ft6">2</P></TD>
             </TR>
         </TABLE>
@@ -5863,7 +5868,7 @@
     <DIV id="id3_1">
         <TABLE cellpadding=0 cellspacing=0 class="t0">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td1"><P class="p8 ft6">3</P></TD>
             </TR>
         </TABLE>
@@ -5994,7 +5999,7 @@
     <DIV id="id4_1">
         <TABLE cellpadding=0 cellspacing=0 class="t0">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td1"><P class="p8 ft6">4</P></TD>
             </TR>
         </TABLE>
@@ -6127,7 +6132,7 @@
 
     <TABLE cellpadding=0 cellspacing=0 class="t4">
         <TR>
-            <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+            <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
             <TD class="tr0 td1"><P class="p8 ft6">5</P></TD>
         </TR>
     </TABLE>
@@ -6139,7 +6144,19 @@
     <P class="p36 ft36">The number ‘0’ represents the minimum OL capacity, meaning that any scores above zero indicate
         that OL component exists, while any scores below zero indicate that the OL component is not existing in the
         organization.</P>
+    <?php
 
+    /** @var array $scoresGroupsArray */
+    /** @var  array $groupsGraph */
+    /** @var array $index */
+
+    /** @var array $orderGraph */
+
+
+    /** @var array $groups */
+    /** @var  \App\Model\QuestionGroups $group */
+    /** @var array $scoresGroupsArray */
+    ?>
 
     <div class="t3">
         <div class="app-t3-tr">
@@ -6154,99 +6171,37 @@
                 </p>
             </div>
         </div>
-        <div class="app-t3-tr">
-            <div class="app-block-10 app-border-l app-border-r app-border-b app-w-420 app-bc-d9e">
-                <p class="ft6 app-t1-b1 app-p-left m-l-20">
-                    External knowledge acquisition
-                </p>
-            </div><!--
-            --><div class="app-block-10 app-border-r app-border-b app-w-200 app-bc-d9e">
-                <p class="ft6 app-t1-b1 app-p-left m-l-50">
-                    1.67
-                </p>
+        <?php foreach ($scoresGroupsArray as $name => $value) : ?>
+            <div class="app-t3-tr">
+                <div class="app-block-10 app-border-l app-border-r
+             app-border-b app-w-420 <?=$value['color']['bg'];  ?>">
+                    <p class="ft6 app-t1-b1 app-p-left
+                 m-l-20 <?=$value['color']['char'];  ?>">
+                        <?= $name; ?>
+                    </p>
+                </div><!--
+            --><div class="app-block-10 app-border-r app-border-b
+             app-w-200 <?=$value['color']['bg'];  ?>">
+                    <p class="ft6 app-t1-b1 app-p-left
+                 m-l-50 <?=$value['color']['char'];  ?>">
+                        <?=$value['score'];  ?>
+                    </p>
+                </div>
             </div>
-        </div>
+        <?php endforeach; ?>
         <div class="app-t3-tr">
-            <div class="app-block-10 app-border-l app-border-r app-border-b app-w-420 app-bc-c0">
-                <p class="ft6 app-t1-b1 app-p-left m-l-20 app-color-white">
-                    Internal knowledge aqcuisition
-                </p>
-            </div><!--
-            --><div class="app-block-10 app-border-r app-border-b app-w-200 app-bc-c0">
-                <p class="ft6 app-t1-b1 app-p-left m-l-50 app-color-white">
-                    -1.25
-                </p>
-            </div>
-        </div>
-        <div class="app-t3-tr">
-            <div class="app-block-10 app-border-l app-border-r app-border-b app-w-420 app-bc-c0">
-                <p class="ft6 app-t1-b1 app-p-left m-l-20 app-color-white">
-                    Knowledge distribution
-                </p>
-            </div><!--
-            --><div class="app-block-10 app-border-r app-border-b app-w-200 app-bc-c0">
-                <p class="ft6 app-t1-b1 app-p-left m-l-50 app-color-white">
-                    -0.06
-                </p>
-            </div>
-        </div>
-        <div class="app-t3-tr">
-            <div class="app-block-10 app-border-l app-border-r app-border-b app-w-420">
-                <p class="ft6 app-t1-b1 app-p-left m-l-20">
-                    Knowledge interpretation
-                </p>
-            </div><!--
-            --><div class="app-block-10 app-border-r app-border-b app-w-200">
-                <p class="ft6 app-t1-b1 app-p-left m-l-50">
-                    0.56
-                </p>
-            </div>
-        </div>
-        <div class="app-t3-tr">
-            <div class="app-block-10 app-border-l app-border-r app-border-b app-w-420 app-bc-c0">
-                <p class="ft6 app-t1-b1 app-p-left m-l-20 app-color-white">
-                    Organizational memory
-                </p>
-            </div><!--
-            --><div class="app-block-10 app-border-r app-border-b app-w-200 app-bc-c0">
-                <p class="ft6 app-t1-b1 app-p-left m-l-50 app-color-white">
-                    -0.21
-                </p>
-            </div>
-        </div>
-        <div class="app-t3-tr">
-            <div class="app-block-10 app-border-l app-border-r app-border-b app-w-420">
-                <p class="ft6 app-t1-b1 app-p-left m-l-20">
-                    Organizational system alignment
-                </p>
-            </div><!--
-            --><div class="app-block-10 app-border-r app-border-b app-w-200">
-                <p class="ft6 app-t1-b1 app-p-left m-l-50">
-                    0.00
-                </p>
-            </div>
-        </div>
-        <div class="app-t3-tr">
-            <div class="app-block-10 app-border-l app-border-r app-border-b app-w-420">
-                <p class="ft6 app-t1-b1 app-p-left m-l-20">
-                    Culture of Learning & Development
-                </p>
-            </div><!--
-            --><div class="app-block-10 app-border-r app-border-b app-w-200">
-                <p class="ft6 app-t1-b1 app-p-left m-l-50">
-                    0.00
-                </p>
-            </div>
-        </div>
-        <div class="app-t3-tr">
-            <div class="app-block-10 app-border-l app-border-r app-border-b app-w-420">
-                <p class="ft6 app-t1-b1 app-p-left m-l-20">
+            <div class="app-block-10 app-border-l app-border-r app-border-b
+             app-w-420  <?=$index['color']['bg'];  ?>">
+                <p class="ft6 app-t1-b1 app-p-left
+                m-l-20  <?=$index['color']['char'];  ?>">
                     <b>Total OL Index</b>
                 </p>
             </div><!--
-            --><div class="app-block-10 app-border-r app-border-b app-w-200">
-                <p class="ft6 app-t1-b1 app-p-left m-l-50">
-                    <b>0.1</b>
+            --><div class="app-block-10 app-border-r app-border-b
+             app-w-200 <?=$index['color']['bg'];  ?>">
+                <p class="ft6 app-t1-b1 app-p-left
+                 m-l-50  <?=$index['color']['char'];  ?>">
+                    <b><?=$index['score'];  ?></b>
                 </p>
             </div>
         </div>
@@ -6271,7 +6226,7 @@
     <DIV id="id6_1">
         <TABLE cellpadding=0 cellspacing=0 class="t0">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td1"><P class="p8 ft6">6</P></TD>
             </TR>
         </TABLE>
@@ -6288,230 +6243,115 @@
                     </p>
                 </div>
             </div>
+
             <div class="app-t3-tr app-bc-d9">
                 <div class="app-block-10 app-w-240 app-bc-d9">
                     <p class="ft6 app-t1-b1 app-p-left">
                         OLSET Index
                     </p>
-                </div><!--
+                </div><!--1
             --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
+                    <div class="app-t1-b1 app-inline-block <?=$index['graph'][1][1]['bg'];  ?>
+                <?php echo ($index['graph'][1][1]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                         style="width: <?=$index['graph'][1][1]['width']; ?>%;"><?=$index['graph'][1][1]['value'];  ?></div>
+                    <div class="app-t1-b1 app-inline-block <?=$index['graph'][1][2]['bg'];  ?>
+                <?php echo ($index['graph'][1][2]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                         style="width: <?=$index['graph'][1][2]['width']; ?>%;"><?=$index['graph'][1][2]['value'];  ?></div>
+                </div><!--2
             --><div class="app-block-10 app-t1-b1 app-border-l-w
              app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
+                    <div class="app-t1-b1 app-inline-block <?=$index['graph'][2][1]['bg'];  ?>
+                <?php echo ($index['graph'][2][1]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                         style="width: <?=$index['graph'][2][1]['width']; ?>%;"><?=$index['graph'][2][1]['value'];  ?></div>
+                    <div class="app-t1-b1 app-inline-block <?=$index['graph'][2][2]['bg'];  ?>
+                <?php echo ($index['graph'][2][2]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                         style="width: <?=$index['graph'][2][2]['width']; ?>%;"><?=$index['graph'][2][2]['value'];  ?></div>
+                </div><!--3
             --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 80%;">0.10</div>
-                </div><!--
+                    <div class="app-t1-b1 app-inline-block <?=$index['graph'][3][1]['bg'];  ?>
+                <?php echo ($index['graph'][3][1]['value'] !== '') ? ' m-l-5' : '';  ?>"
+                         style="width: <?=$index['graph'][3][1]['width']; ?>%;"><?=$index['graph'][3][1]['value'];  ?></div>
+                    <div class="app-t1-b1 app-inline-block   <?=$index['graph'][3][2]['bg'];  ?>
+                 <?php echo ($index['graph'][3][2]['value'] !== '') ? ' m-l-5' : '';  ?>"
+                         style="width: <?=$index['graph'][3][2]['width']; ?>%;"><?=$index['graph'][3][2]['value'];  ?></div>
+                </div><!--4
             --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
+                    <div class="app-t1-b1 app-inline-block <?=$index['graph'][4][1]['bg'];  ?>
+                <?php echo ($index['graph'][4][1]['value'] !== '') ? ' m-l-5' : '';  ?>"
+                         style="width: <?=$index['graph'][4][1]['width']; ?>%;"><?=$index['graph'][4][1]['value'];  ?></div>
+                    <div class="app-t1-b1 app-inline-block <?=$index['graph'][4][1]['bg'];  ?>
+                <?php echo ($index['graph'][4][2]['value'] !== '') ? ' m-l-5' : '';  ?>"
+                         style="width: <?=$index['graph'][4][2]['width']; ?>%;"><?=$index['graph'][4][2]['value'];  ?></div>
                 </div><!--
+
             --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-20">
                     <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
                     <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
                 </div>
             </div>
-            <div class="app-t3-tr  app-bc-d9">
-                <div class="app-block-10 app-w-240 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        External knowledge acquisition
-                    </p>
-                </div><!--
+            <?php foreach ($groupsGraph as $name => $value) : ?>
+                <div class="app-t3-tr  app-bc-d9">
+                    <div class="app-block-10 app-w-240 app-bc-d9">
+                        <p class="ft6 app-t1-b1 app-p-left">
+                            <?= $name; ?>
+                        </p>
+                    </div><!--1
             --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
+                        <div class="app-t1-b1 app-inline-block <?=$value[1][1]['bg']; ?>
+                <?php echo ($value[1][1]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                             style="width: <?=$value[1][1]['width']; ?>%">
+                            <?=$value[1][1]['value'];  ?>
+                        </div>
+                        <div class="app-t1-b1 app-inline-block <?=$value[1][2]['bg']; ?>
+                <?php echo ($value[1][2]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                             style="width: <?=$value[1][2]['width']; ?>%;">
+                            <?=$value[1][2]['value'];  ?>
+                        </div>
+                    </div><!--2
             --><div class="app-block-10 app-t1-b1 app-border-l-w
              app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
+                        <div class="app-t1-b1 app-inline-block <?=$value[2][1]['bg']; ?>
+                <?php echo ($value[2][1]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                             style="width: <?=$value[2][1]['width']; ?>%;">
+                            <?=$value[2][1]['value'];  ?>
+                        </div>
+                        <div class="app-t1-b1 app-inline-block <?=$value[2][2]['bg']; ?>
+                <?php echo ($value[2][2]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                             style="width: <?=$value[2][2]['width']; ?>%;">
+                            <?=$value[2][2]['value'];  ?>
+                        </div>
+                    </div><!--3
             --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block  app-bc-2a" style="width: 100%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
+                        <div class="app-t1-b1 app-inline-block <?=$value[3][1]['bg']; ?>
+                <?php echo ($value[3][1]['value'] !== '') ? ' m-l-5' : '';  ?>"
+                             style="width: <?=$value[3][1]['width']; ?>%;">
+                            <?=$value[3][1]['value'];  ?>
+                        </div>
+                        <div class="app-t1-b1 app-inline-block <?=$value[3][2]['bg']; ?>
+                <?php echo ($value[3][2]['value'] !== '') ? ' m-l-5' : '';  ?>"
+                             style="width: <?=$value[3][2]['width']; ?>%;">
+                            <?=$value[3][2]['value'];  ?>
+                        </div>
+                    </div><!--4
             --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-2a" style="width: 67%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 0;">1.67</div>
-                </div><!--
+                        <div class="app-t1-b1 app-inline-block <?=$value[4][1]['bg']; ?>
+                 <?php echo ($value[4][1]['value'] !== '') ? ' m-l-5' : '';  ?>"
+                             style="width: <?=$value[4][1]['width']; ?>%;">
+                            <?=$value[4][1]['value'];  ?>
+                        </div>
+                        <div class="app-t1-b1 app-inline-block <?=$value[4][2]['bg']; ?>
+                 <?php echo ($value[4][2]['value'] !== '') ? ' m-l-5' : '';  ?>"
+                             style="width: <?=$value[4][2]['width']; ?>%;">
+                            <?=$value[4][2]['value'];  ?>
+                        </div>
+                    </div><!--
+
             --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-20">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
+                        <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
+                        <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
+                    </div>
                 </div>
-            </div>
-            <div class="app-t3-tr  app-bc-d9">
-                <div class="app-block-10 app-w-240 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        Internal knowledge aqcuisition
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 71%">-1.25</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right; width: 25%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-20">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-240 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        Knowledge distribution
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 90%;">-0.06</div>
-                    <div class="app-t1-b1 app-inline-block  app-bc-c0" style="float:right; width: 6%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-20">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-240 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        Knowledge interpretation
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-20">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-240 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        Organizational memory
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 75%;">-0.21</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right;width: 21%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-20">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-240 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        Organizational system alignment
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 0%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;">0.00</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-20">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-240 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        Culture of Learning & Development
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 0%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;">0.00</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-20">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
+            <?php endforeach; ?>
             <div class="app-t3-tr">
                 <div class="app-block-10 app-t1-b1  app-bc-d9 w-100">
                     <span style="float: left; text-align: right; width: 40%;">-2.00</span>
@@ -6547,7 +6387,7 @@
     <DIV id="id7_1">
         <TABLE cellpadding=0 cellspacing=0 class="t0">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td1"><P class="p8 ft6">7</P></TD>
             </TR>
         </TABLE>
@@ -6621,7 +6461,7 @@
     <DIV id="id8_1">
         <TABLE cellpadding=0 cellspacing=0 class="t0">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td1"><P class="p8 ft6">8</P></TD>
             </TR>
         </TABLE>
@@ -6648,7 +6488,7 @@
     <DIV id="id9_1">
         <TABLE cellpadding=0 cellspacing=0 class="t0">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td1"><P class="p8 ft6">9</P></TD>
             </TR>
         </TABLE>
@@ -6662,7 +6502,8 @@
 
         <div class="m-b-15">
             <div class="w-623 app-bc-d9e app-div-t-h-50 app-br-5 m-l-30">
-                <P class="p92 ft2">In External Knowledge Acquisition your organization’s mean score is 0,67 <br>in a scale
+                <P class="p92 ft2">In External Knowledge Acquisition your organization’s mean score is
+                    <?= $scoresGroupsArray['External Knowledge Acquisition']; ?> <br>in a scale
                     ranging from
                     <NOBR>-2</NOBR>
                     to 2.
@@ -6691,16 +6532,14 @@
         <P class="p91 ft13"><SPAN class="ft13">B.</SPAN><SPAN class="ft68">Internal Knowledge Acquisition</SPAN></P>
         <P class="p86 ft2">Internal Knowledge Acquisition is knowledge acquisition from internal development. When
             Internal Knowledge Acquisition is low the organization is not making full use of its members’ knowledge.
-            Consequently, the organizion is not utilizing its employees’ full potential.</P>
+            Consequently, the organization is not utilizing its employees’ full potential.</P>
 
 
         <div class="m-b-15 m-t-50">
             <div class="w-623 app-bc-d9e app-div-t-h-50 app-br-5 m-l-30 p-t-5">
                 <P class="p98 ft2">In Internal Knowledge Acquisition your organization’s mean score is
-                    <NOBR>-0.25</NOBR>
-                    in a scale ranging from
-                    <NOBR>-2</NOBR>
-                    to 2.
+                    <?= $scoresGroupsArray['Internal Knowledge Acquisition']; ?>
+                    in a scale ranging from <NOBR>-2</NOBR> to 2.
                 </P>
             </div>
             <div class="w-623 app-bc-f2 app-div-t-h-150 app-br-5 m-l-30 p-t-5 m-t-30">
@@ -6731,7 +6570,7 @@
     <DIV id="id10_1">
         <TABLE cellpadding=0 cellspacing=0 class="t9">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td225"><P class="p8 ft6">10</P></TD>
             </TR>
         </TABLE>
@@ -6754,10 +6593,8 @@
         <div class="m-b-15 m-t-50">
             <div class="w-623 app-bc-d9e app-div-t-h-50 app-br-5 p-t-5">
                 <P class="p103a ft2">In Knowledge Distribution your organization’s mean score is
-                    <NOBR>-0.06</NOBR>
-                    in a scale ranging<br> from
-                    <NOBR>-2</NOBR>
-                    to 2.
+                    <?= $scoresGroupsArray['Knowledge Distribution']; ?>
+                    in a scale ranging<br> from <NOBR>-2</NOBR> to 2.
                 </P>
             </div>
             <div class="w-623 app-bc-f2 app-div-t-h-300 app-br-5 p-t-5 m-t-30">
@@ -6793,7 +6630,8 @@
         <div class="app-clear"></div>
         <div class="m-b-15 m-t-50">
             <div class="w-623 app-bc-d9e app-div-t-h-50 app-br-5 p-t-5">
-                <P class="p103a ft2">In Knowledge Interpretation your organization’s mean score is 0.57 in a scale ranging<br> from
+                <P class="p103a ft2">In Knowledge Interpretation your organization’s mean score is
+                    <?= $scoresGroupsArray['Knowledge Interpretation']; ?> in a scale ranging<br> from
                     <NOBR>-2</NOBR>   to 2.
                 </P>
             </div>
@@ -6831,7 +6669,7 @@
     <DIV id="id11_1">
         <TABLE cellpadding=0 cellspacing=0 class="t9">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td225"><P class="p8 ft6">11</P></TD>
             </TR>
         </TABLE>
@@ -6847,10 +6685,8 @@
         <div class="m-b-15">
             <div class="w-623 app-bc-d9e app-div-t-h-50 app-br-5  m-t-50 p-t-5">
                 <P class="p103a ft2">In Organizational Memory your organization’s mean score is
-                    <NOBR>-0.21</NOBR>
-                    in a scale ranging<br> from
-                    <NOBR>-2</NOBR>
-                    to 2.
+                    <?= $scoresGroupsArray['Organizational Memory']; ?>
+                    in a scale ranging<br> from <NOBR>-2</NOBR> to 2.
                 </P>
             </div>
             <div class="w-623 app-bc-f2 app-div-t-h-350 app-br-5  p-t-5 m-t-30">
@@ -6898,7 +6734,7 @@
     <DIV id="id12_1">
         <TABLE cellpadding=0 cellspacing=0 class="t9">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td225"><P class="p8 ft6">12</P></TD>
             </TR>
         </TABLE>
@@ -6907,10 +6743,9 @@
 
         <div class="m-b-15">
             <div class="w-623 app-bc-d9e app-div-t-h-50 app-br-5  m-t-50 p-t-5">
-                <P class="p103a ft2">In Organizational System Alignment your organization’s mean score is 0.00 in a scale<br> ranging
-                    from
-                    <NOBR>-2</NOBR>
-                    to 2.
+                <P class="p103a ft2">In Organizational System Alignment your organization’s mean score is
+                    <?= $scoresGroupsArray['Organizational System Alignment']; ?> in a scale<br> ranging
+                    from <NOBR>-2</NOBR> to 2.
                 </P>
             </div>
             <div class="w-623 app-bc-f2 app-div-t-h-350 app-br-5 p-t-5 m-t-30">
@@ -6949,10 +6784,9 @@
 
         <div class="m-b-15">
             <div class="w-623 app-bc-d9e app-div-t-h-50 app-br-5 m-l-30  m-t-50 p-t-5">
-                <P class="p103a ft2">In Culture of Learning and Development your organization’s mean score is 0.00 in a scale ranging
-                    from
-                    <NOBR>-2</NOBR>
-                    to 2<SPAN class="ft71">.</SPAN></P>
+                <P class="p103a ft2">In Culture of Learning and Development your organization’s mean score is
+                    <?= $scoresGroupsArray['Culture of Learning and Development']; ?> in a scale ranging
+                    from  <NOBR>-2</NOBR> to 2<SPAN class="ft71">.</SPAN></P>
             </div>
             <div class="w-623 app-bc-f2 app-div-t-h-400 app-br-5 m-l-30  p-t-5 m-t-30">
                 <P class="p104a ft58">Culture of Learning and Development increase when:</P>
@@ -6998,7 +6832,7 @@
     <DIV id="id13_1">
         <TABLE cellpadding=0 cellspacing=0 class="t9">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td225"><P class="p8 ft6">13</P></TD>
             </TR>
         </TABLE>
@@ -7021,790 +6855,69 @@
                     </p>
                 </div>
             </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        28
-                    </p>
-                </div><!--
+            <?php foreach($orderGraph as $i => $value) : ?>
+                <div class="app-t3-tr app-bc-d9">
+                    <div class="app-block-10 app-w-160 app-bc-d9">
+                        <p class="ft6 app-t1-b1 app-p-left">
+                            <?= $i; ?>
+                        </p>
+                    </div><!--1
             --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
+                        <div class="app-t1-b1 app-inline-block <?=$value[1][1]['bg']; ?>
+                <?php echo ($value[1][1]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                             style="width: <?=$value[1][1]['width']; ?>%;">
+                            <?=$value[1][1]['value'];  ?>
+                        </div>
+                        <div class="app-t1-b1 app-inline-block <?=$value[1][2]['bg']; ?>
+                <?php echo ($value[1][2]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                             style="width: <?=$value[1][2]['width']; ?>%;">
+                            <?=$value[1][2]['value'];  ?>
+                        </div>
+                    </div><!--2
             --><div class="app-block-10 app-t1-b1 app-border-l-w
              app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
+                        <div class="app-t1-b1 app-inline-block <?=$value[2][1]['bg']; ?>
+                <?php echo ($value[2][1]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                             style="width: <?=$value[2][1]['width']; ?>%;">
+                            <?=$value[2][1]['value'];  ?>
+                        </div>
+                        <div class="app-t1-b1 app-inline-block <?=$value[2][2]['bg']; ?>
+                <?php echo ($value[2][2]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                             style="width: <?=$value[2][2]['width']; ?>%;">
+                            <?=$value[2][2]['value'];  ?>
+                        </div>
+                    </div><!--3
             --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 80%;">0.10</div>
-                </div><!--
+                        <div class="app-t1-b1 app-inline-block <?=$value[3][1]['bg']; ?>
+                <?php echo ($value[3][1]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                             style="width: <?=$value[3][1]['width']; ?>%;">
+                            <?=$value[3][1]['value'];  ?>
+                        </div>
+                        <div class="app-t1-b1 app-inline-block <?=$value[3][2]['bg']; ?>
+                <?php echo ($value[3][2]['value'] !== '') ? ' m-l-5' : '';  ?>"
+                             style="width: <?=$value[3][2]['width']; ?>%;">
+                            <?=$value[3][2]['value'];  ?>
+                        </div>
+                    </div><!--4
             --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
+                        <div class="app-t1-b1 app-inline-block <?=$value[4][1]['bg']; ?>
+                <?php echo ($value[4][1]['value'] !== '') ? ' m-l-5' : '';  ?>"
+                             style="width: <?=$value[4][1]['width']; ?>%;">
+                            <?=$value[4][1]['value'];  ?>
+                        </div>
+                        <div class="app-t1-b1 app-inline-block <?=$value[4][2]['bg']; ?>
+                <?php echo ($value[4][2]['value'] !== '') ? ' m-r-5' : '';  ?>"
+                             style="width: <?=$value[4][2]['width']; ?>%;">
+                            <?=$value[4][2]['value'];  ?>
+                        </div>
+                    </div><!--
+
             --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
+                        <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
+                        <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
+                    </div>
                 </div>
-            </div>
-            <div class="app-t3-tr  app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        27
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block  app-bc-2a" style="width: 100%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-2a" style="width: 67%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 0;">1.67</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr  app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        26
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 71%">-1.25</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right; width: 25%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        25
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 90%;">-0.06</div>
-                    <div class="app-t1-b1 app-inline-block  app-bc-c0" style="float:right; width: 6%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        24
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        23
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 75%;">-0.21</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right;width: 21%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        22
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 0%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;">0.00</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        21
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 0%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;">0.00</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        20
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 0%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;">0.00</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        19
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 75%;">-0.21</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right;width: 21%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        18
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 75%;">-0.21</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right;width: 21%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        17
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 75%;">-0.21</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right;width: 21%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        16
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 75%;">-0.21</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right;width: 21%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        15
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 75%;">-0.21</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right;width: 21%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        14
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 75%;">-0.21</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right;width: 21%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        13
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-ta-r" style="width: 75%;">-0.21</div>
-                    <div class="app-t1-b1 app-inline-block app-bc-c0" style="float:right;width: 21%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 10%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 80%;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        12
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        11
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        10
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        9
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        8
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        7
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        6
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        5
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        4
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        3
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        2
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
-            <div class="app-t3-tr app-bc-d9">
-                <div class="app-block-10 app-w-160 app-bc-d9">
-                    <p class="ft6 app-t1-b1 app-p-left">
-                        1
-                    </p>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w
-             app-border-r-red  app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-w-90">
-                    <div class="app-t1-b1 app-inline-block app-bc-w" style="width: 56%;"></div>
-                    <div class="app-t1-b1 app-inline-block m-l-5" style="width: 10%;">0.56</div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1  app-border-l-w app-w-90">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div><!--
-            --><div class="app-block-10 app-t1-b1 app-border-l-w app-w-100">
-                    <div class="app-t1-b1 app-inline-block" style="width: 99%;"></div>
-                    <div class="app-t1-b1 app-inline-block" style="width: 0;"></div>
-                </div>
-            </div>
+            <?php endforeach; ?>
             <div class="app-t3-tr">
                 <div class="app-block-10 app-t1-b1  app-bc-d9 w-100">
                     <span style="float: left; text-align: right; width: 27%;">-2.00</span>
@@ -7831,7 +6944,7 @@
     <DIV id="id14_1">
         <TABLE cellpadding=0 cellspacing=0 class="t9">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td225"><P class="p8 ft6">14</P></TD>
             </TR>
         </TABLE>
@@ -8253,7 +7366,7 @@
     <DIV id="id15_1">
         <TABLE cellpadding=0 cellspacing=0 class="t9">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td225"><P class="p8 ft6">15</P></TD>
             </TR>
         </TABLE>
@@ -8498,7 +7611,7 @@
     <DIV id="id16_1">
         <TABLE cellpadding=0 cellspacing=0 class="t9">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td225"><P class="p8 ft6">16</P></TD>
             </TR>
         </TABLE>
@@ -8771,7 +7884,7 @@
     <DIV id="id17_1">
         <TABLE cellpadding=0 cellspacing=0 class="t9">
             <TR>
-                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: Pilot 3</P></TD>
+                <TD class="tr0 td0"><P class="p7 ft8">OLSET Individual Report: <?= $organizationName; ?></P></TD>
                 <TD class="tr0 td225"><P class="p8 ft6">17</P></TD>
             </TR>
         </TABLE>
