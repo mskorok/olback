@@ -90,17 +90,17 @@ trait Reports
         $scoresOrderArray = $this->getScoresOrderArray($answers);
 
         return [
-            'reportStartDate'       => $reportStartDate,
-            'reportEndDate'         => $reportEndDate,
-            'personName'            => $personName,
-            'role'                  => $user->role,
-            'organizationName'      => $organizationName,
-            'groups'                => $this->getReportGroups(),
-            'index'                 => $this->transformScore($index),
-            'scoresGroupsArray'     => $this->transformScoresArray($scoresGroupsArray),
-            'scoresOrderArray'      => $this->transformScoresArray($scoresOrderArray),
-            'groupsGraph'           => $this->getGraphArray($scoresGroupsArray),
-            'orderGraph'            => $this->getGraphArray($scoresOrderArray)
+            'reportStartDate' => $reportStartDate,
+            'reportEndDate' => $reportEndDate,
+            'personName' => $personName,
+            'role' => $user->role,
+            'organizationName' => $organizationName,
+            'groups' => $this->getReportGroups(),
+            'index' => $this->transformScore($index),
+            'scoresGroupsArray' => $this->transformScoresArray($scoresGroupsArray),
+            'scoresOrderArray' => $this->transformScoresArray($scoresOrderArray),
+            'groupsGraph' => $this->getGraphArray($scoresGroupsArray),
+            'orderGraph' => $this->getGraphArray($scoresOrderArray)
 
         ];
     }
@@ -121,21 +121,21 @@ trait Reports
 
         $index = $this->getGroupOlsetIndex($process);
         $answers = $this->getGroupOlsetAnswers($process);
-        $scoresGroupsArray = $this->getGroupScoresGroupsArray($answers);
-        $scoresOrderArray = $this->getGroupScoresOrderArray($answers);
+        $scoresGroupsArray = $this->getGroupScoresArray($answers);
+        $scoresOrderArray = $this->getGroupScoresArray($answers, true);
 
         return [
-            'reportStartDate'        => $reportStartDate,
-            'reportEndDate'          => $reportEndDate,
-            'personName'             => $personName,
-            'countByRoles'           => $this->getParticipants($process),
-            'organizationName'       => $organizationName,
-            'groups'                 => $this->getReportGroups(),
-            'index'                  => $this->transformScore($index),
-            'scoresGroupsArray'      => $this->transformScoresArray($scoresGroupsArray),
-            'scoresOrderArray'       => $this->transformScoresArray($scoresOrderArray),
-            'groupsGraph'            => $this->getGraphArray($scoresGroupsArray),
-            'orderGraph'             => $this->getGraphArray($scoresOrderArray)
+            'reportStartDate' => $reportStartDate,
+            'reportEndDate' => $reportEndDate,
+            'personName' => $personName,
+            'countByRoles' => $this->getParticipants($process),
+            'organizationName' => $organizationName,
+            'groups' => $this->getReportGroups(),
+            'index' => $this->transformScore($index),
+            'scoresGroupsArray' => $this->transformScoresArray($scoresGroupsArray),
+            'scoresOrderArray' => $this->transformScoresArray($scoresOrderArray),
+            'groupsGraph' => $this->getGraphArray($scoresGroupsArray),
+            'orderGraph' => $this->getGraphArray($scoresOrderArray)
 
         ];
     }
@@ -163,7 +163,7 @@ trait Reports
         $ids = array_unique($ids);
         $users = [];
         foreach ($ids as $id) {
-            $user = User::findFirst((int) $id);
+            $user = User::findFirst((int)$id);
             if ($user instanceof User) {
                 $users[] = $user;
             }
@@ -224,7 +224,7 @@ trait Reports
         if ($report->save()) {
             return true;
         }
-        throw new \RuntimeException('Report not saved error '. serialize($report->getMessages()));
+        throw new \RuntimeException('Report not saved error ' . serialize($report->getMessages()));
     }
 
     /**
@@ -253,7 +253,7 @@ trait Reports
         if ($report->save()) {
             return true;
         }
-        throw new \RuntimeException('Report not saved error '. serialize($report->getMessages()));
+        throw new \RuntimeException('Report not saved error ' . serialize($report->getMessages()));
     }
 
     /**
@@ -292,7 +292,7 @@ trait Reports
         $di = $this->getDI();
         $conf = $di->get(Services::CONFIG);
         $template = $conf->application->report->dir . 'single.phtml';
-        $filename = date('Y-m-d').'_' . $prefix . '_report_' . md5(uniqid(mt_rand(), false));
+        $filename = date('Y-m-d') . '_' . $prefix . '_report_' . md5(uniqid(mt_rand(), false));
         $file = $conf->application->reportUploadDir . $filename . '.pdf';
         $view = new View();
         $html = $view->render($template, $params);
@@ -312,7 +312,7 @@ trait Reports
      */
     private function getReportStartDate(Process $process): string
     {
-        return $process->created_at;
+        return $process->createdAt;
     }
 
     /**
@@ -324,9 +324,11 @@ trait Reports
     {
         /** @var User $user */
         $user = $this->getAuthenticated();
+        /** @var Simple $answers */
         $answers = $this->getOlsetAnswers($process, $user);
-        if ($answers[0] instanceof Answer) {
-            return $answers[0]->created_at;
+        $answer = $answers->getFirst();
+        if ($answer instanceof Answer) {
+            return $answer->createdAt;
         }
         throw new \RuntimeException('Answer not found');
     }
@@ -360,7 +362,7 @@ trait Reports
         /** @var  \Phalcon\DiInterface $di */
         $di = $this->getDI();
         /** @var OlsetIndex $service */
-        $service = $di->getService(Services::OLSET_INDEX);
+        $service = $di->get(Services::OLSET_INDEX);
         if (null === $user) {
             /** @var User $user */
             $user = $this->getAuthenticated();
@@ -380,7 +382,7 @@ trait Reports
         /** @var  \Phalcon\DiInterface $di */
         $di = $this->getDI();
         /** @var OlsetIndex $service */
-        $service = $di->getService(Services::OLSET_INDEX);
+        $service = $di->get(Services::OLSET_INDEX);
         $answersArray = $this->getGroupOlsetAnswers($process);
         $index = 0.00;
         $count = \count($answersArray);
@@ -389,19 +391,19 @@ trait Reports
             throw new \RuntimeException('Answers not found');
         }
 
-        /** @var array $answers */
+        /** @var Simple $answers */
         foreach ($answersArray as $answers) {
             $index += $service->calculateOlsetIndex($answers);
         }
-        return $index/$count;
+        return round($index / $count, 2);
     }
 
     /**
      * @param Process $process
      * @param User $user
-     * @return array
+     * @return Simple
      */
-    private function getOlsetAnswers(Process $process, User $user): array
+    private function getOlsetAnswers(Process $process, User $user): Simple
     {
         $survey = $this->initial ? 'step0' : 'step3_0';
         /** @var  \Phalcon\DiInterface $di */
@@ -430,10 +432,10 @@ trait Reports
             'User'
         );
         $query->andWhere('[Process].[id] = :id:', ['id' => $process->id]);
-        $query->andWhere('[User].[id] = :user:', ['id' => $user->id]);
-        $query->orderBy('[Answer].[created_at]');
+        $query->andWhere('[User].[id] = :user:', ['user' => $user->id]);
+        $query->orderBy('[Answer].[createdAt]');
         $query->limit($config->application->survey->evaluationCount);
-        return $query->getQuery()->execute()->toArray();
+        return $query->getQuery()->execute();
     }
 
     /**
@@ -449,12 +451,26 @@ trait Reports
             throw new \RuntimeException('You are not allowed!!!');
         }
         $users = [];
-        /** @var Simple $surveys */
-        $surveys = $process->getSurveyEvaluation();
         /** @var Survey $survey */
-        foreach ($surveys as $survey) {
-            $users[] = $survey->getUser();
+        $survey = $process->getSurveyEvaluation();
+        /** @var Simple $questions */
+        $questions = $survey->getSurveyQuestions();
+        $ids = [];
+        /** @var SurveyQuestion $question */
+        foreach ($questions as $question) {
+            /** @var Simple $answers */
+            $answers = $question->getAnswers();
+            /** @var Answer $answer */
+            foreach ($answers as $answer) {
+                $user = $answer->getUser();
+                if (!\in_array($user->id, $ids, true)) {
+                    $ids[] = $user->id;
+                    $users[] = $user;
+                }
+            }
         }
+
+
         $answers = [];
         /** @var User $creator */
         foreach ($users as $creator) {
@@ -464,71 +480,76 @@ trait Reports
     }
 
     /**
-     * @param array $answers
+     * @param Simple $answers
      * @return array
      * @throws \RuntimeException
      */
-    private function getScoresGroupsArray(array $answers): array
+    private function getScoresGroupsArray(Simple $answers): array
     {
         /** @var  \Phalcon\DiInterface $di */
         $di = $this->getDI();
         /** @var OlsetIndex $service */
-        $service = $di->getService(Services::OLSET_INDEX);
+        $service = $di->get(Services::OLSET_INDEX);
         $score = [];
         return $service->calculateArrayScore($answers, $score);
     }
 
     /**
      * @param array $groupAnswers
+     * @param bool $order
      * @return array
      * @throws \RuntimeException
      */
-    private function getGroupScoresGroupsArray(array $groupAnswers): array
+    private function getGroupScoresArray(array $groupAnswers, $order = false): array
     {
         $score = [];
         /** @var  \Phalcon\DiInterface $di */
         $di = $this->getDI();
         /** @var OlsetIndex $service */
-        $service = $di->getService(Services::OLSET_INDEX);
-        /** @var array $answers */
-        foreach ($groupAnswers as $answers) {
-            $score = $service->calculateArrayScore($answers, $score);
+        $service = $di->get(Services::OLSET_INDEX);
+        /** @var Simple $answers */
+        foreach ($groupAnswers as $key => $answers) {
+            $score[$key] = $service->calculateArrayScore($answers, [], $order);
         }
-        return $score;
+
+        $res = [];
+        /** @var array $items */
+        foreach ($score as $items) {
+            foreach ($items as $key => $item) {
+                if (isset($res[$key])) {
+                    $res[$key]['count']++;
+                    $res[$key]['score'] += $item;
+                } else {
+                    $res[$key]['count'] = 1;
+                    $res[$key]['score'] = $item;
+                }
+            }
+        }
+
+        $result = [];
+        foreach ($res as $key => $value) {
+            if ((int)$value['count'] === 0) {
+                throw new \RuntimeException('Count can be zero');
+            }
+            $result[$key] = round($value['score']/$value['count'], 2);
+        }
+
+        return $result;
     }
 
     /**
-     * @param array $answers
+     * @param Simple $answers
      * @return array
      * @throws \RuntimeException
      */
-    private function getScoresOrderArray(array $answers): array
+    private function getScoresOrderArray(Simple $answers): array
     {
         /** @var  \Phalcon\DiInterface $di */
         $di = $this->getDI();
         /** @var OlsetIndex $service */
-        $service = $di->getService(Services::OLSET_INDEX);
+        $service = $di->get(Services::OLSET_INDEX);
         $score = [];
         return $service->calculateArrayScore($answers, $score, true);
-    }
-
-    /**
-     * @param array $groupAnswers
-     * @return array
-     * @throws \RuntimeException
-     */
-    private function getGroupScoresOrderArray(array $groupAnswers): array
-    {
-        $score = [];
-        /** @var  \Phalcon\DiInterface $di */
-        $di = $this->getDI();
-        /** @var OlsetIndex $service */
-        $service = $di->getService(Services::OLSET_INDEX);
-        /** @var array $answers */
-        foreach ($groupAnswers as $answers) {
-            $score = $service->calculateArrayScore($answers, $score, true);
-        }
-        return $score;
     }
 
     /**
@@ -555,7 +576,7 @@ trait Reports
     {
         $res = [];
         foreach ($array as $key => $value) {
-            $res[$key] = ['score' => $value, 'color' => $this->getColor($value)];
+            $res[$key] = ['score' => round($value, 2), 'color' => $this->getColor($value)];
         }
         return $res;
     }
@@ -568,7 +589,7 @@ trait Reports
     private function transformScore($score): array
     {
         return [
-            'score' => $score,
+            'score' => round($score, 2),
             'graph' => $this->getSingleGraphArray($score),
             'color' => $this->getColor($score)
         ];
@@ -645,16 +666,25 @@ trait Reports
             ]
         ];
         if ($score >= -2 && $score < -1) {
+            $width1 = round(100 * abs($score + 1), 2);
+            $width2 = round(100 - 100 * abs($score + 1), 2);
+
+            if ($width1 >= 50) {
+                $width1 -= 4.00;
+            }
+            if ($width2 >= 50) {
+                $width2 -= 4.00;
+            }
             $first = [
                 1 => [
                     'color' => '',
-                    'width' => 96 - 100 * abs($score + 1),
-                    'value' => $score,
+                    'width' => $width2,
+                    'value' => round($score, 2),
                     'bg' => ''
                 ],
                 2 => [
                     'color' => '',
-                    'width' => 100 * abs($score + 1),
+                    'width' => $width1,
                     'value' => '',
                     'bg' => $red
                 ]
@@ -674,21 +704,30 @@ trait Reports
                 ]
             ];
         } elseif ($score >= -1 && $score < 0) {
+            $width1 = round(100 * abs($score), 2);
+            $width2 = round(100 - 100 * abs($score), 2);
+
+            if ($width1 >= 50) {
+                $width1 -= 4.00;
+            }
+            if ($width2 >= 50) {
+                $width2 -= 4.00;
+            }
             $second = [
                 1 => [
                     'color' => '',
-                    'width' => 96 - 100 * abs($score),
-                    'value' => $score,
+                    'width' => $width2,
+                    'value' => round($score, 2),
                     'bg' => ''
                 ],
                 2 => [
                     'color' => '',
-                    'width' => 100 * abs($score),
+                    'width' => $width1,
                     'value' => '',
                     'bg' => $red
                 ]
             ];
-        } elseif ((int) $score === 0) {
+        } elseif ((float)$score === 0.00) {
             $third = [
                 1 => [
                     'color' => '',
@@ -703,18 +742,27 @@ trait Reports
                     'bg' => ''
                 ]
             ];
-        } elseif ($score > 0  && $score < 1) {
+        } elseif ($score > 0 && $score < 1) {
+            $width1 = round(100 * abs($score), 2);
+            $width2 = round(100 - 100 * abs($score), 2);
+
+            if ($width1 >= 50) {
+                $width1 -= 4.00;
+            }
+            if ($width2 >= 50) {
+                $width2 -= 4.00;
+            }
             $third = [
                 1 => [
                     'color' => '',
-                    'width' => 100 * abs($score),
+                    'width' => $width1,
                     'value' => '',
                     'bg' => $white
                 ],
                 2 => [
                     'color' => '',
-                    'width' => 96 - 100 * abs($score),
-                    'value' => $score,
+                    'width' => $width2,
+                    'value' => round($score, 2),
                     'bg' => ''
                 ]
             ];
@@ -733,17 +781,26 @@ trait Reports
                     'bg' => $blue
                 ]
             ];
+            $width1 = round(100 * abs($score - 1), 2);
+            $width2 = round(100 - 100 * abs($score - 1), 2);
+
+            if ($width1 >= 50) {
+                $width1 -= 4.00;
+            }
+            if ($width2 >= 50) {
+                $width2 -= 4.00;
+            }
             $fourth = [
                 1 => [
                     'color' => '',
-                    'width' => 100 * abs($score - 1),
+                    'width' => $width1,
                     'value' => '',
                     'bg' => $blue
                 ],
                 2 => [
                     'color' => '',
-                    'width' => 96 - 100 * abs($score - 1),
-                    'value' => $score,
+                    'width' => $width2,
+                    'value' => round($score, 2),
                     'bg' => ''
                 ]
             ];
@@ -755,7 +812,7 @@ trait Reports
             1 => $first,
             2 => $second,
             3 => $third,
-            4 =>$fourth
+            4 => $fourth
         ];
     }
 
@@ -783,7 +840,7 @@ trait Reports
         if ($score >= 1 && $score <= 2) {
             return ['bg' => $blue, 'char' => ''];
         }
-        throw new \RuntimeException('Score is incorrect');
+        throw new \RuntimeException('Score is incorrect ' . $score);
     }
 
     /**

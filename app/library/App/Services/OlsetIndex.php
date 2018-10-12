@@ -11,6 +11,7 @@ use App\Model\Answer;
 use App\Model\QuestionGroups;
 use App\Model\SurveyQuestion;
 use Phalcon\DI\Injectable;
+use Phalcon\Mvc\Model\Resultset\Simple;
 
 class OlsetIndex extends Injectable
 {
@@ -23,11 +24,11 @@ class OlsetIndex extends Injectable
     }
 
     /**
-     * @param array $answers
+     * @param Simple $answers
      * @return float
      * @throws \RuntimeException
      */
-    public function calculateOlsetIndex(array $answers): float
+    public function calculateOlsetIndex(Simple $answers): float
     {
         $score = 0.00;
         /** @var Answer $answer */
@@ -62,59 +63,78 @@ class OlsetIndex extends Injectable
     }
 
     /**
-     * @param array $answers
+     * @param Simple $answers
      * @param array $score
      * @param bool $order
      * @return array
      * @throws \RuntimeException
      */
-    public function calculateArrayScore(array $answers, array $score, $order = false): array
+    public function calculateArrayScore(Simple $answers, array $score, $order = false): array
     {
         $i = 0;
+        $params = [$score, []];
+        $res = [];
         /** @var Answer $answer */
         foreach ($answers as $answer) {
             $i++;
 
-            $score = $order ? $this->getScoreByOrder($answer, $score, $i) : $this->getScoreByGroup($answer, $score);
+            $params = $order
+                ? $this->getScoreByOrder($answer, $params, $i)
+                : $this->getScoreByGroup($answer, $params);
+        }
+        /** @var $score array */
+        [$score, $count] = $params;
+        foreach ($score as $key => $value) {
+            if ($count[$key]  === 0) {
+                throw new \RuntimeException('Count can`t be zero');
+            }
+            $res[$key] = round($score[$key]/$count[$key], 2);
         }
 
-        return $score;
+        return $res;
     }
 
     /**
      * @param Answer $answer
-     * @param array $score
+     * @param array $params
      * @param int $i
      * @return array
      * @throws \RuntimeException
      */
-    private function getScoreByOrder(Answer $answer, array $score, int $i): array
+    private function getScoreByOrder(Answer $answer, array $params, int $i): array
     {
+        [$score, $count] = $params;
         if (isset($score[$i])) {
             $score[$i] += $this->getAnswerScore($answer);
+            $count[$i]++;
         } else {
             $score[$i] = $this->getAnswerScore($answer);
+            $count[$i] = 1;
         }
-        return $score;
+
+        return [$score, $count];
     }
 
     /**
      * @param Answer $answer
-     * @param array $score
+     * @param array $params
      * @return array
      * @throws \RuntimeException
      */
-    private function getScoreByGroup(Answer $answer, array $score): array
+    private function getScoreByGroup(Answer $answer, array $params): array
     {
         /** @var SurveyQuestion $question */
         $question = $answer->getSurveyQuestions();
         /** @var QuestionGroups $group */
         $group = $question->getQuestionGroup();
+        [$score, $count] = $params;
         if (isset($score[$group->name])) {
             $score[$group->name] += $this->getAnswerScore($answer);
+            $count[$group->name]++;
         } else {
             $score[$group->name] = $this->getAnswerScore($answer);
+            $count[$group->name] = 1;
         }
-        return $score;
+        return [$score, $count];
     }
 }

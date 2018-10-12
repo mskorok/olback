@@ -77,10 +77,20 @@ class ReportController extends CollectionController
     {
         $process = Process::findFirst((int) $id);
         $data = $this->getGroupReportData($process);
-        return $this->createArrayResponse($data, 'data');
         /** @var \Phalcon\Mvc\View\Simple $view */
         $view = $this->getDI()->get(Services::VIEW);
-        return $view->render('report/group', ['data' => $data]);
+        return $view->render('report/group', [
+            'reportStartDate' => $data['reportStartDate'],
+            'reportEndDate' => $data['reportEndDate'],
+            'personName' => $data['personName'],
+            'organizationName' => $data['organizationName'],
+            'groups' => $data['groups'],
+            'index' => $data['index'],
+            'scoresGroupsArray' => $data['scoresGroupsArray'],
+            'scoresOrderArray' => $data['scoresOrderArray'],
+            'groupsGraph' => $data['groupsGraph'],
+            'orderGraph' => $data['orderGraph']
+        ]);
     }
 
 
@@ -89,13 +99,25 @@ class ReportController extends CollectionController
      * @return string
      * @throws \RuntimeException
      */
-    public function renderSingleGroup($id): string
+    public function renderSingleGroup($id)
     {
         $process = Process::findFirst((int) $id);
         $data = $this->getSingleReportData($process);
-        return $this->createArrayResponse($data, 'data');
+//        return $this->createArrayResponse($data['groupsGraph'], 'data');
         /** @var \Phalcon\Mvc\View\Simple $view */
         $view = $this->getDI()->get(Services::VIEW);
-        return $view->render('report/single', ['data' => $data]);
+        return $view->render('report/single', [
+            'reportStartDate' => $data['reportStartDate'],
+            'reportEndDate' => $data['reportEndDate'],
+            'personName' => $data['personName'],
+            'countByRoles' => $data['countByRoles'],
+            'organizationName' => $data['organizationName'],
+            'groups' => $data['groups'],
+            'index' => $data['index'],
+            'scoresGroupsArray' => $data['scoresGroupsArray'],
+            'scoresOrderArray' => $data['scoresOrderArray'],
+            'groupsGraph' => $data['groupsGraph'],
+            'orderGraph' => $data['orderGraph']
+        ]);
     }
 }

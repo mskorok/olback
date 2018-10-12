@@ -173,7 +173,7 @@ trait Stats
         /** @var  \Phalcon\DiInterface $di */
         $di = $this->getDI();
         /** @var OlsetIndex $service */
-        $service = $di->getService(Services::OLSET_INDEX);
+        $service = $di->get(Services::OLSET_INDEX);
         $firstIndex = $service->calculateOlsetIndex($answers[0]);
         $secondIndex = $service->calculateOlsetIndex($answers[1]);
         return round($secondIndex - $firstIndex, 2);
@@ -190,7 +190,7 @@ trait Stats
         $di = $this->getDI();
         $config = $di->get(Services::CONFIG);
         /** @var OlsetIndex $service */
-        $service = $di->getService(Services::OLSET_INDEX);
+        $service = $di->get(Services::OLSET_INDEX);
         $score = 0.00;
         /** @var Answer $answer */
         foreach ($answers as $answer) {
