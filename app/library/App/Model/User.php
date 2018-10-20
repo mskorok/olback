@@ -19,10 +19,14 @@ use Phalcon\Validation\Validator\Email as EmailValidator;
  * @method Collection getGroups
  * @method Organization getOrganization
  * @method Collection getPis
+ * @method Collection getProcesses
  * @method Collection getProcessUsers
  * @method Collection getSingleReport
  * @method Collection getSurvey
  * @method Collection getSurveyTemplates
+ * @method Collection getSubscribers
+ * @method Subscriptions getSubscription
+ * @method Collection getSubscriptions
  * @method Collection getSystemicMapItems
  * @method Collection getSystemicStructureMapItems
  * @method Collection getUserDepartment
@@ -137,14 +141,28 @@ class User extends DateTrackingModel
         $this->hasMany('id', Group::class, 'creatorId', ['alias' => 'Groups']);
         $this->hasOne('id', Organization::class, 'userId', ['alias' => 'Organization']);
         $this->hasMany('id', Pis::class, 'user_id', ['alias' => 'Pis']);
+        $this->hasMany('id', Process::class, 'creator_id', ['alias' => 'Processes']);
         $this->hasMany('id', ProcessUsers::class, 'userId', ['alias' => 'ProcessUsers']);
         $this->hasMany('id', SingleReport::class, 'user_id', ['alias' => 'SingleReport']);
+        $this->hasMany('id', Subscribers::class, 'user_id', ['alias' => 'Subscribers']);
+        $this->hasMany('id', Subscriptions::class, 'subscriber', ['alias' => 'Subscription']);
         $this->hasMany('id', Survey::class, 'creator', ['alias' => 'Survey']);
         $this->hasMany('id', SurveyTemplate::class, 'creator', ['alias' => 'SurveyTemplates']);
         $this->hasMany('id', SystemicMapItems::class, 'userId', ['alias' => 'SystemicMapItems']);
         $this->hasMany('id', SystemicStructureMapItems::class, 'userId', ['alias' => 'SystemicStructureMapItems']);
         $this->hasMany('id', UserDepartment::class, 'user_id', ['alias' => 'UserDepartment']);
         $this->hasMany('id', UserOrganization::class, 'user_id', ['alias' => 'UserOrganization']);
+        $this->hasManyToMany(
+            'id',
+            Subscribers::class,
+            'user_id',
+            'subscription_id',
+            Subscriptions::class,
+            'id',
+            [
+                'alias' => 'Subscriptions',
+            ]
+        );
     }
 
     /**
@@ -196,8 +214,6 @@ class User extends DateTrackingModel
                 'first_name' => 'firstName',
                 'last_name' => 'lastName',
                 'location' => 'location',
-                'created_at' => 'created_at',
-                'updated_at' => 'updated_at'
             ];
     }
 }

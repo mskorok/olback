@@ -17,6 +17,7 @@ class OrganizationTransformer extends ModelTransformer
             'Process',
             'Survey',
             'SurveyTemplates',
+            'Subscriptions',
             'SystemicMap',
             'SystemicStructureMap',
             'UserOrganization',
@@ -53,6 +54,11 @@ class OrganizationTransformer extends ModelTransformer
     public function includeSurveyTemplates(Organization $model)
     {
         return $this->collection($model->getSurveyTemplates(), new SurveyTemplatesTransformer);
+    }
+
+    public function includeSubscriptions(Organization $model)
+    {
+        return $this->collection($model->getSubscriptions(), new SubscriptionsTransformer);
     }
 
     public function includeSystemicMap(Organization $model)

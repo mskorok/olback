@@ -31,12 +31,12 @@ class DepartmentController extends CrudResourceController
         }
 
         $creator = static::getUserDetails($creatorId);
-        $organization = $creator['organization']->organization_id;
+        $organizationId = $creator['organization']->organization_id;
         $data = $this->request->getJsonRawBody();
         $department = new Department();
         $department->title = $data->title;
         $department->description = $data->description;
-        $department->organization_id = $organization;
+        $department->organization_id = $organizationId;
         if ($department->save() === false) {
             $messagesErrors = [];
             foreach ($department->getMessages() as $message) {
@@ -76,13 +76,13 @@ class DepartmentController extends CrudResourceController
         }
 
         $creator = static::getUserDetails($creatorId);
-        $organization = $creator['organization']->organization_id;
+        $organizationId = $creator['organization']->organization_id;
         /** @var Simple $departments */
         $departments = Department::find(
             [
                 'conditions' => '	organization_id = ?1',
                 'bind' => [
-                    1 => $organization,
+                    1 => $organizationId,
                 ],
             ]
         );
@@ -125,7 +125,7 @@ class DepartmentController extends CrudResourceController
 
         $data = $this->request->getJsonRawBody();
         $creator = static::getUserDetails($creatorId);
-        $organization = $creator['organization']->organization_id;
+        $organizationId = $creator['organization']->organization_id;
         if ($creator['organization'] === null) {
             $response = [
                 'code' => 0,
@@ -143,7 +143,7 @@ class DepartmentController extends CrudResourceController
                 'conditions' => 'id = ?1 AND organization_id = ?2',
                 'bind' => [
                     1 => $id,
-                    2 => $organization,
+                    2 => $organizationId,
                 ],
             ]
         );
@@ -261,7 +261,7 @@ class DepartmentController extends CrudResourceController
             return $this->createArrayResponse($response, 'data');
         }
         $creator = static::getUserDetails($creatorId);
-        $organization = $creator['organization']->organization_id;
+        $organizationId = $creator['organization']->organization_id;
 
         //check if user is authorized to delete the department
         $department = Department::findFirst(
@@ -269,7 +269,7 @@ class DepartmentController extends CrudResourceController
                 'conditions' => 'id = ?1 AND organization_id = ?2',
                 'bind' => [
                     1 => $departmentId,
-                    2 => $organization,
+                    2 => $organizationId,
                 ],
             ]
         );

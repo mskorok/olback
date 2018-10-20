@@ -253,10 +253,9 @@ class UserController extends CrudResourceController
         //check for duplicates
         $user = User::findFirst(
             [
-                'conditions' => 'email = ?1 OR username = ?2',
+                'conditions' => 'email = ?1',
                 'bind' => [
                     1 => $data->email,
-                    2 => $data->username,
                 ],
             ]
         );
@@ -265,6 +264,26 @@ class UserController extends CrudResourceController
             if ($user->email === $data->email) {
                 $errorText = 'Email';
             }
+            $response = [
+                'code' => 0,
+                'status' => $errorText . ' exists!',
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+
+
+        //check for duplicates
+        $user = User::findFirst(
+            [
+                'conditions' => 'username = ?1',
+                'bind' => [
+                    1 => $data->username,
+                ],
+            ]
+        );
+        if ($user instanceof User) {
+            $errorText = '';
             if ($user->username === $data->username) {
                 $errorText = 'Username';
             }
@@ -276,7 +295,35 @@ class UserController extends CrudResourceController
             return $this->createArrayResponse($response, 'data');
         }
 
-        //create new manager user
+
+        //Old variant - user may have multiply username for one email
+
+//        $user = User::findFirst(
+//            [
+//                'conditions' => 'email = ?1 OR username = ?2',
+//                'bind' => [
+//                    1 => $data->email,
+//                    2 => $data->username,
+//                ],
+//            ]
+//        );
+//        if ($user instanceof User) {
+//            $errorText = '';
+//            if ($user->email === $data->email) {
+//                $errorText = 'Email';
+//            }
+//            if ($user->username === $data->username) {
+//                $errorText = 'Username';
+//            }
+//            $response = [
+//                'code' => 0,
+//                'status' => $errorText . ' exists!',
+//            ];
+//
+//            return $this->createArrayResponse($response, 'data');
+//        }
+
+        //create new user
         $manager = new User();
         $manager->role = AclRoles::USER;
         $manager->email = $data->email;
@@ -302,7 +349,7 @@ class UserController extends CrudResourceController
                 'code' => 1,
                 'status' => 'Success',
                 'data' => [
-                    'userid' => $managerId,
+                    'userId' => $managerId,
                 ],
             ];
         }
@@ -328,115 +375,26 @@ class UserController extends CrudResourceController
      */
     public function createManagerPublic()
     {
-        $data = $this->request->getJsonRawBody();
-        $organization_id = $data->organization;
-        $validate = [
-            'password' => ['mandatory' => true, 'regex' => null],
-            'email' => ['mandatory' => true, 'regex' => null],
-        ];
-
-        $missing_input = [];
-
-        foreach ($data as $key => $val) {
-            $mandatory = $validate[$key] ?? false;
-            if ($mandatory && !trim($val)) {
-                $missing_input[] = $key;
-            }
-        }
-
-        if (!empty($missing_input)) {
-            $response = [
-                'code' => 0,
-                'status' => 'Required field: ' . implode(', ', $missing_input),
-            ];
-
-            return $this->createArrayResponse($response, 'data');
-        }
-
-        //check for duplicates
-        $user = User::findFirst(
-            [
-                'conditions' => 'email = ?1 OR username = ?2',
-                'bind' => [
-                    1 => $data->email,
-                    2 => $data->username,
-                ],
-            ]
-        );
-        if ($user instanceof User) {
-            $errorText = '';
-            if ($user->email === $data->email) {
-                $errorText = 'Email';
-            }
-            if ($user->username === $data->username) {
-                $errorText = 'Username';
-            }
-            $response = [
-                'code' => 0,
-                'status' => $errorText . ' exists!',
-            ];
-
-            return $this->createArrayResponse($response, 'data');
-        }
-
-        //create new manager user
-        $manager = new User();
-        $manager->role = AclRoles::MANAGER;
-        $manager->email = $data->email;
-        $manager->username = $data->username;
-        $manager->password = $this->security->hash($data->password);
-        $manager->firstName = $data->firstName;
-        $manager->lastName = $data->LastName;
-        $manager->createdAt = (new \DateTime())->format('Y-m-d H:i:s');
-
-        if ($manager->save() === false) {
-            $messagesErrors = [];
-            foreach ($manager->getMessages() as $message) {
-                $messagesErrors[] = $message;
-            }
-            $response = [
-                'code' => 0,
-                'status' => 'Error',
-                'data' => $messagesErrors,
-            ];
-        } else {
-            $managerId = $manager->getWriteConnection()->lastInsertId();
-            $assign_org = new UserOrganization();
-            $assign_org->organization_id = $organization_id;
-            $assign_org->user_id = $managerId;
-            if ($assign_org->save() === false) {
-                $messagesErrors = [];
-                foreach ($assign_org->getMessages() as $message) {
-                    $messagesErrors[] = $message;
-                }
-                $response = [
-                    'code' => 0,
-                    'status' => 'Error2',
-                    'data' => $messagesErrors,
-                ];
-            } else {
-                $response = [
-                    'code' => 1,
-                    'status' => 'Success',
-                    'data' => [
-                        'userid' => $managerId,
-                    ],
-                ];
-            }
-        }
-
-        //response
-        return $this->createArrayResponse($response, 'data');
+        return $this->createPublic(AclRoles::MANAGER);
     }
+
 
     /**
      * @return mixed
      */
     public function createUserPublic()
     {
+        return $this->createPublic(AclRoles::USER);
+    }
+
+
+    /**
+     * @param $role
+     * @return mixed
+     */
+    protected function createPublic($role)
+    {
         $data = $this->request->getJsonRawBody();
-        $organization_id = $data->organization;
-        //check for required fields
         $validate = [
             'password' => ['mandatory' => true, 'regex' => null],
             'email' => ['mandatory' => true, 'regex' => null],
@@ -463,10 +421,9 @@ class UserController extends CrudResourceController
         //check for duplicates
         $user = User::findFirst(
             [
-                'conditions' => 'email = ?1 OR username = ?2',
+                'conditions' => 'email = ?1',
                 'bind' => [
                     1 => $data->email,
-                    2 => $data->username,
                 ],
             ]
         );
@@ -475,6 +432,26 @@ class UserController extends CrudResourceController
             if ($user->email === $data->email) {
                 $errorText = 'Email';
             }
+            $response = [
+                'code' => 0,
+                'status' => $errorText . ' exists!',
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+
+
+        //check for duplicates
+        $user = User::findFirst(
+            [
+                'conditions' => 'username = ?1',
+                'bind' => [
+                    1 => $data->username,
+                ],
+            ]
+        );
+        if ($user instanceof User) {
+            $errorText = '';
             if ($user->username === $data->username) {
                 $errorText = 'Username';
             }
@@ -486,14 +463,14 @@ class UserController extends CrudResourceController
             return $this->createArrayResponse($response, 'data');
         }
 
-        //create new manager user
+        //create new user
         $manager = new User();
-        $manager->role = AclRoles::USER;
+        $manager->role = $role;
         $manager->email = $data->email;
         $manager->username = $data->username;
         $manager->password = $this->security->hash($data->password);
         $manager->firstName = $data->firstName;
-        $manager->lastName = $data->LastName;
+        $manager->lastName = $data->lastName;
         $manager->createdAt = (new \DateTime())->format('Y-m-d H:i:s');
 
         if ($manager->save() === false) {
@@ -507,29 +484,14 @@ class UserController extends CrudResourceController
                 'data' => $messagesErrors,
             ];
         } else {
-            $managerId = $manager->getWriteConnection()->lastInsertId();
-            $assign_org = new UserOrganization();
-            $assign_org->organization_id = $organization_id;
-            $assign_org->user_id = $managerId;
-            if ($assign_org->save() === false) {
-                $messagesErrors = [];
-                foreach ($assign_org->getMessages() as $message) {
-                    $messagesErrors[] = $message;
-                }
-                $response = [
-                    'code' => 0,
-                    'status' => 'Error2',
-                    'data' => $messagesErrors,
-                ];
-            } else {
-                $response = [
-                    'code' => 1,
-                    'status' => 'Success',
-                    'data' => [
-                        'userid' => $managerId,
-                    ],
-                ];
-            }
+            $manager->refresh();
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+                'data' => [
+                    'userId' => $manager->id,
+                ],
+            ];
         }
 
         return $this->createArrayResponse($response, 'data');
@@ -826,6 +788,7 @@ class UserController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getUsers()
     {

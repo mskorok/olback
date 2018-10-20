@@ -18,31 +18,39 @@ class ReportResource extends ApiResource
             ->handler(ReportController::class)
             ->itemKey('report')
             ->collectionKey('reports')
-//            ->deny(AclRoles::UNAUTHORIZED)
-            ->allow(AclRoles::UNAUTHORIZED)
+            ->deny(AclRoles::UNAUTHORIZED)
             ->endpoint(
-                ApiEndpoint::get('/render-single/{id}', 'renderSingleGroup')
-                    ->allow(AclRoles::UNAUTHORIZED)
-//                    ->allow(AclRoles::MANAGER)
-//                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                ApiEndpoint::get('/render-single', 'renderSingleReport')
+                    ->allow(AclRoles::MANAGER)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                     ->description('get Single Report data')
             )
             ->endpoint(
-                ApiEndpoint::get('/render-group/{id}', 'renderGroupReport')
-                    ->allow(AclRoles::UNAUTHORIZED)
-//                    ->allow(AclRoles::MANAGER)
-//                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                ApiEndpoint::get('/render-group', 'renderGroupReport')
+                    ->allow(AclRoles::MANAGER)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                     ->description('get Group Report data')
             )->endpoint(
-                ApiEndpoint::get('/single/{id}', 'singleReport')
+                ApiEndpoint::get('/single', 'singleReport')
                     ->allow(AclRoles::USER)
                     ->deny(AclRoles::UNAUTHORIZED)
                     ->description('get Single Report link')
             )->endpoint(
-                ApiEndpoint::get('/group/{id}', 'groupReport')
+                ApiEndpoint::get('/group', 'groupReport')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                     ->description('get Group Report link')
+            )->endpoint(
+                ApiEndpoint::get('/create-group', 'groupReportCreate')
+                    ->allow(AclRoles::MANAGER)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('get Group Report create')
+            )
+            ->endpoint(
+                ApiEndpoint::get('/create-single', 'singleReportCreate')
+                    ->allow(AclRoles::MANAGER)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('get Group Report create')
             );
     }
 }

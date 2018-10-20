@@ -234,4 +234,14 @@ class ProcessController extends CrudResourceController
         ];
         return $this->createArrayResponse($response, 'data');
     }
+
+    /********************** CRUD METHODS ******************************************/
+
+    protected function transformPostDataValue($key, $value, $data)
+    {
+        if ($key === 'creator_id') {
+            $value = $this->getAuthenticatedId();
+        }
+        return $value;
+    }
 }

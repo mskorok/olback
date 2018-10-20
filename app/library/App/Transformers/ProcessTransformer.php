@@ -17,12 +17,11 @@ class ProcessTransformer extends ModelTransformer
     {
         $this->modelClass = Process::class;
         $this->availableIncludes = [
-            'GroupReport',
+            'Creator',
             'ProcessDepartments',
             'ProcessOrganizations',
             'ProcessUsers',
             'ProcessYearSurvey',
-            'SingleReport',
             'SystemicMap',
             'SystemicStructureMap',
             'Organization',
@@ -34,9 +33,9 @@ class ProcessTransformer extends ModelTransformer
         ];
     }
 
-    public function includeGroupReport(Process $model)
+    public function includeCreator(Process $model)
     {
-        return $this->collection($model->getGroupReport(), new GroupReportTransformer());
+        return $this->item($model->getCreator(), new UserTransformer());
     }
 
     public function includeProcessDepartments(Process $model)
@@ -57,11 +56,6 @@ class ProcessTransformer extends ModelTransformer
     public function includeProcessYearSurvey(Process $model)
     {
         return $this->collection($model->getProcessYearSurvey(), new ProcessYearSurveyTransformer());
-    }
-
-    public function includeSingleReport(Process $model)
-    {
-        return $this->collection($model->getSingleReport(), new SingleReportTransformer());
     }
 
     public function includeSystemicMap(Process $model)

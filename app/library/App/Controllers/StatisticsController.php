@@ -214,7 +214,7 @@ class StatisticsController extends CollectionController
     {
         $user = $this->getAuthenticated();
         if ($user instanceof User) {
-            $organization = $user->getOrganization();
+            $organization = $this->getAuthUserOrganization()->getOrganization();
             if ($organization instanceof Organization) {
                 /** @var Simple $processes */
                 $processes = $organization->getProcess();

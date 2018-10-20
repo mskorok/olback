@@ -29,7 +29,7 @@ class CollectionBootstrap implements BootstrapInterface
      * @param Config $config
      * @throws \PhalconApi\Exception
      */
-    public function run(Api $api, DiInterface $di, Config $config)
+    public function run(Api $api, DiInterface $di, Config $config): void
     {
         $api
             ->collection(new ExportCollection('/export'))

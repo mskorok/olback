@@ -22,7 +22,7 @@ class OrganizationResource extends ApiResource
             ->handler(OrganizationController::class)
             ->itemKey('organization')
             ->collectionKey('organization')
-            ->deny(AclRoles::UNAUTHORIZED, AclRoles::USER)
+//            ->deny(AclRoles::UNAUTHORIZED, AclRoles::USER)
             ->endpoint(
                 ApiEndpoint::get('/organization', 'getOrgs')
                     ->allow(AclRoles::MANAGER)
@@ -37,8 +37,7 @@ class OrganizationResource extends ApiResource
             )
             ->endpoint(
                 ApiEndpoint::post('/organization', 'createOrg')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->allow(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                     ->description('create an organization')
             );
     }

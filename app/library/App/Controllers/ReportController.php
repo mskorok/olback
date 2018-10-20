@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Constants\Services;
+use App\Model\GroupReport;
 use App\Model\Process;
 use App\Traits\Auth;
 use App\Traits\Reports;
@@ -15,74 +16,69 @@ class ReportController extends CollectionController
     use Stats, Reports, Auth;
 
     /**
-     * @param $id
      * @return mixed
-     * @throws \RuntimeException
      */
-    public function singleReport($id)
+    public function singleReport()
     {
-        $process = Process::findFirst((int) $id);
-        if ($process instanceof Process) {
+        try {
             $response = [
                 'code' => 1,
                 'status' => 'Success',
                 'data' => [
-                    'report' => $this->getSingleReport($process)
+                    'report' => $this->getSingleReport()
                 ],
             ];
             return $this->createArrayResponse($response, 'data');
-        }
-        $response = [
-            'code' => 0,
-            'status' => 'Error',
-            'data' => 'Process not found!',
-        ];
+        } catch (\RuntimeException $exception) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $exception->getMessage(),
+            ];
 
-        return $this->createArrayResponse($response, 'data');
+            return $this->createArrayResponse($response, 'data');
+        }
     }
 
     /**
-     * @param $id
      * @return mixed
-     * @throws \RuntimeException
      */
-    public function groupReport($id)
+    public function groupReport()
     {
-        $process = Process::findFirst((int) $id);
-        if ($process instanceof Process) {
+        try {
             $response = [
                 'code' => 1,
                 'status' => 'Success',
                 'data' => [
-                    'report' => $this->getGroupReport($process)
+                    'report' => $this->getGroupReport()
                 ],
             ];
             return $this->createArrayResponse($response, 'data');
-        }
-        $response = [
-            'code' => 0,
-            'status' => 'Error',
-            'data' => 'Process not found!',
-        ];
+        } catch (\RuntimeException $exception) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $exception->getMessage(),
+            ];
 
-        return $this->createArrayResponse($response, 'data');
+            return $this->createArrayResponse($response, 'data');
+        }
     }
 
     /**
-     * @param $id
      * @return string
      * @throws \RuntimeException
      */
-    public function renderGroupReport($id): string
+    public function renderGroupReport(): string
     {
-        $process = Process::findFirst((int) $id);
-        $data = $this->getGroupReportData($process);
+        $data = $this->getGroupReportData();
         /** @var \Phalcon\Mvc\View\Simple $view */
         $view = $this->getDI()->get(Services::VIEW);
         return $view->render('report/group', [
             'reportStartDate' => $data['reportStartDate'],
             'reportEndDate' => $data['reportEndDate'],
             'personName' => $data['personName'],
+            'countByRoles' => $data['countByRoles'],
             'organizationName' => $data['organizationName'],
             'groups' => $data['groups'],
             'index' => $data['index'],
@@ -95,15 +91,12 @@ class ReportController extends CollectionController
 
 
     /**
-     * @param $id
      * @return string
      * @throws \RuntimeException
      */
-    public function renderSingleGroup($id)
+    public function renderSingleReport(): string
     {
-        $process = Process::findFirst((int) $id);
-        $data = $this->getSingleReportData($process);
-//        return $this->createArrayResponse($data['groupsGraph'], 'data');
+        $data = $this->getSingleReportData();
         /** @var \Phalcon\Mvc\View\Simple $view */
         $view = $this->getDI()->get(Services::VIEW);
         return $view->render('report/single', [
@@ -119,5 +112,57 @@ class ReportController extends CollectionController
             'groupsGraph' => $data['groupsGraph'],
             'orderGraph' => $data['orderGraph']
         ]);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function singleReportCreate()
+    {
+        try {
+            $this->createSingleReport();
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+                'data' => [
+                    'report' => $this->getSingleReport()
+                ],
+            ];
+            return $this->createArrayResponse($response, 'data');
+        } catch (\RuntimeException $exception) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $exception->getMessage(),
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function groupReportCreate()
+    {
+        try {
+            $this->createGroupReport();
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+                'data' => [
+                    'report' => $this->getGroupReport()
+                ],
+            ];
+            return $this->createArrayResponse($response, 'data');
+        } catch (\RuntimeException $exception) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => $exception->getMessage(),
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
     }
 }

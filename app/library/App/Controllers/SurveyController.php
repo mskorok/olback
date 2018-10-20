@@ -44,7 +44,7 @@ class SurveyController extends CrudResourceController
         }
         $creator = static::getUserDetails($creatorId);
 
-        $organization = $creator['organization']->organization_id;
+        $organizationId = $creator['organization']->organization_id;
 
         $data = $this->request->getJsonRawBody();
         $survey = new SurveyTemplate();
@@ -53,7 +53,7 @@ class SurveyController extends CrudResourceController
         $survey->isEditable = $data->isEditable;
         $survey->isOlset = $data->isOlset;
         $survey->creator = $creator['account']->id;
-        $survey->organization_id = $organization;
+        $survey->organization_id = $organizationId;
         if (property_exists($data, 'show_extra_info_and_tags')) {
             $survey->show_extra_info_and_tags = $data->show_extra_info_and_tags;
         } else {
@@ -107,12 +107,12 @@ class SurveyController extends CrudResourceController
         }
 
         $creator = static::getUserDetails($creatorId);
-        $organization = $creator ? $creator['organization']->organization_id : null;
+        $organizationId = $creator ? $creator['organization']->organization_id : null;
         $surveys = SurveyTemplate::find(
             [
                 'conditions' => '	organization_id = ?1 AND isOlset = 0 ',
                 'bind' => [
-                    1 => $organization,
+                    1 => $organizationId,
                 ],
             ]
         );
@@ -144,7 +144,7 @@ class SurveyController extends CrudResourceController
         }
         $data = $this->request->getJsonRawBody();
         $creator = static::getUserDetails($creatorId);
-        $organization = $creator['organization']->organization_id;
+        $organizationId = $creator['organization']->organization_id;
         if ($creator && $creator['organization'] === null) {
             $response = [
                 'code' => 0,
@@ -161,7 +161,7 @@ class SurveyController extends CrudResourceController
                 'conditions' => 'id = ?1 AND organization_id = ?2 AND creator = ?3',
                 'bind' => [
                     1 => $id,
-                    2 => $organization,
+                    2 => $organizationId,
                     3 => $creator['account']->id
                 ],
             ]
@@ -224,7 +224,7 @@ class SurveyController extends CrudResourceController
         }
         $creator = static::getUserDetails($creatorId);
 
-        $organization = $creator['organization']->organization_id;
+        $organizationId = $creator['organization']->organization_id;
 
         $data = $this->request->getJsonRawBody();
 
@@ -233,7 +233,7 @@ class SurveyController extends CrudResourceController
                 'conditions' => 'id = ?1 AND organization_id = ?2 AND creator = ?3',
                 'bind' => [
                     1 => $id,
-                    2 => $organization,
+                    2 => $organizationId,
                     3 => $creator['account']->id
                 ],
             ]
@@ -395,17 +395,9 @@ class SurveyController extends CrudResourceController
      */
     public function createAnswer($id)
     {
-        $creatorId = $this->getAuthenticatedId();
-        if (null === $creatorId) {
-            $response = [
-                'code' => 0,
-                'status' => 'Error',
-                'data' => ['User not authenticated']
-            ];
-            return $this->createArrayResponse($response, 'data');
-        }
-
-        $creator = static::getUserDetails($creatorId);
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
 
         $data = $this->request->getJsonRawBody();
 
@@ -415,33 +407,65 @@ class SurveyController extends CrudResourceController
             throw new \RuntimeException('Survey not found');
         }
 
-        $config = $this->getDI()->get(Services::CONFIG)->application->survey;
+        switch ($survey->tag) {
+            case '_IS_':
+                $count = $config->application->survey->initCount;
+                break;
+            case '_CS_':
+                $count = $config->application->survey->realityCount;
+                break;
+            case '_VS_':
+                $count = $config->application->survey->visionCount;
+                break;
+            case '_AAR_':
+                $count = $config->application->survey->aarCount;
+                break;
+            case '_ES_':
+                $count = $config->application->survey->evaluationCount;
+                break;
+            case '_DS_':
+                $count = $config->application->survey->demographicsCount;
+                break;
+            default:
+                throw new \RuntimeException('Survey type not recognized');
+        }
+
+//        if ($survey->tag !== '_AAR_') {
+        try {
+            $answers = $this->_getSurveysAnswers($survey, $count, $survey->tag);
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'This survey has been evaluated ' . serialize($answers)
+            ];
+            return $this->createArrayResponse($response, 'data');
+        } catch (\RuntimeException $exception) {
+            //
+        }
+//        }
+
+//        $config = $this->getDI()->get(Services::CONFIG)->application->survey;
 
         foreach ($data as $answer) {
             $oldAnswer = Answer::findFirst([
-                'conditions' => 'questionId = ?1',
+                'conditions' => 'questionId = ?1 AND userId = ?2',
                 'bind' => [
-                    1 => $answer->questionId
+                    1 => $answer->questionId,
+                    2 => $this->getAuthenticatedId()
                 ],
             ]);
-            if (\in_array($survey->tag, [$config->evaluation, $config->aar], true)) {
-                $answerModel = new Answer();
-            } else {
-                $answerModel = $oldAnswer instanceof Answer ? $oldAnswer : new Answer();
-            }
+//            if (\in_array($survey->tag, [$config->evaluation, $config->aar], true)) {
+//                $answerModel = new Answer();
+//            } else {
+//                $answerModel = $oldAnswer instanceof Answer ? $oldAnswer : new Answer();
+//            }
+
+            $answerModel = $oldAnswer instanceof Answer ? $oldAnswer : new Answer();
 
             $answerModel->answer = $answer->answer;
-            $answerModel->userId = $creator['account']->id;
+            $answerModel->userId = $this->getAuthenticatedId();
             $answerModel->questionId = $answer->questionId;
             $answerModel->save();
-        }
-
-        if ($survey->tag === $config->application->survey->evaluation) {
-            $process = $survey->getProcess30();
-            if ($process instanceof Process) {
-                $this->createSingleReport($process);
-                $this->createGroupReport($process);
-            }
         }
 
 
@@ -470,7 +494,9 @@ class SurveyController extends CrudResourceController
         }
         $creator = static::getUserDetails($creatorId);
 
-        $organization = $creator['organization']->organization_id;
+
+        $organizationId = $creator['organization']->organization_id;
+
 
         $process = Process::findFirst(
             [
@@ -550,8 +576,10 @@ class SurveyController extends CrudResourceController
             $process->step3_1 = $step3_1_ID;
             $process->reality = $reality;
             $process->vision = $vision;
-            $process->organizationId = $organization;
+            $process->creator_id = $this->getAuthenticatedId();
+            $process->organizationId = $organizationId;
             if ($process->save()) {
+                $this->hasInitialEvaluated($process);
                 $process->refresh();
 //                try {
 //                    $this->initYearProcesses((int) $id);
@@ -780,7 +808,7 @@ class SurveyController extends CrudResourceController
      * @return mixed
      * @throws \RuntimeException
      */
-    public function availableUserSurveys()//todo
+    public function availableUserSurveys()
     {
         $creatorId = $this->getAuthenticatedId();
         $user = $this->getAuthenticated();
@@ -862,7 +890,7 @@ class SurveyController extends CrudResourceController
                 throw new \RuntimeException('User not authenticated');
             }
 
-            $process = Process::findFirst((int) $val['id']);
+            $process = Process::findFirst((int)$val['id']);
             if (!$this->processFinished($process)) {
                 continue;
             }
@@ -874,6 +902,8 @@ class SurveyController extends CrudResourceController
                 'index' => $this->getOlsetIndexesCompare($process),
                 'user' => $this->getParticipatedUsersCompare($process),
                 'absolute' => $this->getAbsoluteOlsetIndexCompare($process),
+                'previousIndex' => $this->previousIndex,
+                'lastIndex' => $this->lastIndex,
                 'surveys' => [
                     'step0' => [
                         'id' => $val['step0'],

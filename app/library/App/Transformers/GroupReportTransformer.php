@@ -11,13 +11,8 @@ class GroupReportTransformer extends ModelTransformer
     {
         $this->modelClass = GroupReport::class;
         $this->availableIncludes = [
-            'Process', 'Organization'
+            'Organization'
         ];
-    }
-
-    public function includeProcess(GroupReport $model)
-    {
-        return $this->item($model->getProcess(), new ProcessTransformer());
     }
 
     public function includeOrganization(GroupReport $model)

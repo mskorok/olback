@@ -22,6 +22,15 @@ use Phalcon\Mvc\Model\Resultset\Simple;
 trait Stats
 {
     /**
+     * @var int
+     */
+    protected $previousIndex = 0;
+
+    /**
+     * @var int
+     */
+    protected $lastIndex = 0;
+    /**
      * @param Process $process
      * @return float
      * @throws \RuntimeException
@@ -209,7 +218,9 @@ trait Stats
     private function calculateOlsetIndexRatio(array $answers): float
     {
         $firstIndex = $this->calculateAbsoluteOlsetIndex($answers[0]);
+        $this->previousIndex = round($firstIndex -2, 2);
         $secondIndex = $this->calculateAbsoluteOlsetIndex($answers[1]);
+        $this->lastIndex = round($secondIndex -2, 2);
         return round($secondIndex/$firstIndex, 2);
     }
 

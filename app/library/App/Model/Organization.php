@@ -19,6 +19,7 @@ use Phalcon\Mvc\Model;
  * @method Collection getSurvey
  * @method Collection getSurveyTemplates
  * @method Collection getSystemicMap
+ * @method Collection getSubscriptions
  * @method Collection getSystemicStructureMap
  * @method Collection getUserOrganization
  * @method User getUser
@@ -69,6 +70,7 @@ class Organization extends Model
         $this->hasMany('id', Process::class, 'organizationId', ['alias' => 'Process']);
         $this->hasMany('id', Survey::class, 'organization_id', ['alias' => 'Survey']);
         $this->hasMany('id', SurveyTemplate::class, 'organization_id', ['alias' => 'SurveyTemplates']);
+        $this->hasMany('id', Subscriptions::class, 'organization_id', ['alias' => 'Subscriptions']);
         $this->hasMany('id', SystemicMap::class, 'organization', ['alias' => 'SystemicMap']);
         $this->hasMany('id', SystemicStructureMap::class, 'organization', ['alias' => 'SystemicStructureMap']);
         $this->hasMany('id', UserOrganization::class, 'organization_id', ['alias' => 'UserOrganization']);

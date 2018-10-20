@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Model\Group;
 use App\Model\GroupTemplate;
 use App\Model\User;
+use App\Model\UserOrganization;
 use App\Traits\Auth;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
@@ -70,51 +71,135 @@ class OrganizationController extends CrudResourceController
         $data = $this->request->getJsonRawBody();
 
         $userId = $this->getAuthenticatedId();
-        if (null === $userId) {
-            $response = [
-                'code' => 0,
-                'status' => 'Error',
-                'data' => ['User not authenticated']
-            ];
-            return $this->createArrayResponse($response, 'data');
-        }
-
-        $organizationCheck = Organization::findFirst(
-            [
-                'conditions' => 'userId = ?1',
-                'bind' => [
-                    1 => $userId
+        $messagesErrors = [];
+        if ($userId !== null) {
+            $organizationCheck = Organization::findFirst(
+                [
+                    'conditions' => 'userId = ?1',
+                    'bind' => [
+                        1 => $userId
+                    ]
                 ]
-            ]
-        );
+            );
 
-        if ($organizationCheck instanceof Organization) {
-            $response = [
-                'code' => 1,
-                'status' => 'Cannot create organization'
-            ];
+            if ($organizationCheck instanceof Organization) {
+                $userOrganization = UserOrganization::findFirst([
+                    'conditions' => 'organization_id = ?1 AND user_id =?2',
+                    'bind' => [
+                        1 => $organizationCheck->id,
+                        2 => $userId
+                    ]
+                ]);
 
-            return $this->createArrayResponse($response, 'data');
+                if (!($userOrganization instanceof UserOrganization)) {
+                    $assignedOrg = new UserOrganization();
+                    $assignedOrg->organization_id = $organizationCheck->id;
+                    $assignedOrg->user_id = $userId;
+                    if ($assignedOrg->save() === false) {
+                        foreach ($assignedOrg->getMessages() as $message) {
+                            $messagesErrors[] = $message;
+                        }
+                    }
+                }
+                if (\count($messagesErrors) > 0) {
+                    $response = [
+                        'code' => 0,
+                        'status' => 'Error',
+                        'data' => $messagesErrors
+                    ];
+                } else {
+                    $response = [
+                        'code' => 1,
+                        'status' => 'Success',
+                        'message' => 'Organization exist',
+                        'data' =>[
+                            'organizationId' => $organizationCheck->id
+                        ]
+                    ];
+                }
+
+
+                return $this->createArrayResponse($response, 'data');
+            }
+        } else {
+            $organizationCheck = Organization::findFirst(
+                [
+                    'conditions' => 'name = ?1',
+                    'bind' => [
+                        1 => $data->name
+                    ]
+                ]
+            );
+            if ($organizationCheck instanceof Organization) {
+                $userOrganization = UserOrganization::findFirst([
+                    'conditions' => 'organization_id = ?1 AND user_id =?2',
+                    'bind' => [
+                        1 => $organizationCheck->id,
+                        2 => $data->userId
+                    ]
+                ]);
+                if (!($userOrganization instanceof UserOrganization)) {
+                    $assignedOrg = new UserOrganization();
+                    $assignedOrg->organization_id = $organizationCheck->id;
+                    $assignedOrg->user_id = $data->userId;
+                    if ($assignedOrg->save() === false) {
+                        foreach ($assignedOrg->getMessages() as $message) {
+                            $messagesErrors[] = $message;
+                        }
+                    }
+                }
+                if (\count($messagesErrors) > 0) {
+                    $response = [
+                        'code' => 0,
+                        'status' => 'Error',
+                        'data' => $messagesErrors
+                    ];
+                } else {
+                    $response = [
+                        'code' => 1,
+                        'status' => 'Success',
+                        'message' => 'Organization exist',
+                        'data' =>[
+                            'organizationId' => $organizationCheck->id
+                        ]
+                    ];
+                }
+
+                return $this->createArrayResponse($response, 'data');
+            }
         }
+
+
 
 
         $organization = new Organization();
         $organization->name = $data->name;
         $organization->description = $data->description;
-        $organization->userId = $userId;
+        $organization->userId = $userId ?: $data->userId;
         if ($organization->save() === false) {
-            $messagesErrors = [];
             foreach ($organization->getMessages() as $message) {
                 $messagesErrors[] = $message;
             }
             $response = [
                 'code' => 0,
                 'status' => 'Error',
-                'data' => $messagesErrors
+                'step' => 'Creation failed',
+                'data' => serialize($organization->getMessages())
             ];
         } else {
             $organization->refresh();
-            $messagesErrors = $this->createDefaultGroups($organization);
+            $assignedOrg = new UserOrganization();
+            $assignedOrg->organization_id = $organization->id;
+            $assignedOrg->user_id = $userId ?: $data->userId;
+            if ($assignedOrg->save() === false) {
+                foreach ($assignedOrg->getMessages() as $message) {
+                    $messagesErrors[] = $message;
+                }
+            }
+
+
+            $errors = $this->createDefaultGroups($organization);
+            $messagesErrors = array_merge($messagesErrors, $errors);
             if (\count($messagesErrors) > 0) {
                 $response = [
                     'code' => 0,
@@ -124,7 +209,10 @@ class OrganizationController extends CrudResourceController
             } else {
                 $response = [
                     'code' => 1,
-                    'status' => 'Success'
+                    'status' => 'Success',
+                    'data' =>[
+                        'organizationId' => $organization->id
+                    ]
                 ];
             }
         }

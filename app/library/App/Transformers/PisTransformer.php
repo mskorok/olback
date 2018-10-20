@@ -5,7 +5,7 @@ namespace App\Transformers;
 use App\Model\Pis;
 use PhalconRest\Transformers\ModelTransformer;
 
-class PicTransformer extends ModelTransformer
+class PisTransformer extends ModelTransformer
 {
     public function __construct()
     {

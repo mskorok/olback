@@ -8,6 +8,7 @@
 
 namespace App\Traits;
 
+use App\Model\Organization;
 use App\Model\User;
 use App\Model\UserOrganization;
 use Phalcon\Mvc\Model;
@@ -48,10 +49,10 @@ trait Auth
     }
 
     /**
-     * @return UserOrganization|null|Model\ResultInterface
+     * @return UserOrganization
      * @throws \RuntimeException
      */
-    public function getAuthOrganization()
+    public function getAuthUserOrganization(): UserOrganization
     {
         $user = $this->getAuthenticated();
         if ($user instanceof User) {
@@ -68,7 +69,31 @@ trait Auth
                 return $organization;
             }
         }
-        return null;
+        throw new \RuntimeException('UserOrganization not found');
+    }
+
+    /**
+     * @return Organization
+     * @throws \RuntimeException
+     */
+    public function getAuthOrganization(): Organization
+    {
+        $user = $this->getAuthenticated();
+        if ($user instanceof User) {
+            $organization = UserOrganization::findFirst(
+                [
+                    'conditions' => 'user_id = ?1',
+                    'bind' => [
+                        1 => $user->id,
+                    ],
+                ]
+            );
+
+            if ($organization instanceof UserOrganization) {
+                return $organization->getOrganization();
+            }
+        }
+        throw new \RuntimeException('UserOrganization not found');
     }
 
     /**

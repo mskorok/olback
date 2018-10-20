@@ -11,13 +11,8 @@ class SingleReportTransformer extends ModelTransformer
     {
         $this->modelClass = SingleReport::class;
         $this->availableIncludes = [
-            'Process', 'User'
+            'User'
         ];
-    }
-
-    public function includeProcess(SingleReport $model)
-    {
-        return $this->item($model->getProcess(), new ProcessTransformer());
     }
 
     public function includeUser(SingleReport $model)

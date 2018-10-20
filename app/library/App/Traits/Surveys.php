@@ -9,6 +9,8 @@
 namespace App\Traits;
 
 use App\Constants\Services;
+use App\Model\Answer;
+use App\Model\Organization;
 use App\Model\Process;
 use App\Model\ProcessYearSurvey;
 use App\Model\Survey;
@@ -31,9 +33,11 @@ trait Surveys
      * @return bool
      * @throws \RuntimeException
      */
-    protected function createDemographicsSurvey(User $user): bool//todo
+    protected function createDemographicsSurvey(User $user): bool
     {
-        $config = $this->getDI()->get(Services::CONFIG);
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
         $survey = Survey::findFirst([
             'conditions' => 'creator = ?1 AND tag = ?2',
             'bind' => [
@@ -45,7 +49,7 @@ trait Surveys
             $this->extra_info = 'User = ' . $user->id . ' Demographics';
             $surveyTemplate = SurveyTemplate::findFirst(
                 [
-                    'conditions' => 'tag LIKE "%'. $config->application->survey->demographics . '%"',
+                    'conditions' => 'tag LIKE "%' . $config->application->survey->demographics . '%"',
                     'bind' => [
                     ],
                 ]
@@ -65,12 +69,13 @@ trait Surveys
         if ($this->extra_info === null) {
             $this->extra_info = 'Process = ' . $this->processId . ' Evaluation';
         }
-
-        $config = $this->getDI()->get(Services::CONFIG);
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
 
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $config->application->survey->evaluation . '%"',
+                'conditions' => 'tag LIKE "%' . $config->application->survey->evaluation . '%"',
                 'bind' => [
                 ],
             ]
@@ -87,12 +92,13 @@ trait Surveys
         if ($this->extra_info === null) {
             $this->extra_info = 'Process = ' . $this->processId . ' Evaluation';
         }
-
-        $config = $this->getDI()->get(Services::CONFIG);
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
 
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $config->application->survey->init . '%"',
+                'conditions' => 'tag LIKE "%' . $config->application->survey->init . '%"',
                 'bind' => [
                 ],
             ]
@@ -109,12 +115,13 @@ trait Surveys
         if ($this->extra_info === null) {
             $this->extra_info = 'Process = ' . $this->processId . ' After Action Review';
         }
-
-        $config = $this->getDI()->get(Services::CONFIG);
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
 
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $config->application->survey->aar . '%"',
+                'conditions' => 'tag LIKE "%' . $config->application->survey->aar . '%"',
                 'bind' => [
                 ],
             ]
@@ -131,12 +138,13 @@ trait Surveys
         if ($this->extra_info === null) {
             $this->extra_info = 'Process = ' . $this->processId . ' Current Situation';
         }
-
-        $config = $this->getDI()->get(Services::CONFIG);
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
 
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $config->application->survey->CRS . '%"',
+                'conditions' => 'tag LIKE "%' . $config->application->survey->CRS . '%"',
                 'bind' => [
                 ],
             ]
@@ -153,19 +161,19 @@ trait Surveys
         if ($this->extra_info === null) {
             $this->extra_info = 'Process = ' . $this->processId . ' Vision';
         }
-
-        $config = $this->getDI()->get(Services::CONFIG);
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
 
         $surveyTemplate = SurveyTemplate::findFirst(
             [
-                'conditions' => 'tag LIKE "%'. $config->application->survey->VS . '%"',
+                'conditions' => 'tag LIKE "%' . $config->application->survey->VS . '%"',
                 'bind' => [
                 ],
             ]
         );
         return $this->_createSurvey($surveyTemplate);
     }
-
 
 
     protected function createSurveyQuestion($data, $id, $template = false)
@@ -227,11 +235,11 @@ trait Surveys
     protected function initYearProcesses($id): void
     {
         /** @var Process $process */
-        $process = Process::findFirst((int) $id);
+        $process = Process::findFirst((int)$id);
         $now = new \DateTime();
         $createdDate = $process->createdAt;
         $createdDate = new \DateTime($createdDate);
-        $diff = (int) $createdDate->diff($now)->y;
+        $diff = (int)$createdDate->diff($now)->y;
         if ($diff > 0) {
             /** @var Simple $yearSurveys */
             $yearSurveys = $process->getProcessYearSurvey();
@@ -287,7 +295,203 @@ trait Surveys
         }
     }
 
+    /***************** INIT PROCESS *******************/
+
+    /**
+     * @param Process $process
+     * @return bool
+     * @throws \RuntimeException
+     */
+    protected function isFirstProcess(Process $process): bool
+    {
+        /** @var Organization $organization */
+        $organization = $this->getAuthOrganization();
+        /** @var Simple $processes */
+        $processes = $organization->getProcess();
+        /** @var Process $firstProcess */
+        $firstProcess = $processes->getFirst();
+        return $firstProcess->id === $process->id;
+    }
+
+    /**
+     * @return bool | Process
+     * @throws \RuntimeException
+     */
+    protected function getFirstProcess()
+    {
+        /** @var Organization $organization */
+        $organization = $this->getAuthOrganization();
+        /** @var Simple $processes */
+        $processes = $organization->getProcess();
+        /** @var Process $firstProcess */
+        return $processes->getFirst();
+    }
+
+    /**
+     * @param Process $process
+     * @param bool $fill
+     * @return bool
+     * @throws \RuntimeException
+     */
+    protected function hasInitialEvaluated(Process $process, $fill = true): bool
+    {
+        $initialSurveys = $this->getInitialSurveyAnswersByUser();
+        $processInitialSurveyAnswers = [];
+        try {
+            $processInitialSurveyAnswers = $this->getInitialSurveyAnswersByProcess($process);
+        } catch (\RuntimeException $exception) {
+            //
+        }
+
+
+        if (\count($processInitialSurveyAnswers) > 0) {
+            return true;
+        }
+
+        if (\count($initialSurveys) > 0 && \count($processInitialSurveyAnswers) === 0) {
+            /** @var Survey $survey */
+            $survey = $initialSurveys[0]['survey'];
+            $initialProcess =  $survey->getProcess0();
+            if ($initialProcess instanceof Process && $process->id === $initialProcess->id) {
+                return true;
+            }
+            $answers = $initialSurveys[0]['answers'];
+            if ($fill) {
+                /** @var Simple $answers */
+                $this->addInitialSurveyAnswers($process, $answers);
+                return true;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param Process $process
+     * @param iterable $answers
+     * @throws \RuntimeException
+     */
+    private function addInitialSurveyAnswers(Process $process, iterable $answers): void
+    {
+        $initial = $process->getSurveyInitial();
+        /** @var Simple $questions */
+        $questions = $initial->getSurveyQuestions();
+        $newAnswers = [];
+        try {
+            /** @var Answer $answer */
+            foreach ($answers as $answer) {
+                $question = $answer->getSurveyQuestions();
+                /** @var SurveyQuestion $model */
+                foreach ($questions as $model) {
+                    if ($question->question === $model->question) {
+                        $newAnswer = new Answer();
+                        $newAnswer->questionId = $model->id;
+                        $newAnswer->answer = $answer->answer;
+                        $newAnswer->userId = $answer->userId;
+                        $newAnswers[] = $newAnswer;
+                    }
+                }
+            }
+        } catch (\RuntimeException $exception) {
+            throw new \RuntimeException($exception->getMessage());
+        }
+        $answer = null;
+        unset($answer);
+        foreach ($newAnswers as $answer) {
+            $answer->save();
+        }
+    }
+
+    /**
+     * @param Process $process
+     * @return array
+     * @throws \RuntimeException
+     */
+    protected function getInitialSurveyAnswersByProcess(Process $process): array
+    {
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
+        /** @var Survey $initialSurvey */
+        $initialSurvey = $process->getSurveyInitial();
+        return $this->_getSurveysAnswers($initialSurvey, $config->application->survey->initCount, 'Initial');
+    }
+
+    /**
+     * @param bool $answer
+     * @param bool $survey
+     * @return array
+     * @throws \RuntimeException
+     */
+    protected function getInitialSurveyAnswersByUser($answer = true, $survey = true): array
+    {
+        /** @var  \Phalcon\DiInterface $di */
+        $di = $this->getDI();
+        $config = $di->get(Services::CONFIG);
+        /** @var Organization $organization */
+        $organization = $this->getAuthOrganization();
+        /** @var Simple $processes */
+        $processes = $organization->getProcess();
+        $initialSurveys = [];
+        /** @var Process $process */
+        foreach ($processes as $process) {
+            $initialSurvey = $process->getSurveyInitial();
+            try {
+                $answers = $this->_getSurveysAnswers(
+                    $initialSurvey,
+                    $config->application->survey->initCount,
+                    'Initial'
+                );
+                if ($answer && $survey) {
+                    $initialSurveys[] = ['survey' => $initialSurvey, 'answers' => $answers];
+                } elseif ($answer) {
+                    $initialSurveys[] = $answers;
+                } else {
+                    $initialSurveys[] = $initialSurvey;
+                }
+            } catch (\RuntimeException $exception) {
+                continue;
+            }
+        }
+        return $initialSurveys;
+    }
+
+
     /****************  PRIVATE  **********************/
+
+    /**
+     * @param Survey $survey
+     * @param int $count
+     * @param string $prefix
+     * @return array
+     * @throws \RuntimeException
+     */
+    private function _getSurveysAnswers(Survey $survey, $count = 28, $prefix = ''): array
+    {
+        /** @var Simple $questions */
+        $questions = $survey->getSurveyQuestions();
+        $answers = [];
+//        $user = $this->getAuthenticated(); todo remove after testing
+        /** @var SurveyQuestion $question */
+        foreach ($questions as $question) {
+            $answer = Answer::findFirst([
+                'conditions' => 'questionId = ?1 AND userId = ?2',
+                'bind' => [
+                    1 => $question->id,
+                    2 => $this->getAuthenticatedId(),
+                ],
+            ]);
+            if ($answer instanceof Answer) {
+                $answers[] = $answer;
+            }
+        }
+
+        if (\count($answers) !== $count) {
+            throw new \RuntimeException($prefix . ' Survey not fully evaluated '. \count($answers) . '  ' . $count);
+        }
+
+        return $answers;
+    }
 
     /**
      * @param SurveyTemplate $surveyTemplate
@@ -302,7 +506,7 @@ trait Surveys
             $survey->description = $surveyTemplate->description;
             $survey->isEditable = $surveyTemplate->isEditable;
             $survey->isOlset = $surveyTemplate->isOlset;
-            $survey->creator = $surveyTemplate->creator;
+            $survey->creator = $this->getAuthenticatedId();
             $survey->organization_id = $surveyTemplate->organization_id;
             if (!empty($surveyTemplate->show_extra_info_and_tags)) {
                 $survey->show_extra_info_and_tags = $surveyTemplate->show_extra_info_and_tags;

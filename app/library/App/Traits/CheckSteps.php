@@ -8,6 +8,7 @@
 
 namespace App\Traits;
 
+use App\Constants\AclRoles;
 use App\Constants\Services;
 use App\Model\Answer;
 use App\Model\Pis;
@@ -43,15 +44,28 @@ trait CheckSteps
     protected function getCurrentStepPositions(Process $process, User $user): array
     {
         $pis = Pis::findFirst([
-            'conditions' => 'user_id = ?1 AND process_id = ?2',
+            'conditions' => 'user_id = ?1',
             'bind' => [
-                1 => $user->id,
-                2 => $process->id,
+                1 => $user->id
             ],
         ]);
 
+//        $pis = Pis::findFirst([
+//            'conditions' => 'user_id = ?1 AND process_id = ?2',
+//            'bind' => [
+//                1 => $user->id,
+//                2 => $process->id,
+//            ],
+//        ]);
+
+        $this->hasInitialEvaluated($process);
 
         $hasDemographics = $this->checkDemographics($user);
+
+        $hasCRText = \strlen($process->CurrentReality) > 0;
+        $hasIIText = \strlen($process->InitialIntentions) > 0;
+        $hasSVText = \strlen($process->SharedVision) > 0;
+        $isCreator = (int) $this->getAuthenticatedId() === (int) $process->creator_id;
 
         $hasInitial = false;
         $hasCRS = false;
@@ -63,9 +77,9 @@ trait CheckSteps
         if ($hasPis) {
             $hasInitial = $this->checkInitial($process, $user);
             if ($hasInitial) {
-                $hasCRS = $this->checkCRS($process, $user);
+                $hasCRS = $user->role !== AclRoles::USER ? $this->checkCRS($process, $user) : true;
                 if ($hasCRS) {
-                    $hasVS = $this->checkVS($process, $user);
+                    $hasVS = $user->role !== AclRoles::USER ? $this->checkVS($process, $user) : true;
                     if ($hasVS) {
                         $hasEvaluation = $this->checkEvaluation($process, $user);
                         if ($hasEvaluation) {
@@ -84,6 +98,10 @@ trait CheckSteps
             'hasVS' => $hasVS,
             'hasEvaluation' => $hasEvaluation,
             'hasAAR' => $hasAAR,
+            'hasCRText' => $hasCRText,
+            'hasIIText' => $hasIIText,
+            'hasSVText' => $hasSVText,
+            'isCreator' => $isCreator,
             'demographicsSurvey' => $this->getDemographicsSurvey($user)
         ];
     }
@@ -242,6 +260,7 @@ trait CheckSteps
         );
         $query->andWhere('[User].[id] = :id:', ['id' => $user->id]);
         $query->andWhere('[Process].[id] = :pid:', ['pid' => $process->id]);
+        $sql = $query->getQuery()->getSql();//todo remove after testing
         /** @var Simple $result */
         $result = $query->getQuery()->execute();
         $config = $this->getDI()->get(Services::CONFIG);

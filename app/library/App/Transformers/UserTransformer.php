@@ -15,10 +15,15 @@ class UserTransformer extends ModelTransformer
             'Answers',
             'Groups',
             'Organization',
+            'Pis',
+            'Processes',
             'ProcessUsers',
             'SingleReport',
             'Survey',
             'SurveyTemplates',
+            'Subscribers',
+            'Subscription',
+            'Subscriptions',
             'SystemicMapItems',
             'SystemicStructureMapItems',
             'UserDepartment',
@@ -51,6 +56,16 @@ class UserTransformer extends ModelTransformer
         return $this->item($model->getOrganization(), new OrganizationTransformer());
     }
 
+    public function includePis(User $model)
+    {
+        return $this->collection($model->getPis(), new PisTransformer());
+    }
+
+    public function includeProcesses(User $model)
+    {
+        return $this->item($model->getProcesses(), new ProcessTransformer());
+    }
+
     public function includeProcessUsers(User $model)
     {
         return $this->collection($model->getProcessUsers(), new ProcessUsersTransformer());
@@ -69,6 +84,18 @@ class UserTransformer extends ModelTransformer
     public function includeSurveyTemplates(User $model)
     {
         return $this->collection($model->getSurveyTemplates(), new SurveyTemplatesTransformer());
+    }
+    public function includeSubscribers(User $model)
+    {
+        return $this->collection($model->getSubscribers(), new SubscribersTransformer());
+    }
+    public function includeSubscription(User $model)
+    {
+        return $this->item($model->getSubscription(), new SubscriptionsTransformer());
+    }
+    public function includeSubscriptions(User $model)
+    {
+        return $this->collection($model->getSubscriptions(), new SubscriptionsTransformer());
     }
 
     public function includeSystemicMapItems(User $model)
