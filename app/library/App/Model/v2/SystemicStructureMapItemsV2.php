@@ -14,11 +14,10 @@ use Phalcon\Mvc\Model;
  * @method SystemicStructureMapChain getSystemicStructureMapChainFrom
  * @method SystemicStructureMapChain getSystemicStructureMapChainTo
  * @method Group getGroups
- * @method Survey getSurvey
  * @method SystemicStructureMap getSystemicStructureMap
  * @method User getUser
  */
-class SystemicStructureMapItems extends Model
+class SystemicStructureMapItemsV2 extends Model
 {
 
     /**
@@ -67,10 +66,10 @@ class SystemicStructureMapItems extends Model
 
     /**
      *
-     * @var integer
-     * @Column(type="integer", length=11, nullable=true)
+     * @var string
+     * @Column(type="string", length=255, nullable=false)
      */
-    public $survey;
+    public $itemType;
 
     /**
      * Initialize method for model.
@@ -103,7 +102,6 @@ class SystemicStructureMapItems extends Model
             'id',
             ['alias' => 'SystemicStructureMap']
         );
-        $this->belongsTo('survey', Survey::class, 'id', ['alias' => 'Survey']);
         $this->belongsTo('userId', User::class, 'id', ['alias' => 'User']);
     }
 
@@ -154,7 +152,7 @@ class SystemicStructureMapItems extends Model
             'proposal' => 'proposal',
             'groupId' => 'groupId',
             'userId' => 'userId',
-            'survey' => 'survey'
+            'itemType' => 'itemType'
         ];
     }
 }

@@ -468,6 +468,11 @@ class SurveyController extends CrudResourceController
             $answerModel->save();
         }
 
+        if ($survey->tag === $config->application->survey->evaluation) {
+            $this->createSingleReport();
+            $this->createGroupReport();
+        }
+
 
         $response = [
             'code' => 1,

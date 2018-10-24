@@ -15,12 +15,12 @@ class SystemicStructureMapChainTransformer extends ModelTransformer
         ];
     }
 
-    public function includeSystemicStructureMapItemsFrom($model)
+    public function includeSystemicStructureMapItemsFrom(SystemicStructureMapChain $model)
     {
         return $this->item($model->getSystemicStructureMapItemsFrom(), new SystemicStructureMapItemsTransformer());
     }
 
-    public function includeSystemicStructureMapItemsTo($model)
+    public function includeSystemicStructureMapItemsTo(SystemicStructureMapChain $model)
     {
         return $this->item($model->getSystemicStructureMapItemsTo(), new SystemicStructureMapItemsTransformer());
     }

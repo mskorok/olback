@@ -1,5 +1,5 @@
 AddDefaultCharset UTF-8
-
+Header always unset X-Frame-Options
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-d
@@ -8,7 +8,6 @@ AddDefaultCharset UTF-8
 </IfModule>
 
 #Header append X-FRAME-OPTIONS "SAMEORIGIN"
-Header always unset X-Frame-Options
 #IMPORTANT TO GET JWT FROM HEADERS
 RewriteCond %{HTTP:Authorization} ^(.*)
 RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]

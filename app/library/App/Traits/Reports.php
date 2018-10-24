@@ -447,7 +447,7 @@ trait Reports
         $query->orderBy('[Answer].[createdAt]');
         $query->limit($config->application->survey->evaluationCount);
         $answers =  $query->getQuery()->execute();
-        if ($answers->count === $config->application->survey->evaluationCount) {
+        if ($answers->count() === $config->application->survey->evaluationCount) {
             return $answers;
         }
         $query = new Builder();
@@ -482,7 +482,7 @@ trait Reports
         $query->orderBy('[Answer].[createdAt]');
         $query->limit($config->application->survey->evaluationCount);
         $answers =  $query->getQuery()->execute();
-        if ($answers->count === $config->application->survey->evaluationCount) {
+        if ($answers->count() === $config->application->survey->evaluationCount) {
             return $answers;
         }
         throw new \RuntimeException('Answers not found');
@@ -556,10 +556,10 @@ trait Reports
         /** @var Simple $processes */
         $processes = $organization->getProcess();
 
-        $surveys =[];
+        $surveys = [];
         /** @var Process $process */
         foreach ($processes as $process) {
-            $surveys = $evaluated
+            $surveys[] = $evaluated
                 ? $process->getSurveyEvaluation()
                 : $process->getSurveyInitial();
         }
@@ -612,7 +612,7 @@ trait Reports
         /** @var User $creator */
         foreach ($ids as $id) {
             $user = $users[$id];
-            $answers[$creator->id] = $this->getOlsetAnswers($user);
+            $answers[$id] = $this->getOlsetAnswers($user);
         }
         return $answers;
     }
@@ -938,11 +938,11 @@ trait Reports
             $width1 = round(100 * abs($score + 1), 2);
             $width2 = round(100 - 100 * abs($score + 1), 2);
 
-            if ($width1 >= 50) {
-                $width1 -= 4.00;
+            if ($width1 >= 50 && $width1 < 99) {
+                $width1 -= 9.00;
             }
-            if ($width2 >= 50) {
-                $width2 -= 4.00;
+            if ($width2 >= 50 && $width2 < 99) {
+                $width2 -= 9.00;
             }
             $first = [
                 1 => [
@@ -976,11 +976,11 @@ trait Reports
             $width1 = round(100 * abs($score), 2);
             $width2 = round(100 - 100 * abs($score), 2);
 
-            if ($width1 >= 50) {
-                $width1 -= 4.00;
+            if ($width1 >= 50 && $width1 < 99) {
+                $width1 -= 9.00;
             }
-            if ($width2 >= 50) {
-                $width2 -= 4.00;
+            if ($width2 >= 50 && $width2 < 99) {
+                $width2 -= 9.00;
             }
             $second = [
                 1 => [
@@ -1015,11 +1015,11 @@ trait Reports
             $width1 = round(100 * abs($score), 2);
             $width2 = round(100 - 100 * abs($score), 2);
 
-            if ($width1 >= 50) {
-                $width1 -= 4.00;
+            if ($width1 >= 50 && $width1 < 99) {
+                $width1 -= 9.00;
             }
-            if ($width2 >= 50) {
-                $width2 -= 4.00;
+            if ($width2 >= 50 && $width2 < 99) {
+                $width2 -= 9.00;
             }
             $third = [
                 1 => [
@@ -1053,11 +1053,11 @@ trait Reports
             $width1 = round(100 * abs($score - 1), 2);
             $width2 = round(100 - 100 * abs($score - 1), 2);
 
-            if ($width1 >= 50) {
-                $width1 -= 4.00;
+            if ($width1 >= 50 && $width1 < 99) {
+                $width1 -= 9.00;
             }
-            if ($width2 >= 50) {
-                $width2 -= 4.00;
+            if ($width2 >= 50 && $width2 < 99) {
+                $width2 -= 9.00;
             }
             $fourth = [
                 1 => [
@@ -1098,7 +1098,7 @@ trait Reports
         $white = $config->application->report->bg->white;
         $red = $config->application->report->bg->red;
         $blue = $config->application->report->bg->blue;
-        $whiteColor = $config->application->report->bg->white;
+        $whiteColor = $config->application->report->char->white;
         if ($score >= -2 && $score < 0) {
             return ['bg' => $red, 'char' => $whiteColor];
         }

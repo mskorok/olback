@@ -11,7 +11,12 @@ class SystemicStructureMapItemsTransformer extends ModelTransformer
     {
         $this->modelClass = SystemicStructureMapItems::class;
         $this->availableIncludes = [
-            'SystemicStructureMapChainFrom', 'SystemicStructureMapChainTo', 'Groups', 'SystemicStructureMap', 'User'
+            'SystemicStructureMapChainFrom',
+            'SystemicStructureMapChainTo',
+            'Groups',
+            'SystemicStructureMap',
+            'User',
+            'Survey'
         ];
     }
 
@@ -38,5 +43,10 @@ class SystemicStructureMapItemsTransformer extends ModelTransformer
     public function includeUser(SystemicStructureMapItems $model)
     {
         return $this->item($model->getUser(), new UserTransformer());
+    }
+
+    public function includeSurvey(SystemicStructureMapItems $model)
+    {
+        return $this->item($model->getSurvey(), new SurveyTransformer());
     }
 }

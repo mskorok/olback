@@ -22,13 +22,13 @@ class ReportResource extends ApiResource
             ->endpoint(
                 ApiEndpoint::get('/render-single', 'renderSingleReport')
                     ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->deny(AclRoles::UNAUTHORIZED)
                     ->description('get Single Report data')
             )
             ->endpoint(
                 ApiEndpoint::get('/render-group', 'renderGroupReport')
                     ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->deny(AclRoles::UNAUTHORIZED)
                     ->description('get Group Report data')
             )->endpoint(
                 ApiEndpoint::get('/single', 'singleReport')
@@ -38,18 +38,18 @@ class ReportResource extends ApiResource
             )->endpoint(
                 ApiEndpoint::get('/group', 'groupReport')
                     ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->deny(AclRoles::UNAUTHORIZED)
                     ->description('get Group Report link')
             )->endpoint(
                 ApiEndpoint::get('/create-group', 'groupReportCreate')
                     ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::USER)
                     ->description('get Group Report create')
             )
             ->endpoint(
                 ApiEndpoint::get('/create-single', 'singleReportCreate')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
                     ->description('get Group Report create')
             );
     }

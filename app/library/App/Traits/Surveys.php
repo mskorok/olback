@@ -414,7 +414,10 @@ trait Surveys
         $config = $di->get(Services::CONFIG);
         /** @var Survey $initialSurvey */
         $initialSurvey = $process->getSurveyInitial();
-        return $this->_getSurveysAnswers($initialSurvey, $config->application->survey->initCount, 'Initial');
+        if ($initialSurvey instanceof Survey) {
+            return $this->_getSurveysAnswers($initialSurvey, $config->application->survey->initCount, 'Initial');
+        }
+        throw new \RuntimeException('Initial survey not found App/Traits/Surveys.php:416');
     }
 
     /**

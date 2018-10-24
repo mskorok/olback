@@ -22,139 +22,94 @@ class SystemicMapResource extends ApiResource
             ->itemKey('systemicmap')
             ->collectionKey('systemicmap')
             ->deny(AclRoles::UNAUTHORIZED, AclRoles::USER)
+            //Map
             ->endpoint(
                 ApiEndpoint::get('/getAll', 'getSystemicMap')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('get systemicmaps')
+                    ->description('Get Systemic Maps')
             )
             ->endpoint(
                 ApiEndpoint::get('/getSystemic/{id}', 'getSystemicMapByProcess')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('get systemicmaps')
-            )
-            ->endpoint(
-                ApiEndpoint::get('/getSystemicStructureMap/{id}', 'getSystemicStructureMapByProcess')
+                    ->description('Get Systemic Maps by Process')
+            )->endpoint(
+                ApiEndpoint::post('/create', 'createSystemicMap')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('get getSystemicStructureMapByProcess')
+                    ->description('Create Systemic Map')
+            )->endpoint(
+                ApiEndpoint::put('/{id}', 'updateSystemicMap')
+                    ->allow(AclRoles::MANAGER)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('Update Systemic Map')
+            )->endpoint(
+                ApiEndpoint::delete('/{id}', 'deleteSystemicMap')
+                    ->allow(AclRoles::MANAGER)
+                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
+                    ->description('Delete Systemic Map')
             )
+            //Items
             ->endpoint(
                 ApiEndpoint::get('/getItem/{id}', 'getSystemicItem')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('get systemicmaps')
-            )
-            ->endpoint(
-                ApiEndpoint::get('/getItemTree/{id}', 'getSystemicItemTree')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('get systemicmaps')
-            )
-            ->endpoint(
-                ApiEndpoint::post('/create', 'createSystemicMap')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('create systemicmaps')
-            )->endpoint(
-                ApiEndpoint::post('/createSystemicStructureMap', 'createSystemicStructureMap')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('create structure systemicmaps')
+                    ->description('Get Systemic Map Items')
             )->endpoint(
                 ApiEndpoint::post('/createItem', 'createSystemicMapItem')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('create systemicmapsItem')
-            )
-            //createSystemicStructureMapItem
-            ->endpoint(
-                ApiEndpoint::post('/createSystemicStructureMapItem', 'createSystemicStructureMapItem')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('create SystemicStructureMap item')
-            )
-            ->endpoint(
-                ApiEndpoint::put('/updateSystemicStructureMap/{id}', 'updateSystemicStructureMap')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('update SystemicStructureMap')
-            )
-            ->endpoint(
-                ApiEndpoint::put('/{id}', 'updateSystemicMap')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('update systemicmapsItem')
-            )
-            ->endpoint(
+                    ->description('Create Systemic Map Item')
+            )->endpoint(
                 ApiEndpoint::put('/item/{id}', 'updateSystemicItem')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('update systemicmapsItem')
-            )
-            //updateSystemicStructureItem
-            ->endpoint(
-                ApiEndpoint::put('/updateSystemicStructureItem/{id}', 'updateSystemicStructureItem')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('update updateSystemicStructureItem')
-            )
-            ->endpoint(
-                ApiEndpoint::delete('/{id}', 'deleteSystemicMap')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('delete systemicmapsItem')
-            )
-            ->endpoint(
+                    ->description('Update Systemic Map Item')
+            )->endpoint(
                 ApiEndpoint::delete('/item/{id}', 'deleteSystemicItem')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('delete systemicmapsItem')
+                    ->description('Delete Systemic Map Item')
             )
-            //deleteSystemicStructureItem
+            //Chain
             ->endpoint(
-                ApiEndpoint::delete('/deleteSystemicStructureItem/{id}', 'deleteSystemicStructureItem')
+                ApiEndpoint::get('/getChain/{id}/{type}', 'getChain')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('delete deleteSystemicStructureItem')
+                    ->description('getChain')
             )
             ->endpoint(
-                ApiEndpoint::get('/getStructureChain/{id}/{type}', 'getStructureChain')
+                ApiEndpoint::delete('/deleteChain/{id}', 'deleteChain')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('getStructureChain')
+                    ->description('Delete Chain')
             )
             ->endpoint(
-                ApiEndpoint::delete('/deleteStructureChain/{id}', 'deleteStructureChain')
+                ApiEndpoint::post('/createChain', 'createChain')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('deleteStructureChain')
+                    ->description('Create Chain')
             )
+            //Tree
             ->endpoint(
-                ApiEndpoint::get('/getSystemicStructureItem/{id}/{type}', 'getSystemicStructureItem')
+                ApiEndpoint::get('/getItemTree/{id}', 'getSystemicItemTree')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('getSystemicStructureItem')
+                    ->description('Get Systemic Map Items Tree')
             )
-            //createStructureChain
-            ->endpoint(
-                ApiEndpoint::post('/createStructureChain', 'createStructureChain')
-                    ->allow(AclRoles::MANAGER)
-                    ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('createStructureChain')
-            )
+            //Action List
             ->endpoint(
                 ApiEndpoint::post('/createActionListGroup', 'createActionListGroup')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('create Action List Group')
+                    ->description('Create Action List Group')
             )
             ->endpoint(
                 ApiEndpoint::post('/importActionListGroup', 'createActionListGroup4')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
-                    ->description('create Action List Group')
+                    ->description('Import Action List Group')
             );
     }
 }

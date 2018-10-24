@@ -4,20 +4,22 @@ namespace App\Controllers;
 
 use App\Constants\Services;
 use App\Model\Process;
+use App\Model\SystemicStructureMap;
+use App\Model\SystemicStructureMapChain;
+use App\Model\SystemicStructureMapItems;
 use App\Traits\Auth;
 use Phalcon\Db;
 use Phalcon\Mvc\Model\Resultset\Simple;
 use PhalconRest\Mvc\Controllers\CrudResourceController;
 use App\Model\UserOrganization;
 use App\Model\User;
-use App\Model\SystemicMap;
 use App\Model\SystemicMapItems;
 use App\Model\SystemicMapChain;
 use App\Model\ActionListGroup;
 use App\Constants\AclRoles;
 use App\Model\Group;
 
-class SystemicMapController extends CrudResourceController
+class SystemicStructureMapController extends CrudResourceController
 {
     use Auth;
 
@@ -29,7 +31,7 @@ class SystemicMapController extends CrudResourceController
      * @return mixed
      * @throws \RuntimeException
      */
-    public function getSystemicMap()
+    public function getSystemicStructureMap()
     {
         $creatorId = $this->getAuthenticatedId();
         if (null === $creatorId) {
@@ -54,7 +56,7 @@ class SystemicMapController extends CrudResourceController
         $organization_id = $creator['organization']->organization_id;
 
         /** @var Simple $systemicMaps */
-        $systemicMaps = SystemicMap::find(
+        $systemicMaps = SystemicStructureMap::find(
             [
                 'conditions' => '	organization = ?1',
                 'bind' => [
@@ -64,68 +66,7 @@ class SystemicMapController extends CrudResourceController
         );
         $systemicMapsArray = [];
         if ($systemicMaps->count() > 0) {
-            /** @var SystemicMap $systemicMap */
-            foreach ($systemicMaps as $systemicMap) {
-                $systemicMapsArray[] = [
-                    'id' => $systemicMap->id,
-                    'name' => $systemicMap->name,
-                    'department' => $systemicMap->department,
-                    'organization' => $systemicMap->organization,
-                    'isActive' => $systemicMap->isActive,
-                ];
-            }
-        }
-        $response = [
-            'code' => 1,
-            'status' => 'Success',
-            'data' => $systemicMapsArray,
-        ];
-
-        return $this->createArrayResponse($response, 'data');
-    }
-
-    /**
-     * @param $id
-     * @return mixed
-     * @throws \RuntimeException
-     */
-    public function getSystemicMapByProcess($id)
-    {
-        $creatorId = $this->getAuthenticatedId();
-        if (null === $creatorId) {
-            $response = [
-                'code' => 0,
-                'status' => 'Error',
-                'data' => 'User not authenticated!'
-            ];
-            return $this->createArrayResponse($response, 'data');
-        }
-
-        $creator = static::getUserDetails($creatorId);
-        if ($creator && $creator['organization'] === null) {
-            $response = [
-                'code' => 0,
-                'status' => 'Error',
-                'data' => "Manager's organization not found!",
-            ];
-
-            return $this->createArrayResponse($response, 'data');
-        }
-        $organization_id = $creator['organization']->organization_id;
-
-        /** @var Simple $systemicMaps */
-        $systemicMaps = SystemicMap::find(
-            [
-                'conditions' => '	organization = ?1 AND processId = ?2',
-                'bind' => [
-                    1 => $organization_id,
-                    2 => $id,
-                ],
-            ]
-        );
-        $systemicMapsArray = [];
-        if ($systemicMaps->count() > 0) {
-            /** @var SystemicMap $systemicMap */
+            /** @var SystemicStructureMap $systemicMap */
             foreach ($systemicMaps as $systemicMap) {
                 $systemicMapsArray[] = [
                     'id' => $systemicMap->id,
@@ -147,13 +88,74 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     * @throws \RuntimeException
+     */
+    public function getSystemicStructureMapByProcess($id)
+    {
+        $creatorId = $this->getAuthenticatedId();
+        if (null === $creatorId) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'User not authenticated!'
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
 
+        $creator = static::getUserDetails($creatorId);
+        if ($creator && $creator['organization'] === null) {
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => "Manager's organization not found!",
+            ];
+
+            return $this->createArrayResponse($response, 'data');
+        }
+        $organization_id = $creator['organization']->organization_id;
+
+        /** @var Simple $systemicMaps */
+        $systemicMaps = SystemicStructureMap::find(
+            [
+                'conditions' => '	organization = ?1 AND processId = ?2',
+                'bind' => [
+                    1 => $organization_id,
+                    2 => $id,
+                ],
+            ]
+        );
+        $systemicMapsArray = [];
+        if ($systemicMaps->count() > 0) {
+            /** @var SystemicStructureMap $systemicMap */
+            foreach ($systemicMaps as $systemicMap) {
+                $systemicMapsArray[] = [
+                    'id' => $systemicMap->id,
+                    'name' => $systemicMap->name,
+                    'creator' => User::findFirst($systemicMap->creator_id),
+                    'department' => $systemicMap->department,
+                    'organization' => $systemicMap->organization,
+                    'isActive' => $systemicMap->isActive,
+                    'process' => Process::findFirst($systemicMap->processId)
+                ];
+            }
+        }
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => $systemicMapsArray,
+        ];
+
+        return $this->createArrayResponse($response, 'data');
+    }
 
     /**
      * @return mixed
      * @throws \RuntimeException
      */
-    public function createSystemicMap()
+    public function createSystemicStructureMap()
     {
         $creatorId = $this->getAuthenticatedId();
         if (null === $creatorId) {
@@ -217,7 +219,7 @@ class SystemicMapController extends CrudResourceController
             ];
             return $this->createArrayResponse($response, 'data');
         }
-        $systemicMap = new SystemicMap();
+        $systemicMap = new SystemicStructureMap();
         $systemicMap->name = $data->name;
         if ($data->department === '') {
             $systemicMap->department = null;
@@ -252,14 +254,12 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
-
     /**
      * @param $id
      * @return mixed
      * @throws \RuntimeException
      */
-    public function updateSystemicMap($id)
+    public function updateSystemicStructureMap($id)
     {
         $data = $this->request->getJsonRawBody();
         $creatorId = $this->getAuthenticatedId();
@@ -285,9 +285,8 @@ class SystemicMapController extends CrudResourceController
 
         $user = User::findFirst($creatorId);
 
-
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
-            $systemicMap = SystemicMap::findFirst(
+            $systemicMap = SystemicStructureMap::findFirst(
                 [
                     'conditions' => 'id = ?1 AND organization = ?2',
                     'bind' => [
@@ -297,7 +296,7 @@ class SystemicMapController extends CrudResourceController
                 ]
             );
         } else {
-            $systemicMap = SystemicMap::findFirst(
+            $systemicMap = SystemicStructureMap::findFirst(
                 [
                     'conditions' => 'id = ?1 AND organization = ?2 AND creator_id = ?3',
                     'bind' => [
@@ -308,7 +307,7 @@ class SystemicMapController extends CrudResourceController
                 ]
             );
         }
-        if ($systemicMap instanceof SystemicMap) {
+        if ($systemicMap instanceof SystemicStructureMap) {
             if (isset($data->name)) {
                 $systemicMap->name = $data->name;
             }
@@ -330,14 +329,12 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
-
     /**
      * @param $id
      * @return mixed
      * @throws \RuntimeException
      */
-    public function deleteSystemicMap($id)
+    public function deleteSystemicStructureMap($id)
     {
         $creatorId = $this->getAuthenticatedId();
         if (null === $creatorId) {
@@ -358,12 +355,19 @@ class SystemicMapController extends CrudResourceController
 
             return $this->createArrayResponse($response, 'data');
         }
-        $user = User::findFirst((int)$creatorId);
+        $user = User::findFirst(
+            [
+                'conditions' => 'id = ?1',
+                'bind' => [
+                    1 => $creatorId,
+                ],
+            ]
+        );
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
             /** @var Simple $systemicMap */
-            $systemicMap = SystemicMap::findFirst((int) $id);
+            $systemicMap = SystemicStructureMap::findFirst((int) $id);
 
-            if ($systemicMap instanceof SystemicMap) {
+            if ($systemicMap instanceof SystemicStructureMap) {
                 /** @var Simple $systemicItems */
                 $systemicItems = SystemicMapItems::find(
                     [
@@ -373,10 +377,10 @@ class SystemicMapController extends CrudResourceController
                         ],
                     ]
                 );
-                /** @var SystemicMapItems $systemicItem */
+                /** @var SystemicStructureMapItems $systemicItem */
                 foreach ($systemicItems as $systemicItem) {
                     /** @var Simple $systemicChains */
-                    $systemicChains = SystemicMapChain::find(
+                    $systemicChains = SystemicStructureMapChain::find(
                         [
                             'conditions' => 'from_item =?1 OR to_item =?1',
                             'bind' => [
@@ -384,7 +388,7 @@ class SystemicMapController extends CrudResourceController
                             ],
                         ]
                     );
-                    /** @var SystemicMapChain $systemicChain */
+                    /** @var SystemicStructureMapChain $systemicChain */
                     foreach ($systemicChains as $systemicChain) {
                         $systemicChain->delete();
                     }
@@ -412,32 +416,33 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
+
     /**************************** ITEM *****************************/
 
     /**
      * @param $id
      * @return mixed
      */
-    public function getSystemicItem($id)
+    public function getSystemicStructureItem($id)
     {
         /** @var Simple $systemicMapItems */
-        $systemicMapItems = SystemicMapItems::find(
+        $systemicMapItems = SystemicStructureMapItems::find(
             [
-                'conditions' => '	systemic_map_id = ?1',
+                'conditions' => 'systemic_map_id = ?1',
                 'bind' => [
-                    1 => $id,
+                    1 => $id
                 ],
             ]
         );
-        $systemicMapsArray = [];
+        $systemicMapItemsArray = [];
         $linksArray = [];
         $i = 0;
         $map = [];
         if ($systemicMapItems->count() > 0) {
-            /** @var SystemicMapItems $systemicMapItem */
+            /** @var SystemicStructureMapItems $systemicMapItem */
             foreach ($systemicMapItems as $systemicMapItem) {
                 $groupColorValue = null;
-                if ($systemicMapItem->groupId !== null) {
+                if (null !== $systemicMapItem->groupId) {
                     $groupColor = Group::findFirst($systemicMapItem->groupId);
 
                     if ($groupColor instanceof Group && $groupColor->color !== null) {
@@ -445,8 +450,9 @@ class SystemicMapController extends CrudResourceController
                     }
                 }
 
+
                 /** @var Simple $chains */
-                $chains = SystemicMapChain::find(
+                $chains = SystemicStructureMapChain::find(
                     [
                         'conditions' => 'to_item =?1',
                         'bind' => [
@@ -455,9 +461,9 @@ class SystemicMapController extends CrudResourceController
                     ]
                 );
 
-                $systemicMapsArray[] = [
-                    'id' => $systemicMapItem->id,
-                    'systemic_map_id' => $systemicMapItem->systemic_map_id,
+                $systemicMapItemsArray[] = [
+                    'id' => (int)$systemicMapItem->id,
+                    'systemic_map_id' => (int)$systemicMapItem->systemic_map_id,
                     'name' => $systemicMapItem->question,
                     'proposal' => $systemicMapItem->proposal,
                     'group' => (int)$systemicMapItem->groupId,
@@ -470,43 +476,42 @@ class SystemicMapController extends CrudResourceController
 
                 $i++;
             }
+        }
 
-
-            foreach ($systemicMapsArray as $item) {
-                /** @var array $chains */
-                $chains = $item['chains'];
-                /** @var SystemicMapChain $chain */
-                foreach ($chains as $chain) {
-                    if ($chain->from_item === null) {
-                        $linksArray[] = [
-                            'source' => 0,
-                            'target' => 0,
-                            'value' => 2,
-                        ];
-                    } else {
-                        $linksArray[] = [
-                            'source' => $map[$chain->from_item],
-                            'target' => $map[$chain->to_item],
-                            'value' => 2,
-                        ];
-                    }
+        foreach ($systemicMapItemsArray as $item) {
+            /** @var array $chains */
+            $chains = $item['chains'];
+            /** @var SystemicMapChain $chain */
+            foreach ($chains as $chain) {
+                if ($chain->from_item === null) {
+                    $linksArray[] = [
+                        'source' => 0,
+                        'target' => 0,
+                        'value' => 2,
+                    ];
+                } else {
+                    $linksArray[] = [
+                        'source' => $map[$chain->from_item],
+                        'target' => $map[$chain->to_item],
+                        'value' => 2,
+                    ];
                 }
             }
         }
+
         $response = [
             'code' => 1,
             'status' => 'Success',
-            'data' => ['nodes' => $systemicMapsArray, 'links' => $linksArray],
+            'data' => ['nodes' => $systemicMapItemsArray, 'links' => $linksArray],
         ];
 
         return $this->createArrayResponse($response, 'data');
     }
 
-
     /**
      * @return mixed
      */
-    public function createSystemicMapItem()
+    public function createSystemicStructureMapItem()
     {
         $creatorId = $this->getAuthenticatedId();
         if (null === $creatorId) {
@@ -552,7 +557,7 @@ class SystemicMapController extends CrudResourceController
 
         $config = $this->getDI()->get(Services::CONFIG);
 
-        $systemicItem = new SystemicMapItems();
+        $systemicItem = new SystemicStructureMapItems();
         $systemicItem->systemic_map_id = $data->systemic_map_id;
         $systemicItem->question = $data->question;
         $systemicItem->proposal = $dp;
@@ -572,14 +577,14 @@ class SystemicMapController extends CrudResourceController
                 'data' => $messagesErrors,
             ];
         } else {
-            $systemicMapItemId = $systemicItem->getWriteConnection()->lastInsertId();
-            $chain = new SystemicMapChain();
+            $systemicItem->refresh();
+            $chain = new SystemicStructureMapChain();
             if ($data->from_item === '') {
                 $chain->from_item = null;
             } else {
                 $chain->from_item = $data->from_item;
             }
-            $chain->to_item = $systemicMapItemId;
+            $chain->to_item = $systemicItem->id;
             if ($chain->save() === false) {
                 $messagesErrors = [];
                 foreach ($chain->getMessages() as $message) {
@@ -597,7 +602,7 @@ class SystemicMapController extends CrudResourceController
             $response = [
                 'code' => 1,
                 'status' => 'Success',
-                'data' => ['systemicMapItemId' => $systemicMapItemId],
+                'data' => ['systemicMapItemId' => $systemicItem->id],
             ];
         }
 
@@ -609,7 +614,7 @@ class SystemicMapController extends CrudResourceController
      * @return mixed
      * @throws \RuntimeException
      */
-    public function updateSystemicItem($id)
+    public function updateSystemicStructureItem($id)
     {
         $data = $this->request->getJsonRawBody();
         $creatorId = $this->getAuthenticatedId();
@@ -643,9 +648,9 @@ class SystemicMapController extends CrudResourceController
         );
 
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
-            $systemicItems = SystemicMapItems::findFirst((int) $id);
+            $systemicItems = SystemicStructureMapItems::findFirst((int) $id);
 
-            if ($systemicItems instanceof SystemicMapItems && $creatorId !== $systemicItems->userId) {
+            if ($systemicItems instanceof SystemicStructureMapItems && $creatorId !== $systemicItems->userId) {//todo
                 $organizationChecked = UserOrganization::findFirst(
                     [
                         'conditions' => 'user_id = ?1 AND organization_id = ?2',
@@ -676,7 +681,7 @@ class SystemicMapController extends CrudResourceController
                 ]
             );
         }
-        if ($systemicItems instanceof SystemicMapItems) {
+        if ($systemicItems instanceof SystemicStructureMapItems) {
             if (isset($data->question)) {
                 $systemicItems->question = $data->question;
             }
@@ -694,7 +699,7 @@ class SystemicMapController extends CrudResourceController
         } else {
             $response = [
                 'code' => 0,
-                'status' => 'You cannot edit this group!',
+                'status' => 'You can`t edit this group!',
             ];
         }
 
@@ -706,7 +711,7 @@ class SystemicMapController extends CrudResourceController
      * @return mixed
      * @throws \RuntimeException
      */
-    public function deleteSystemicItem($id)
+    public function deleteSystemicStructureItem($id)
     {
         $creatorId = $this->getAuthenticatedId();
         if (null === $creatorId) {
@@ -731,7 +736,7 @@ class SystemicMapController extends CrudResourceController
 
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
             /** @var Simple $systemicChains */
-            $systemicChains = SystemicMapChain::find(
+            $systemicChains = SystemicStructureMapChain::find(
                 [
                     'conditions' => 'from_item =?1 OR to_item =?1',
                     'bind' => [
@@ -739,14 +744,14 @@ class SystemicMapController extends CrudResourceController
                     ],
                 ]
             );
-            /** @var SystemicMapChain $systemicChain */
+            /** @var SystemicStructureMapChain $systemicChain */
             foreach ($systemicChains as $systemicChain) {
                 $systemicChain->delete();
             }
             /** @var Simple $systemicItems */
-            $systemicItems = SystemicMapItems::find((int)$id);
+            $systemicItems = SystemicStructureMapItems::find((int)$id);
 
-            /** @var SystemicMapItems $systemicItem */
+            /** @var SystemicStructureMapItems $systemicItem */
             foreach ($systemicItems as $systemicItem) {
                 $systemicItem->delete();
             }
@@ -757,7 +762,7 @@ class SystemicMapController extends CrudResourceController
             ];
         } else {
             /** @var Simple $systemicItems */
-            $systemicItems = SystemicMapItems::find(
+            $systemicItems = SystemicStructureMapItems::find(
                 [
                     'conditions' => 'userId =?1 AND id =?2',
                     'bind' => [
@@ -771,10 +776,10 @@ class SystemicMapController extends CrudResourceController
                     'code' => 1,
                     'status' => 'Success',
                 ];
-                /** @var SystemicMapItems $systemicItem */
+                /** @var SystemicStructureMapItems $systemicItem */
                 foreach ($systemicItems as $systemicItem) {
                     /** @var Simple $systemicChain */
-                    $systemicChain = SystemicMapChain::find(
+                    $systemicChain = SystemicStructureMapChain::find(
                         [
                             'conditions' => 'from_item =?1 OR to_item =?1',
                             'bind' => [
@@ -802,19 +807,18 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($response, 'data');
     }
 
-
     /**************************** CHAIN *****************************/
 
     /**
      * @param $id
      * @return mixed
      */
-    public function getChain($id)
+    public function getSystemicStructureChain($id)
     {
         $connection = $this->db;
         $sql_dist = 'SELECT DISTINCT SC.id,SC.from_item,SC.to_item,I.itemType '
-            . 'FROM `systemic_map_chain` SC '
-            . 'LEFT JOIN systemic_map_items I ON SC.from_item = I.id OR SC.to_item = I.id '
+            . 'FROM `systemic_structure_map_chain` SC '
+            . 'LEFT JOIN systemic_map_structure_items I ON SC.from_item = I.id OR SC.to_item = I.id '
             . 'WHERE systemic_map_id = ' . $id . ' ';
         $data_dist = $connection->query($sql_dist);
         $data_dist->setFetchMode(Db::FETCH_ASSOC);
@@ -836,7 +840,7 @@ class SystemicMapController extends CrudResourceController
      * @return mixed
      * @throws \RuntimeException
      */
-    public function createChain()
+    public function createSystemicStructureChain()
     {
         $data = $this->request->getJsonRawBody();
         $creatorId = $this->getAuthenticatedId();
@@ -860,34 +864,34 @@ class SystemicMapController extends CrudResourceController
         }
 
         if (isset($data->from_item) && is_numeric($data->from_item)) {
-            $systemicMapsItemFrom = SystemicMapItems::findFirst((int)$data->from_item);
+            $systemicMapsItemFrom = SystemicStructureMapItems::findFirst((int)$data->from_item);
 
-            if (!($systemicMapsItemFrom instanceof SystemicMapItems)) {
+            if (!($systemicMapsItemFrom instanceof SystemicStructureMapItems)) {
                 $response = [
                     'code' => 0,
-                    'status' => 'Can`t find item id: ' . $data->from_item,
+                    'status' => 'Cannot find item id: ' . $data->from_item,
                 ];
                 return $this->createArrayResponse($response, 'data');
             }
         }
         if (isset($data->to_item) && is_numeric($data->to_item)) {
-            $systemicMapsItemTo = SystemicMapItems::findFirst((int)$data->to_item);
-            if (!($systemicMapsItemTo instanceof SystemicMapItems)) {
+            $systemicMapsItemTo = SystemicStructureMapItems::findFirst((int)$data->to_item);
+            if (!($systemicMapsItemTo instanceof SystemicStructureMapItems)) {
                 $response = [
                     'code' => 0,
-                    'status' => 'Can`t find item id: ' . $data->to_item,
+                    'status' => 'Cannot find item id: ' . $data->to_item,
                 ];
                 return $this->createArrayResponse($response, 'data');
             }
         } else {
             $response = [
                 'code' => 0,
-                'status' => 'Can`t find item id: ' . $data->to_item,
+                'status' => 'Cannot find item id: ' . $data->to_item,
             ];
             return $this->createArrayResponse($response, 'data');
         }
 
-        $chain = new SystemicMapChain();
+        $chain = new SystemicStructureMapChain();
         if (isset($data->from_item)) {
             $chain->from_item = $data->from_item;
         }
@@ -904,9 +908,9 @@ class SystemicMapController extends CrudResourceController
      * @param $id
      * @return mixed
      */
-    public function deleteChain($id)
+    public function deleteSystemicStructureChain($id)
     {
-        $chain = SystemicMapChain::findFirst((int)$id);
+        $chain = SystemicStructureMapChain::findFirst((int)$id);
         $response = [
             'code' => 0,
             'status' => 'Error',
@@ -922,6 +926,7 @@ class SystemicMapController extends CrudResourceController
 
 
 
+
     /****************** TREE  ******************************/
 
     /**
@@ -929,7 +934,7 @@ class SystemicMapController extends CrudResourceController
      * @return mixed
      * @throws \RuntimeException
      */
-    public function getSystemicItemTree($id)
+    public function getSystemicStructureItemTree($id)
     {
         $creatorId = $this->getAuthenticatedId();
         if (null === $creatorId) {
@@ -942,11 +947,11 @@ class SystemicMapController extends CrudResourceController
         }
 
         /** @var Simple $systemicMapsR */
-        $systemicMapsR = SystemicMap::find((int) $id);
+        $systemicMapsR = SystemicStructureMap::find((int) $id);
 
         $systemicR = '';
         if ($systemicMapsR->count() > 0) {
-            /** @var SystemicMap $systemicMapR */
+            /** @var SystemicStructureMap $systemicMapR */
             foreach ($systemicMapsR as $systemicMapR) {
                 $systemicR = $systemicMapR->name;
             }
@@ -955,9 +960,9 @@ class SystemicMapController extends CrudResourceController
         $creator = static::getUserDetails($creatorId);
         $creatorInfo = [$creatorId, $creator['account']->role];
         $connection = $this->db;
-        $sql_dist = 'SELECT smi.id,u.first_name,u.last_name FROM `systemic_map_items` smi '
+        $sql_dist = 'SELECT smi.id,u.first_name,u.last_name FROM `systemic_map_structure_items` smi '
             . 'JOIN user u ON smi.userId = u.id WHERE smi.id NOT IN '
-            . '(SELECT distinct smc.from_item as id FROM `systemic_map_chain` smc '
+            . '(SELECT distinct smc.from_item as id FROM `systemic_structure_map_chain` smc '
             . 'WHERE smc.from_item IS NOT NULL ) AND smi.systemic_map_id=' . $id . ';';
         $data_dist = $connection->query($sql_dist);
         $data_dist->setFetchMode(Db::FETCH_ASSOC);
@@ -967,9 +972,9 @@ class SystemicMapController extends CrudResourceController
         foreach ($results_dist as $key => $value) {
             $non_ch[] = $value['id'];
         }
-        $sql = 'SELECT to_item as id FROM `systemic_map_chain` '
+        $sql = 'SELECT to_item as id FROM `systemic_structure_map_chain` '
             . 'WHERE from_item IS NULL AND to_item IN '
-            . '(SELECT id FROM systemic_map_items WHERE systemic_map_id=' . $id . ')';
+            . '(SELECT id FROM systemic_map_structure_items WHERE systemic_map_id=' . $id . ')';
 
         $data = $connection->query($sql);
         $data->setFetchMode(Db::FETCH_ASSOC);
@@ -1024,6 +1029,7 @@ class SystemicMapController extends CrudResourceController
         return $this->createArrayResponse($a, 'data');
     }
 
+
     /**
      * @param array $arrayData
      * @return array
@@ -1032,7 +1038,7 @@ class SystemicMapController extends CrudResourceController
     {
         $tree = [];
         foreach ($arrayData as $value) {
-            $sql = 'SELECT sm.*,u.first_name,u.last_name FROM systemic_map_items sm '
+            $sql = 'SELECT sm.*,u.first_name,u.last_name FROM systemic_map_structure_items sm '
                 . 'JOIN user u ON sm.userId = u.id WHERE sm.id=' . $value['id'];
 
             $connection = $this->db;
@@ -1059,7 +1065,7 @@ class SystemicMapController extends CrudResourceController
         $treeArray = [];
         foreach ($tree as $item) {
             $id = $item['id'];
-            $sql = 'SELECT to_item as id FROM `systemic_map_chain` WHERE from_item = ' . $id;
+            $sql = 'SELECT to_item as id FROM `systemic_structure_map_chain` WHERE from_item = ' . $id;
             $connection = $this->db;
             $data = $connection->query($sql);
             $data->setFetchMode(Db::FETCH_ASSOC);
@@ -1149,6 +1155,7 @@ class SystemicMapController extends CrudResourceController
         return $hex;//todo
     }
 
+
     /****************** ACTION LIST  ******************************/
 
     /**
@@ -1181,9 +1188,9 @@ class SystemicMapController extends CrudResourceController
         } else {
             $data = $this->request->getJsonRawBody();
             $connection = $this->db;
-            $sql_dist = 'SELECT SM.to_item as id FROM `systemic_map_chain` SM '
-                . 'JOIN systemic_map_items SI ON SI.id = SM.to_item WHERE NOT EXISTS '
-                . '(SELECT * FROM systemic_map_chain sm2 '
+            $sql_dist = 'SELECT SM.to_item as id FROM `systemic_structure_map_chain` SM '
+                . 'JOIN systemic_map_structure_items SI ON SI.id = SM.to_item WHERE NOT EXISTS '
+                . '(SELECT * FROM systemic_structure_map_chain sm2 '
                 . 'WHERE sm2.from_item = SM.to_item) AND SI.systemic_map_id = ' . $data->systemicMapId . ';';
             $data_dist = $connection->query($sql_dist);
             $data_dist->setFetchMode(Db::FETCH_ASSOC);
@@ -1209,7 +1216,7 @@ class SystemicMapController extends CrudResourceController
         $tree = [];
         foreach ($arrayData as $value) {
             if ($value['id'] !== '') {
-                $sql = 'SELECT sm.*,u.first_name,u.last_name FROM systemic_map_items sm '
+                $sql = 'SELECT sm.*,u.first_name,u.last_name FROM systemic_map_structure_items sm '
                     . 'JOIN user u ON sm.userId = u.id WHERE sm.id=' . $value['id'];
 
                 $connection = $this->db;
@@ -1236,7 +1243,7 @@ class SystemicMapController extends CrudResourceController
         }
         foreach ($tree as $item) {
             $id = $item['id'];
-            $sql = 'SELECT from_item as id FROM `systemic_map_chain` WHERE to_item = ' . $id;
+            $sql = 'SELECT from_item as id FROM `systemic_structure_map_chain` WHERE to_item = ' . $id;
             $connection = $this->db;
             $data = $connection->query($sql);
             $data->setFetchMode(Db::FETCH_ASSOC);
@@ -1250,7 +1257,7 @@ class SystemicMapController extends CrudResourceController
      * @return mixed
      * @throws \RuntimeException
      */
-    protected function createActionListGroup4()
+    protected function importActionListGroup()
     {
         $creatorId = $this->getAuthenticatedId();
         if (null === $creatorId) {
@@ -1275,9 +1282,10 @@ class SystemicMapController extends CrudResourceController
         } else {
             $data = $this->request->getJsonRawBody();
             $connection = $this->db;
-            $sql_dist = 'SELECT SM.to_item as id FROM `systemic_map_chain` SM '
-                . 'JOIN systemic_map_items SI ON SI.id = SM.to_item WHERE NOT EXISTS '
-                . '(SELECT * FROM systemic_map_chain sm2 WHERE sm2.from_item = SM.to_item) AND SI.systemic_map_id = '
+            $sql_dist = 'SELECT SM.to_item as id FROM `systemic_structure_map_chain` SM '
+                . 'JOIN systemic_map_structure_items SI ON SI.id = SM.to_item WHERE NOT EXISTS '
+                . '(SELECT * FROM systemic_structure_map_chain sm2 WHERE sm2.from_item = SM.to_item) '
+                . 'AND SI.systemic_map_id = '
                 . $data->systemicMapId . ';';
             $data_dist = $connection->query($sql_dist);
             $data_dist->setFetchMode(Db::FETCH_ASSOC);
