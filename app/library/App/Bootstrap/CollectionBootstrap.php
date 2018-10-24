@@ -7,6 +7,7 @@ use App\Collections\ExportCollection;
 // use App\Collections\UserCollection;
 use App\Resources\ProcessYearSurveyResource;
 use App\Resources\ReportResource;
+use App\Resources\SystemicStructureMapResource;
 use App\Resources\UserResource;
 use App\Resources\AlbumResource;
 use App\Resources\PhotoResource;
@@ -44,6 +45,7 @@ class CollectionBootstrap implements BootstrapInterface
             ->resource(new ProcessYearSurveyResource('/year-survey'))
             ->resource(new ReportResource('/report'))
             ->resource(new SystemicMapResource('/systemicmap'))
+            ->resource(new SystemicStructureMapResource('/ssm'))
             ->resource(new SurveyResource('/survey'))
             ->resource(new StatisticsResource('/statistics'))
             ->resource(new UserResource('/users'));

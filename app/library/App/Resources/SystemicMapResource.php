@@ -30,7 +30,7 @@ class SystemicMapResource extends ApiResource
                     ->description('Get Systemic Maps')
             )
             ->endpoint(
-                ApiEndpoint::get('/getSystemic/{id}', 'getSystemicMapByProcess')
+                ApiEndpoint::get('/get/{id}', 'getSystemicMapByProcess')
                     ->allow(AclRoles::MANAGER)
                     ->deny(AclRoles::UNAUTHORIZED, AclRoles::AUTHORIZED)
                     ->description('Get Systemic Maps by Process')
