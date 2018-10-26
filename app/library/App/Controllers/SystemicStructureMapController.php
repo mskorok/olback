@@ -1091,11 +1091,11 @@ class SystemicStructureMapController extends CrudResourceController
             if (\is_array($value)) {
                 if (isset($value['id'])) {
                     if ((AclRoles::ADMINISTRATOR === $creatorInfo[1]) || (AclRoles::MANAGER === $creatorInfo[1])) {
-                        $delete_raw = '<a class="fa fa-lg fa-trash-o" data-ng-click="deleteSysMapItem('
+                        $delete_raw = '<a class="fa fa-lg fa-trash-o" data-ng-click="deleteSysStructureMapItem('
                             . $value['id'] . ')"></a>';
                     } else {
                         if ((int)$creatorInfo[0] === (int)$value['userId']) {
-                            $delete_raw = '<a class="fa fa-lg fa-trash-o" data-ng-click="deleteSysMapItem('
+                            $delete_raw = '<a class="fa fa-lg fa-trash-o" data-ng-click="deleteSysStructureMapItem('
                                 . $value['id'] . ')"></a>';
                         } else {
                             $delete_raw = '';
@@ -1113,11 +1113,12 @@ class SystemicStructureMapController extends CrudResourceController
                         . $delete_raw . '<a class="fa fa-lg fa-plus" data-toggle="modal" data-target="#myModal'
                         . $value['id']
                         . 'C"></a><a class="fa fa-lg fa-pencil-square-o" data-toggle="modal" data-target="#myModal'
-                        . $value['id'] . 'E"></a></span><data-sys-map-items-add lolo="myModal" add-func="addSysMapItem('
+                        . $value['id'] . 'E"></a></span><data-sys-map-items-add lolo="myModal"'
+                        . ' add-func="addSysStructureMapItem('
                         . $value['id'] . ',question,proposal,group,color)" datasp="'
                         . $value['id']
                         . '"></data-sys-map-items-add><data-sys-map-items-edit lolo="myModal"'
-                        . ' edit-func="editSysMapItem('
+                        . ' edit-func="editSysStructureMapItem('
                         . $value['id'] . ',question,proposal,group,color)" datasp="'
                         . $value['id'] . '" dataprop="' . $value['proposal'] . '" dataque="'
                         . $value['question'] . '" datagrp="' . $value['groupId']

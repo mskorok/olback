@@ -5,6 +5,8 @@ namespace App\Controllers;
 use App\Constants\AclRoles;
 use App\Model\Organization;
 use App\Model\Process;
+use App\Model\Subscribers;
+use App\Model\Subscriptions;
 use App\Model\User;
 use App\Traits\Auth;
 use App\Traits\Processes;
@@ -34,10 +36,41 @@ class StatisticsController extends CollectionController
         }
         $creator = static::getUserDetails($creatorId);
 
+        $organizationId = $creator['organization']->organization_id;
+
         $process = $this->getFirstProcessByUser($creator['account']);
 
+        $subscriptions = [];
+        /** @var Simple $singleSubscriptions */
+        $singleSubscriptions = Subscriptions::find([
+            'conditions' => 'subscriber = ?1 AND organization_id = ?2',
+            'bind' => [
+                1 => $this->getAuthenticatedId(),
+                2 => $organizationId
+            ],
+        ]);
 
-        $organizationId = $creator['organization']->organization_id;
+        /** @var Simple $subscribers */
+        $subscribers = Subscribers::find([
+            'conditions' => 'user_id = ?1',
+            'bind' => [
+                1 => $this->getAuthenticatedId()
+            ],
+        ]);
+
+        /** @var Subscriptions $subscription */
+        foreach ($singleSubscriptions as $subscription) {
+            $subscriptions[] = $subscription;
+        }
+
+        /** @var Subscribers $subscriber */
+        foreach ($subscribers as $subscriber) {
+            $subscription = $subscriber->getSubscriptions();
+            $subscriptions[] = $subscription;
+        }
+
+
+
         $connection = $this->db;
         $sql_dist = 'SELECT COUNT(U.id) AS count, role FROM `user` U '
             . 'INNER JOIN user_organization UO ON U.id = UO.user_id '
@@ -84,7 +117,8 @@ class StatisticsController extends CollectionController
                 'count_organizations' => $countOrganizations,
                 'process' => $process,
                 'running' => $statusRunningCount,
-                'stopped' => $statusStoppedCount
+                'stopped' => $statusStoppedCount,
+                'subscriptions' => $subscriptions
             ],
         ];
 

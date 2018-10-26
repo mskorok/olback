@@ -1,4 +1,4 @@
-<?php header('Access-Control-Allow-Origin: *'); ?>
+<?php header('X-Frame-Options: ALLOWALL'); ?>
 <!DOCTYPE html>
 <html>
 <head>
