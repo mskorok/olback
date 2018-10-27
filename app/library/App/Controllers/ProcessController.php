@@ -10,6 +10,8 @@ namespace App\Controllers;
 
 use App\Model\Pis;
 use App\Model\Process;
+use App\Model\SessionSubscription;
+use App\Model\Subscriptions;
 use App\Model\SystemicMap;
 use App\Model\SystemicMapItems;
 use App\Model\User;
@@ -231,6 +233,97 @@ class ProcessController extends CrudResourceController
             'code' => 0,
             'status' => 'Error',
             'data' => 'Process not found'
+        ];
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function setSubscription($id)
+    {
+        $subscription = Subscriptions::findFirst((int) $id);
+        if ($subscription instanceof Subscriptions) {
+            $sessionSubscription = SessionSubscription::findFirst([
+                'conditions' => 'subscription_id = ?1 AND user_id = ?2',
+                'bind' => [
+                    1 => $subscription->id,
+                    2 => $this->getAuthenticatedId()
+                ],
+            ]);
+            $sessionSubscription = $sessionSubscription instanceof SessionSubscription
+                ? $sessionSubscription
+                : new SessionSubscription();
+            $sessionSubscription->subscription_id = $subscription->id;
+            $sessionSubscription->user_id = $this->getAuthenticatedId();
+            if ($sessionSubscription->save()) {
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success',
+                    'data' => $subscription,
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+        }
+        $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => 'Subscription not saved!!!'
+        ];
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function getSubscription()
+    {
+        $sessionSubscription = SessionSubscription::findFirst([
+            'conditions' => 'user_id = ?1',
+            'bind' => [
+                1 => $this->getAuthenticatedId()
+            ],
+        ]);
+        if ($sessionSubscription instanceof SessionSubscription) {
+            $response = [
+                'code' => 1,
+                'status' => 'Success',
+                'data' => $sessionSubscription->subscription_id,
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
+
+        $response = [
+            'code' => 0,
+            'status' => 'Error',
+            'data' => 'Subscription not found'
+        ];
+        return $this->createArrayResponse($response, 'data');
+    }
+
+    public function unsetSubscription()
+    {
+        $sessionSubscription = SessionSubscription::findFirst([
+            'conditions' => 'user_id = ?1',
+            'bind' => [
+                1 => $this->getAuthenticatedId()
+            ],
+        ]);
+        if ($sessionSubscription instanceof SessionSubscription) {
+            if ($sessionSubscription->delete()) {
+                $response = [
+                    'code' => 1,
+                    'status' => 'Success',
+                    'data' => 'Subscription unset',
+                ];
+                return $this->createArrayResponse($response, 'data');
+            }
+            $response = [
+                'code' => 0,
+                'status' => 'Error',
+                'data' => 'Subscription not unset'
+            ];
+            return $this->createArrayResponse($response, 'data');
+        }
+
+        $response = [
+            'code' => 1,
+            'status' => 'Success',
+            'data' => 'Subscription not found'
         ];
         return $this->createArrayResponse($response, 'data');
     }

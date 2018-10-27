@@ -11,13 +11,18 @@ class SubscriptionsTransformer extends ModelTransformer
     {
         $this->modelClass = Subscriptions::class;
         $this->availableIncludes = [
-            'Organization', 'Subscribers', 'User', 'Users'
+            'Organization', 'SessionSubscription', 'Subscribers', 'User', 'Users'
         ];
     }
 
     public function includeOrganization(Subscriptions $model)
     {
         return $this->item($model->getOrganization(), new OrganizationTransformer());
+    }
+
+    public function includeSessionSubscription(Subscriptions $model)
+    {
+        return $this->item($model->getSessionSubscription(), new SessionSubscriptionTransformer());
     }
 
     public function includeSubscribers(Subscriptions $model)

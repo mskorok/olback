@@ -6,6 +6,7 @@ use App\Auth\UsernameAccountType;
 use App\Constants\AclRoles;
 use App\Model\ProcessOrganizations;
 use App\Model\ProcessUsers;
+use App\Model\SessionSubscription;
 use App\Traits\Auth;
 use App\Transformers\UserTransformer;
 use Phalcon\Db;
@@ -66,6 +67,16 @@ class UserController extends CrudResourceController
 
         $transformer = new UserTransformer();
         $transformer->setModelClass(User::class);
+
+        $sessionSubscription = SessionSubscription::findFirst([
+            'conditions' => 'user_id = ?1',
+            'bind' => [
+                1 => $session->getIdentity()
+            ],
+        ]);
+        if ($sessionSubscription instanceof SessionSubscription) {
+            $sessionSubscription->delete();
+        }
 
         $user = $this->createItemResponse(User::findFirst($session->getIdentity()), $transformer);
 

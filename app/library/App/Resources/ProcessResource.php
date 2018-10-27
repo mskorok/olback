@@ -67,6 +67,21 @@ class ProcessResource extends ApiResource
                     ->allow(AclRoles::USER)
                     ->deny(AclRoles::UNAUTHORIZED)
                     ->description('Get Full Process Data')
+            )->endpoint(
+                ApiEndpoint::post('/subscription/{id}', 'setSubscription')
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
+                    ->description('Set Subscription')
+            )->endpoint(
+                ApiEndpoint::get('/subscription', 'getSubscription')
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
+                    ->description('Get Subscription')
+            )->endpoint(
+                ApiEndpoint::get('/subscription/unset', 'unsetSubscription')
+                    ->allow(AclRoles::USER)
+                    ->deny(AclRoles::UNAUTHORIZED)
+                    ->description('Unset Subscription')
             );
     }
 }

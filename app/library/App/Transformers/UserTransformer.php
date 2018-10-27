@@ -18,6 +18,7 @@ class UserTransformer extends ModelTransformer
             'Pis',
             'Processes',
             'ProcessUsers',
+            'SessionSubscription',
             'SingleReport',
             'Survey',
             'SurveyTemplates',
@@ -69,6 +70,11 @@ class UserTransformer extends ModelTransformer
     public function includeProcessUsers(User $model)
     {
         return $this->collection($model->getProcessUsers(), new ProcessUsersTransformer());
+    }
+
+    public function includeSessionSubscription(User $model)
+    {
+        return $this->item($model->getSessionSubscription(), new SessionSubscriptionTransformer());
     }
 
     public function includeSingleReport(User $model)
