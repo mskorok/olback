@@ -5,7 +5,6 @@ namespace App\Model;
 use App\Constants\Services;
 use App\Mvc\DateTrackingModel;
 use League\Fractal\Resource\Collection;
-use App\Model\User;
 
 /**
  * Process
@@ -23,6 +22,7 @@ use App\Model\User;
  * @method Collection getSystemicMap
  * @method Collection getSystemicStructureMap
  * @method Collection getOrganization
+ * @method Subscriptions getSubscriptions
  * @method Survey getSurveyInitial
  * @method Survey getSurveyEvaluation
  * @method Survey getSurveyAAR
@@ -154,6 +154,7 @@ class Process extends DateTrackingModel
         $this->hasMany('id', SystemicMap::class, 'processId', ['alias' => 'SystemicMap']);
         $this->hasMany('id', SystemicStructureMap::class, 'processId', ['alias' => 'SystemicStructureMap']);
         $this->belongsTo('organizationId', Organization::class, 'id', ['alias' => 'Organization']);
+        $this->belongsTo('subscription_id', Subscriptions::class, 'id', ['alias' => 'Subscription']);
         $this->belongsTo('step0', Survey::class, 'id', ['alias' => 'SurveyInitial']);
         $this->belongsTo('step3_0', Survey::class, 'id', ['alias' => 'SurveyEvaluation']);
         $this->belongsTo('step3_1', Survey::class, 'id', ['alias' => 'SurveyAAR']);

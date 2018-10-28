@@ -1089,6 +1089,7 @@ class SystemicStructureMapController extends CrudResourceController
 
         foreach ($array as $value) {
             if (\is_array($value)) {
+                $depth = $this->arrayDepth($value['items'], $creatorInfo, $non_ch)['max'] + 1;
                 if (isset($value['id'])) {
                     if ((AclRoles::ADMINISTRATOR === $creatorInfo[1]) || (AclRoles::MANAGER === $creatorInfo[1])) {
                         $delete_raw = '<a class="fa fa-lg fa-trash-o" data-ng-click="deleteSysStructureMapItem('
@@ -1105,7 +1106,8 @@ class SystemicStructureMapController extends CrudResourceController
                     if (!\in_array($value['id'], $non_ch, true)) {
                         $delete_raw = '';
                     }
-                    $this->html .= '<ol class="dd-list"><li class="dd-item dd3-item item' . $value['id']
+                    $this->html .= '<ol data-depth="' . $depth . '" class="dd-list"><li class="dd-item dd3-item item'
+                        . $value['id']
                         . " generals-item\" style=\“color:" . $value['color'] . ";\” data-id=\"" . $value['id']
                         . '"><div class="dd3-content" ><div class="itemscolor" style="background-color:'
                         . $this->colorLuminance($value['color'], 0.1)
@@ -1129,13 +1131,13 @@ class SystemicStructureMapController extends CrudResourceController
                         . '</div><div class="item-groupname">' . $value['groupTitle'] . '</div></div>';
                 }
 
-                $depth = $this->arrayDepth($value['items'], $creatorInfo, $non_ch)['max'] + 1;
+
 
                 if ($depth > $max_depth) {
                     $max_depth = $depth;
                 }
 
-                $this->html .= '</li></ol>';
+                $this->html .= '</li></ol >';
             }
         }
 

@@ -7,6 +7,7 @@ use App\Constants\AclRoles;
 use App\Model\ProcessOrganizations;
 use App\Model\ProcessUsers;
 use App\Model\SessionSubscription;
+use App\Model\Subscriptions;
 use App\Traits\Auth;
 use App\Transformers\UserTransformer;
 use Phalcon\Db;
@@ -216,6 +217,16 @@ class UserController extends CrudResourceController
                     'data' => $messagesErrors,
                 ];
             } else {
+                $subscription = new Subscriptions();
+                $subscription->subscriber = $managerId;
+                $subscription->description = 'Free ' . $manager->firstName . ' ' . $manager->lastName;
+                $subscription->type = 'Free';
+                $subscription->organization_id = $assign_org->organization_id;
+                $subscription->save();
+                $subscription->refresh();
+
+
+
                 $response = [
                     'code' => 1,
                     'status' => 'Success',
@@ -232,6 +243,7 @@ class UserController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createUser()
     {
@@ -355,7 +367,24 @@ class UserController extends CrudResourceController
                 'data' => $messagesErrors,
             ];
         } else {
+            /** @var Organization $organization */
+            $organization = $this->getAuthUserOrganization();
+
             $managerId = $manager->getWriteConnection()->lastInsertId();
+
+            $assign_org = new UserOrganization();
+            $assign_org->organization_id = $data->organization ?? $organization->id;
+            $assign_org->user_id = $managerId;
+            $assign_org->save();
+
+            $subscription = new Subscriptions();
+            $subscription->subscriber = $managerId;
+            $subscription->description = 'Free ' . $manager->firstName . ' ' . $manager->lastName;
+            $subscription->type = 'Free';
+            $subscription->organization_id = $data->organization ?? $organization->id;
+            $subscription->save();
+            $subscription->refresh();
+
             $response = [
                 'code' => 1,
                 'status' => 'Success',
@@ -496,6 +525,25 @@ class UserController extends CrudResourceController
             ];
         } else {
             $manager->refresh();
+
+            /** @var Organization $organization */
+            $organization = $this->getAuthUserOrganization();
+
+            $managerId = $manager->id;
+
+            $assign_org = new UserOrganization();
+            $assign_org->organization_id = $data->organization ?? $organization->id;
+            $assign_org->user_id = $managerId;
+            $assign_org->save();
+
+            $subscription = new Subscriptions();
+            $subscription->subscriber = $managerId;
+            $subscription->description = 'Free ' . $manager->firstName . ' ' . $manager->lastName;
+            $subscription->type = 'Free';
+            $subscription->organization_id = $data->organization ?? $organization->id;
+            $subscription->save();
+            $subscription->refresh();
+
             $response = [
                 'code' => 1,
                 'status' => 'Success',

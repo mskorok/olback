@@ -40,6 +40,9 @@ class StatisticsController extends CollectionController
 
         $process = $this->getFirstProcessByUser($creator['account']);
 
+        /** @var User $user */
+        $user = $this->getAuthenticated();
+
         $subscriptions = [];
         /** @var Simple $singleSubscriptions */
         $singleSubscriptions = Subscriptions::find([
@@ -66,6 +69,17 @@ class StatisticsController extends CollectionController
         /** @var Subscribers $subscriber */
         foreach ($subscribers as $subscriber) {
             $subscription = $subscriber->getSubscriptions();
+            $subscriptions[] = $subscription;
+        }
+
+        if (\count($subscriptions) === 0) {
+            $subscription = new Subscriptions();
+            $subscription->subscriber = $this->getAuthenticatedId();
+            $subscription->description = 'Free ' . $user->firstName . ' ' . $user->lastName;
+            $subscription->type = 'Free';
+            $subscription->organization_id = $organizationId;
+            $subscription->save();
+            $subscription->refresh();
             $subscriptions[] = $subscription;
         }
 

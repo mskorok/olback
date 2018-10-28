@@ -25,6 +25,7 @@ class ProcessTransformer extends ModelTransformer
             'SystemicMap',
             'SystemicStructureMap',
             'Organization',
+            'Subscriptions',
             'SurveyInitial',
             'SurveyEvaluation',
             'SurveyAAR',
@@ -71,6 +72,11 @@ class ProcessTransformer extends ModelTransformer
     public function includeOrganization(Process $model)
     {
         return $this->collection($model->getOrganization(), new OrganizationTransformer());
+    }
+
+    public function includeSubscriptions(Process $model)
+    {
+        return $this->item($model->getSubscriptions(), new SubscriptionsTransformer());
     }
 
     public function includeSurveyInitial(Process $model)
