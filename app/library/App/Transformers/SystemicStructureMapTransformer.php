@@ -11,7 +11,7 @@ class SystemicStructureMapTransformer extends ModelTransformer
     {
         $this->modelClass = SystemicStructureMap::class;
         $this->availableIncludes = [
-            'Creator', 'Departments', 'Organization', 'Process'
+            'Creator', 'Departments', 'Organization', 'Process', 'Subscriptions'
         ];
     }
 
@@ -34,5 +34,10 @@ class SystemicStructureMapTransformer extends ModelTransformer
     public function includeProcess(SystemicStructureMap $model)
     {
         return $this->item($model->getProcess(), new ProcessTransformer());
+    }
+
+    public function includeSubscriptions(SystemicStructureMap $model)
+    {
+        return $this->item($model->getSubscriptions(), new SubscriptionsTransformer());
     }
 }

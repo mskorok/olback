@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Constants\Services;
 use App\Model\Process;
+use App\Model\SessionSubscription;
+use App\Model\Subscriptions;
 use App\Traits\Auth;
 use Phalcon\Db;
 use Phalcon\Mvc\Model\Resultset\Simple;
@@ -53,12 +55,19 @@ class SystemicMapController extends CrudResourceController
         }
         $organization_id = $creator['organization']->organization_id;
 
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription() instanceof SessionSubscription
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : null;
+
         /** @var Simple $systemicMaps */
         $systemicMaps = SystemicMap::find(
             [
-                'conditions' => '	organization = ?1',
+                'conditions' => '	organization = ?1 AND subscription_id = ?2 ',
                 'bind' => [
                     1 => $organization_id,
+                    2 => $subscription instanceof  Subscriptions ? $subscription->id : 0
                 ],
             ]
         );
@@ -113,13 +122,20 @@ class SystemicMapController extends CrudResourceController
         }
         $organization_id = $creator['organization']->organization_id;
 
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription() instanceof SessionSubscription
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : null;
+
         /** @var Simple $systemicMaps */
         $systemicMaps = SystemicMap::find(
             [
-                'conditions' => '	organization = ?1 AND processId = ?2',
+                'conditions' => '	organization = ?1 AND processId = ?2 AND subscription_id = ?3',
                 'bind' => [
                     1 => $organization_id,
                     2 => $id,
+                    3 => $subscription instanceof  Subscriptions ? $subscription->id : 0
                 ],
             ]
         );
@@ -230,6 +246,7 @@ class SystemicMapController extends CrudResourceController
         $systemicMap->isActive = $data->isActive;
         $systemicMap->creator_id = $creatorId;
         $systemicMap->processId = $process->id;
+        $systemicMap->subscription_id = $process->subscription_id;
         if ($systemicMap->save() === false) {
             $messagesErrors = [];
             foreach ($systemicMap->getMessages() as $message) {
@@ -285,25 +302,30 @@ class SystemicMapController extends CrudResourceController
 
         $user = User::findFirst($creatorId);
 
+        $subscription = $user->getSessionSubscription() instanceof SessionSubscription
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : null;
 
         if ($user instanceof User && (AclRoles::MANAGER === $user->role || AclRoles::ADMINISTRATOR === $user->role)) {
             $systemicMap = SystemicMap::findFirst(
                 [
-                    'conditions' => 'id = ?1 AND organization = ?2',
+                    'conditions' => 'id = ?1 AND organization = ?2 AND subscription_id = ?3',
                     'bind' => [
                         1 => $id,
                         2 => $organization_id,
+                        3 => $subscription instanceof  Subscriptions ? $subscription->id : 0
                     ],
                 ]
             );
         } else {
             $systemicMap = SystemicMap::findFirst(
                 [
-                    'conditions' => 'id = ?1 AND organization = ?2 AND creator_id = ?3',
+                    'conditions' => 'id = ?1 AND organization = ?2 AND creator_id = ?3 AND subscription_id = 4?',
                     'bind' => [
                         1 => $id,
                         2 => $organization_id,
-                        3 => $creatorId
+                        3 => $creatorId,
+                        4 => $subscription instanceof  Subscriptions ? $subscription->id : 0
                     ],
                 ]
             );
@@ -943,6 +965,24 @@ class SystemicMapController extends CrudResourceController
 
         /** @var Simple $systemicMapsR */
         $systemicMapsR = SystemicMap::find((int) $id);
+
+
+        /** @var User $user */
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription()
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : 0;
+        $sid = $subscription instanceof  Subscriptions ? $subscription->id : 0;
+        if ($systemicMapsR->getFirst() instanceof SystemicMap) {
+            /** @var SystemicMap $map */
+            $map = $systemicMapsR->getFirst();
+            if ($map->subscription_id !== $sid) {
+                throw new \RuntimeException('Your subscription haven`t access to this map');
+            }
+        } else {
+            throw new \RuntimeException('Map not found');
+        }
 
         $systemicR = '';
         if ($systemicMapsR->count() > 0) {

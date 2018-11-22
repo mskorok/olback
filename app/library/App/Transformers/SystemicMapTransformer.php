@@ -11,7 +11,7 @@ class SystemicMapTransformer extends ModelTransformer
     {
         $this->modelClass = SystemicMap::class;
         $this->availableIncludes = [
-            'ActionListGroup', 'Creator', 'SystemicMapItems', 'Departments', 'Organization', 'Process'
+            'ActionListGroup', 'Creator', 'SystemicMapItems', 'Departments', 'Organization', 'Process', 'Subscriptions'
         ];
     }
 
@@ -43,5 +43,10 @@ class SystemicMapTransformer extends ModelTransformer
     public function includeProcess(SystemicMap $model)
     {
         return $this->item($model->getProcess(), new ProcessTransformer());
+    }
+
+    public function includeSubscriptions(SystemicMap $model)
+    {
+        return $this->item($model->getSubscriptions(), new SubscriptionsTransformer());
     }
 }

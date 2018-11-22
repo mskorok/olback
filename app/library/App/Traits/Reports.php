@@ -15,6 +15,7 @@ use App\Model\Organization;
 use App\Model\Process;
 use App\Model\QuestionGroups;
 use App\Model\SingleReport;
+use App\Model\Subscriptions;
 use App\Model\Survey;
 use App\Model\SurveyQuestion;
 use App\Model\User;
@@ -526,12 +527,27 @@ trait Reports
         /** @var SurveyQuestion $question */
         $question = $answer->getSurveyQuestions();
         $survey = $question->getSurvey();
+        /** @var User $user */
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription()
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : null;
+
+        $sid = $subscription instanceof Subscriptions ? $subscription->id : 0;
+
         $process = $survey->getProcess30();
         if ($process instanceof Process) {
+            if ($process->subscription_id !== $sid) {
+                throw new \RuntimeException('Your subscription haven`t access to this process');
+            }
             return $process;
         }
         $process = $survey->getProcess0();
         if ($process instanceof Process) {
+            if ($process->subscription_id !== $sid) {
+                throw new \RuntimeException('Your subscription haven`t access to this process');
+            }
             return $process;
         }
         throw new \RuntimeException('Process not found');
@@ -553,8 +569,21 @@ trait Reports
         /** @var UserOrganization $userOrganization */
         $userOrganization = $this->getAuthUserOrganization();
         $organization = $userOrganization->getOrganization();
+        /** @var User $user */
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription()
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : null;
+        $sid = $subscription instanceof Subscriptions ? $subscription->id : 0;
         /** @var Simple $processes */
-        $processes = $organization->getProcess();
+        $processes = Process::find([
+            'conditions' => 'organizationId =?1 AND subscription_id = ?2 ',
+            'bind' => [
+                1 => $organization->id,
+                2 => $sid
+            ],
+        ]);
 
         $surveys = [];
         /** @var Process $process */
@@ -626,8 +655,21 @@ trait Reports
         /** @var UserOrganization $userOrganization */
         $userOrganization = $this->getAuthUserOrganization();
         $organization = $userOrganization->getOrganization();
+        /** @var User $user */
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription()
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : null;
+        $sid = $subscription instanceof Subscriptions ? $subscription->id : 0;
         /** @var Simple $processes */
-        $processes = $organization->getProcess();
+        $processes = Process::find([
+            'conditions' => 'organizationId =?1 AND subscription_id = ?2 ',
+            'bind' => [
+                1 => $organization->id,
+                2 => $sid
+            ],
+        ]);
 
 
         $users = [];

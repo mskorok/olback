@@ -15,6 +15,7 @@ use Phalcon\Mvc\Model;
  * @method Department getDepartments
  * @method Organization getOrganization
  * @method Process getProcess
+ * @method Subscriptions getSubscriptions
  */
 class SystemicStructureMap extends Model
 {
@@ -41,6 +42,13 @@ class SystemicStructureMap extends Model
      * @Column(type="integer", length=11, nullable=true)
      */
     public $creator_id;
+
+    /**
+     *
+     * @var integer
+     * @Column(type="integer", length=11, nullable=true)
+     */
+    public $subscription_id;
 
     /**
      *
@@ -90,6 +98,7 @@ class SystemicStructureMap extends Model
             'systemic_map_id',
             ['alias' => 'SystemicMapStructureItems']
         );
+        $this->belongsTo('subscription_id', Subscriptions::class, 'id', ['alias' => 'Subscriptions']);
         $this->belongsTo('creator_id', User::class, 'id', ['alias' => 'Creator']);
         $this->belongsTo('department', Department::class, 'id', ['alias' => 'Departments']);
         $this->belongsTo('organization', Organization::class, 'id', ['alias' => 'Organization']);
@@ -140,6 +149,7 @@ class SystemicStructureMap extends Model
             'id' => 'id',
             'name' => 'name',
             'creator_id' => 'creator_id',
+            'subscription_id' => 'subscription_id',
             'department' => 'department',
             'organization' => 'organization',
             'lang' => 'lang',

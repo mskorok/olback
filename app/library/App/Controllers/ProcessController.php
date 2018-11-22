@@ -335,11 +335,38 @@ class ProcessController extends CrudResourceController
      * @param $value
      * @param $data
      * @return mixed
+     * @throws \RuntimeException
      */
     protected function transformPostDataValue($key, $value, $data)
     {
         if ($key === 'creator_id') {
             $value = $this->getAuthenticatedId();
+        }
+
+        if ($key === 'subscription_id') {
+            /** @var User $user */
+            $user = $this->getAuthenticated();
+            $session = SessionSubscription::findFirst([
+                'conditions' => 'user_id = ?1',
+                'bind' => [
+                    1 => $user->id
+                ],
+            ]);
+            if ($session instanceof SessionSubscription) {
+                $value = $session->subscription_id;
+            } else {
+                $subscription = Subscriptions::findFirst([
+                    'conditions' => 'user_id = ?1 AND type = "Free"',
+                    'bind' => [
+                        1 => $user->id
+                    ],
+                ]);
+                if ($subscription instanceof Subscriptions) {
+                    $value = $subscription->id;
+                } else {
+                    throw new \RuntimeException('Subscription not defined');
+                }
+            }
         }
         return $value;
     }

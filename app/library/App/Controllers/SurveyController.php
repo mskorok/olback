@@ -8,6 +8,8 @@ use App\Model\Answer;
 use App\Model\OptionAnswer;
 use App\Model\Process;
 use App\Model\QuestionGroups;
+use App\Model\SessionSubscription;
+use App\Model\Subscriptions;
 use App\Model\SurveyTemplate;
 use App\Model\SystemicMapItems;
 use App\Model\User;
@@ -288,6 +290,7 @@ class SurveyController extends CrudResourceController
     /**
      * @param $id
      * @return mixed
+     * @throws \RuntimeException
      */
     public function getQuestion($id)
     {
@@ -332,6 +335,16 @@ class SurveyController extends CrudResourceController
 
 
             $user = User::findFirst((int)$creatorId);
+
+            $subscription = $user->getSessionSubscription() instanceof SessionSubscription
+                ? $user->getSessionSubscription()->getSubscriptions()
+                : 0;
+            $sid = $subscription instanceof Subscriptions ? $subscription->id : 0;
+
+            if ($process->subscription_id !== $sid) {
+                throw new \RuntimeException('Your subscription haven`t access to this process');
+            }
+
             $groups = [];
             $flag = 0;
             /** @var SurveyQuestion $item */
@@ -816,7 +829,6 @@ class SurveyController extends CrudResourceController
     public function availableUserSurveys()
     {
         $creatorId = $this->getAuthenticatedId();
-        $user = $this->getAuthenticated();
         if (null === $creatorId) {
             $response = [
                 'code' => 0,
@@ -827,17 +839,30 @@ class SurveyController extends CrudResourceController
         }
 
         $config = $this->getDI()->get(Services::CONFIG);
+        /** @var User $user */
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription() instanceof SessionSubscription
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : 0;
+
+        $sid = $subscription instanceof Subscriptions ? $subscription->id : 0;
 
         $sql_getProcesses = 'SELECT PR.id, PR.title, PR.`step0`, PR.`step3_0`, PR.`step3_1`,'
-            . 'PR.`reality`, PR.`vision` FROM `process` PR '
-            . 'INNER JOIN survey S ON PR.`step0`= S.id OR PR.`step3_0`= S.id OR PR.`step3_1`= S.id '
-            . 'OR PR.`reality`= S.id OR PR.`vision`= S.id '
-            . 'WHERE PR.id IN (SELECT  `processId` FROM `process_departments` WHERE `departmentId` '
-            . 'IN (SELECT department_id FROM user_department WHERE user_id =  ' . $creatorId . ' )) OR '
-            . 'PR.id IN (SELECT  `processId` FROM `process_organizations` WHERE `organizationId` '
-            . 'IN (SELECT organization_id FROM user_organization WHERE user_id =  ' . $creatorId . ' )) OR '
-            . 'PR.id IN (SELECT `processId` FROM `process_users` WHERE userId = ' . $creatorId . ' ) '
-            . 'GROUP BY PR.`step0`, PR.`step3_0`, PR.`step3_1`, PR.`reality`, PR.`vision`, PR.`id`';
+            . ' PR.`reality`, PR.`vision`, PR.subscription_id FROM `process` PR '
+            . ' INNER JOIN survey S ON PR.`step0`= S.id OR PR.`step3_0`= S.id OR PR.`step3_1`= S.id '
+            . ' OR PR.`reality`= S.id OR PR.`vision`= S.id '
+            . ' WHERE PR.subscription_id IS NOT NULL AND PR.subscription_id = ' . $sid
+            . ' AND PR.id IN (SELECT  `processId` FROM `process_departments` WHERE `departmentId` '
+            . ' IN (SELECT department_id FROM user_department WHERE user_id =  ' . $creatorId
+            . ' )) OR PR.subscription_id IS NOT NULL AND PR.subscription_id = ' . $sid
+            . ' AND PR.id IN (SELECT  `processId` FROM `process_organizations` WHERE `organizationId` '
+            . ' IN (SELECT organization_id FROM user_organization WHERE user_id =  '
+            . $creatorId . ' )) OR PR.subscription_id IS NOT NULL AND PR.subscription_id = ' . $sid
+            . ' AND PR.id IN (SELECT `processId` FROM `process_users` WHERE userId = ' . $creatorId . ' ) '
+            . ' GROUP BY PR.`step0`, PR.`step3_0`, PR.`step3_1`, PR.`reality`, PR.`vision`, PR.`id`';
+
+
         $connection = $this->db;
         $data = $connection->query($sql_getProcesses);
         $data->setFetchMode(Db::FETCH_ASSOC);

@@ -13,6 +13,7 @@ use App\Model\Answer;
 use App\Model\Organization;
 use App\Model\Process;
 use App\Model\ProcessYearSurvey;
+use App\Model\Subscriptions;
 use App\Model\Survey;
 use App\Model\SurveyQuestion;
 use App\Model\SurveyTemplate;
@@ -306,8 +307,22 @@ trait Surveys
     {
         /** @var Organization $organization */
         $organization = $this->getAuthOrganization();
+
+        /** @var User $user */
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription()
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : null;
         /** @var Simple $processes */
-        $processes = $organization->getProcess();
+        $processes = Process::find([
+            'conditions' => 'organizationId =?1 AND subscription_id = ?2 ',
+            'bind' => [
+                1 => $organization->id,
+                2 => $subscription instanceof Subscriptions ? $subscription->id : 0
+            ],
+        ]);
+
         /** @var Process $firstProcess */
         $firstProcess = $processes->getFirst();
         return $firstProcess->id === $process->id;
@@ -321,8 +336,20 @@ trait Surveys
     {
         /** @var Organization $organization */
         $organization = $this->getAuthOrganization();
+        /** @var User $user */
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription()
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : null;
         /** @var Simple $processes */
-        $processes = $organization->getProcess();
+        $processes = Process::find([
+            'conditions' => 'organizationId =?1 AND subscription_id = ?2 ',
+            'bind' => [
+                1 => $organization->id,
+                2 => $subscription instanceof Subscriptions ? $subscription->id : 0
+            ],
+        ]);
         /** @var Process $firstProcess */
         return $processes->getFirst();
     }
@@ -348,10 +375,23 @@ trait Surveys
             return true;
         }
 
+        /** @var User $user */
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription()
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : null;
+        $sid = $subscription instanceof Subscriptions ? $subscription->id : 0;
+
+
         if (\count($initialSurveys) > 0 && \count($processInitialSurveyAnswers) === 0) {
             /** @var Survey $survey */
             $survey = $initialSurveys[0]['survey'];
             $initialProcess =  $survey->getProcess0();
+            if ($initialProcess->subscription_id !== $sid) {
+                return false;
+//                throw new \RuntimeException('Your subscription haven`t access to this process');
+            }
             if ($initialProcess instanceof Process && $process->id === $initialProcess->id) {
                 return true;
             }
@@ -433,8 +473,20 @@ trait Surveys
         $config = $di->get(Services::CONFIG);
         /** @var Organization $organization */
         $organization = $this->getAuthOrganization();
+        /** @var User $user */
+        $user = $this->getAuthenticated();
+
+        $subscription = $user->getSessionSubscription()
+            ? $user->getSessionSubscription()->getSubscriptions()
+            : null;
         /** @var Simple $processes */
-        $processes = $organization->getProcess();
+        $processes = Process::find([
+            'conditions' => 'organizationId =?1 AND subscription_id = ?2 ',
+            'bind' => [
+                1 => $organization->id,
+                2 => $subscription instanceof Subscriptions ? $subscription->id : 0
+            ],
+        ]);
         $initialSurveys = [];
         /** @var Process $process */
         foreach ($processes as $process) {

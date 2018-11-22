@@ -412,6 +412,7 @@ class UserController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createManagerPublic()
     {
@@ -421,6 +422,7 @@ class UserController extends CrudResourceController
 
     /**
      * @return mixed
+     * @throws \RuntimeException
      */
     public function createUserPublic()
     {
@@ -431,6 +433,7 @@ class UserController extends CrudResourceController
     /**
      * @param $role
      * @return mixed
+     * @throws \RuntimeException
      */
     protected function createPublic($role)
     {

@@ -18,6 +18,7 @@ use Phalcon\Mvc\Model;
  * @method Department getDepartments
  * @method Organization getOrganization
  * @method Process getProcess
+ * @method Subscriptions getSubscriptions
  */
 class SystemicMap extends Model
 {
@@ -44,6 +45,13 @@ class SystemicMap extends Model
      * @Column(type="integer", length=11, nullable=true)
      */
     public $creator_id;
+
+    /**
+     *
+     * @var integer
+     * @Column(type="integer", length=11, nullable=true)
+     */
+    public $subscription_id;
 
     /**
      *
@@ -93,6 +101,7 @@ class SystemicMap extends Model
         $this->belongsTo('department', Department::class, 'id', ['alias' => 'Departments']);
         $this->belongsTo('organization', Organization::class, 'id', ['alias' => 'Organization']);
         $this->belongsTo('processId', Process::class, 'id', ['alias' => 'Process']);
+        $this->belongsTo('subscription_id', Subscriptions::class, 'id', ['alias' => 'Subscriptions']);
     }
 
     /**
@@ -139,6 +148,7 @@ class SystemicMap extends Model
             'id' => 'id',
             'name' => 'name',
             'creator_id' => 'creator_id',
+            'subscription_id' => 'subscription_id',
             'department' => 'department',
             'organization' => 'organization',
             'lang' => 'lang',

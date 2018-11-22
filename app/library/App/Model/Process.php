@@ -127,6 +127,13 @@ class Process extends DateTrackingModel
 
     /**
      *
+     * @var integer
+     * @Column(type="integer", length=11, nullable=true)
+     */
+    public $subscription_id;
+
+    /**
+     *
      * @var string
      * @Column(type="string", nullable=true)
      */
@@ -217,6 +224,7 @@ class Process extends DateTrackingModel
                 'status' => 'status',
                 'organizationId' => 'organizationId',
                 'creator_id' => 'creator_id',
+                'subscription_id' => 'subscription_id',
             ];
     }
 }
