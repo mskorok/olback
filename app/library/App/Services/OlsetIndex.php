@@ -24,11 +24,11 @@ class OlsetIndex extends Injectable
     }
 
     /**
-     * @param iterable $answers
+     * @param $answers
      * @return float
      * @throws \RuntimeException
      */
-    public function calculateOlsetIndex(iterable $answers): float
+    public function calculateOlsetIndex($answers): float
     {
         $score = 0.00;
         /** @var Answer $answer */
