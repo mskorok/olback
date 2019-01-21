@@ -129,7 +129,7 @@ class SystemicMapController extends CrudResourceController
             : null;
 
         /** @var Simple $systemicMaps */
-        $systemicMaps = SystemicMap::find(
+	$systemicMaps = SystemicMap::find(
             [
                 'conditions' => '	organization = ?1 AND processId = ?2 AND subscription_id = ?3',
                 'bind' => [
@@ -1034,19 +1034,15 @@ class SystemicMapController extends CrudResourceController
                     ' . $tree[0]['question'] . '
 
                     <span class="pull-right">
-
-
                     <a class="fa fa-lg fa-plus" data-toggle="modal" data-target="#myModal' . $tree[0]['id'] . 'C"></a>
                     <a class="fa fa-lg fa-pencil-square-o" data-toggle="modal" data-target="#myModal' . $tree[0]['id']
             . 'E"></a>
-
-
                     </span>
                   </div>';
         $html = $this->arrayDepth($tree[0]['items'], $creatorInfo, $non_ch)['html'];
         $html .= '
 				<data-sys-map-items-add lolo="myModal" add-func="addSysMapItem(' . $tree[0]['id']
-            . ',question,proposal,group,color)" datasp="' . $tree[0]['id'] . '"></data-sys-map-items-add>
+				. ',question,proposal,group,color)" datasp="' . $tree[0]['id'] . '"  dataprop="' . $tree[0]['proposal'].'" dataque="'.  $tree[0]['question'] .'"></data-sys-map-items-add>
 
 				<data-sys-map-items-edit lolo="myModal" edit-func="editSysMapItem(' . $tree[0]['id']
             . ',question,proposal,group,color)" datasp="' . $tree[0]['id'] . '" dataprop="' . $tree[0]['proposal']
@@ -1122,6 +1118,7 @@ class SystemicMapController extends CrudResourceController
         $max_depth = 1;
 
         foreach ($array as $value) {
+
             if (\is_array($value)) {
                 if (isset($value['id'])) {
                     if ((AclRoles::ADMINISTRATOR === $creatorInfo[1]) || (AclRoles::MANAGER === $creatorInfo[1])) {
@@ -1139,8 +1136,9 @@ class SystemicMapController extends CrudResourceController
                     if (!\in_array($value['id'], $non_ch, true)) {
                         $delete_raw = '';
                     }
+                    // ,' . addslashes($value['question']) . '
                     $this->html .= '<ol class="dd-list"><li class="dd-item dd3-item item' . $value['id']
-                        . " generals-item\" style=\“color:" . $value['color'] . ";\” data-id=\"" . $value['id']
+                        . " generals-item\" style=\β€�color:" . $value['color'] . ";\β€� data-id=\"" . $value['id']
                         . '"><div class="dd3-content" ><div class="itemscolor" style="background-color:'
                         . $this->colorLuminance($value['color'], 0.1)
                         . '"></div>' . $value['question'] . '<span class="pull-right">'
@@ -1148,9 +1146,10 @@ class SystemicMapController extends CrudResourceController
                         . $value['id']
                         . 'C"></a><a class="fa fa-lg fa-pencil-square-o" data-toggle="modal" data-target="#myModal'
                         . $value['id'] . 'E"></a></span><data-sys-map-items-add lolo="myModal" add-func="addSysMapItem('
-                        . $value['id'] . ',question,proposal,group,color)" datasp="'
+                            . $value['id'] . ',question,proposal,group,color)" datasp="'
                         . $value['id']
-                        . '"></data-sys-map-items-add><data-sys-map-items-edit lolo="myModal"'
+                        . '" dataprop="' . $value['proposal']. '" dataque="'.  $value['question'] .'" >
+                        . </data-sys-map-items-add><data-sys-map-items-edit lolo="myModal"'
                         . ' edit-func="editSysMapItem('
                         . $value['id'] . ',question,proposal,group,color)" datasp="'
                         . $value['id'] . '" dataprop="' . $value['proposal'] . '" dataque="'
@@ -1225,7 +1224,12 @@ class SystemicMapController extends CrudResourceController
                 . 'JOIN systemic_map_items SI ON SI.id = SM.to_item WHERE NOT EXISTS '
                 . '(SELECT * FROM systemic_map_chain sm2 '
                 . 'WHERE sm2.from_item = SM.to_item) AND SI.systemic_map_id = ' . $data->systemicMapId . ';';
+            //var_dump( $sql_dist);
+            
             $data_dist = $connection->query($sql_dist);
+            
+            //var_dump($data_dist);
+            
             $data_dist->setFetchMode(Db::FETCH_ASSOC);
             $results_dist = $data_dist->fetchAll();
 
@@ -1248,7 +1252,7 @@ class SystemicMapController extends CrudResourceController
     {
         $tree = [];
         foreach ($arrayData as $value) {
-            if ($value['id'] !== '') {
+            if ($value['id'] != '') {
                 $sql = 'SELECT sm.*,u.first_name,u.last_name FROM systemic_map_items sm '
                     . 'JOIN user u ON sm.userId = u.id WHERE sm.id=' . $value['id'];
 
