@@ -368,17 +368,17 @@ class UserController extends CrudResourceController
             ];
         } else {
             /** @var Organization $organization */
-            $organization = $this->getAuthUserOrganization();
+            $organization = $this->getAuthOrganization();
 
-            $managerId = $manager->getWriteConnection()->lastInsertId();
+            $manager->refresh();
 
             $assign_org = new UserOrganization();
             $assign_org->organization_id = $data->organization ?? $organization->id;
-            $assign_org->user_id = $managerId;
+            $assign_org->user_id = $manager->id;
             $assign_org->save();
 
             $subscription = new Subscriptions();
-            $subscription->subscriber = $managerId;
+            $subscription->subscriber = $manager->id;
             $subscription->description = 'Free ' . $manager->firstName . ' ' . $manager->lastName;
             $subscription->type = 'Free';
             $subscription->organization_id = $data->organization ?? $organization->id;
@@ -389,7 +389,7 @@ class UserController extends CrudResourceController
                 'code' => 1,
                 'status' => 'Success',
                 'data' => [
-                    'userId' => $managerId,
+                    'userId' => $manager->id,
                 ],
             ];
         }
