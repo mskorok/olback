@@ -341,7 +341,8 @@ class SurveyController extends CrudResourceController
                 : 0;
             $sid = $subscription instanceof Subscriptions ? $subscription->id : 0;
 
-            if ($process->subscription_id !== $sid) {
+            //SuperAdmin is excluded from error
+            if ($process && $process->subscription_id !== $sid && $user->role !== AclRoles::ADMINISTRATOR) {
                 throw new \RuntimeException('Your subscription haven`t access to this process');
             }
 

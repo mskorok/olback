@@ -1,0 +1,708 @@
+Hi Stav! in this version structure of SSM and SAM /SSMItems and SAMItems will be the same?
+now in database I see difference SAMItem has relation with survey but SSMItem has only itemType field
+Stav 16:33 please ignore existing SSM tableshi Mikhailcopy the SAM tables to new copiesthey will be the same
+16:34So I create full copy of SAM?
+Stav 16:34but different Step of courseyesexact copy
+16:34different step - what do you mean?
+Stav 16:34SAM is in Step 2 I thinkSSM is in step 3 I thinklet me check
+16:35of course
+Stav 16:35yes, that's what I meant
+16:35ok
+Stav 16:36step 1 -> SSMstep 2 -> SAMthe above is correct ^
+11:18Hi Stav! When you will have time, explain what changes need to be done in SSM.
+ I installed all as copy of SSAM functionality
+ Stav 13:04heyok
+ 13:04Hi!Stav
+ 13:04how can i help you
+ 13:05I do not know what changes must be done in SSM, I created the same functionality as SAM. You said about arrows
+ Stav 13:07okyessothe arrows
+ 13:17Stav, can you translate what Anthi want?
+ Stav 13:30yes I will do itin the other chat
+ 14:42ok
+ 16:51Stav, we wait you
+ Stav 17:16hey
+ 17:16Hi
+ Stav 17:16sorryI have lots of requests from everywhere please tell
+ 17:17We decided all questions with Anthi.
+ Stav 17:18ok so do you need me?
+ 17:18no, have a good evening! :)
+ Stav 17:18ok one thingI have one question the arrowsI need to make arrows from the outer level to the inner levelI
+  "may" need some helpin the sense that I need to know what the outer isand what the innermaybe we can add a flagso I can know which one is
+  17:20I find in Stackowerflow how to do it, if I will have problems I will ask your help
+  Stav 17:20please do not do anything yet no noplease do not do anythingi'll do the graphicsin d3
+  no problemI'm just sayingthat maybe I will need an additional fieldmaybeI don't know yet
+  17:22I hope to finish this project next week.
+  Stav 17:22oh nook...i will try to leave you aloneand not give any more work
+  17:22sorry Do not worry, there no problem for me, I just tired and type "last" against "next"
+  Stav 17:24oh hahahaok
+  17:25:D
+
+
+
+
+
+
+
+
+
+
+
+Hello @Mikhail. How is it going?
+13:05Hi! I talk now with Stav about changes in SSM
+Anthi 13:07please let's talk together about the changes in SSM to avoid any misunderstanding. Are you finishing with the frame files?
+13:07yes, I installed the same functionality as SAM
+Anthi 13:08great! Thank you!
+Stav 13:08 ok sot here are a few differences
+Anthi 13:09
+First we start by Placing the text of the Vision text box as Item 1 at the center and we colour it blue
+(and we write at the below corner that blue = Vision then the user clicks the + sign of Item 1at the modal window that opens
+at the field "question" we write "identify the key elements of your current reality that can be increased or decreased"at
+the field "action" we write "key element of current reality"we colour all items of this layer red (and we write at
+the bottom red = current reality same thing as many times as the + sign of Item 1 is clicked
+Then, when the user clicks the + sign of any of the red items, at the "question" field of the modal window
+that opens we write "identify intervention projects" and at the field "action" we replace it with "Intervention projects".
+Colour this green and write at the bottom green = intervention projectsInstead of lines we should use arrows all directed towards Item 1.
+That is all about SSM. After that we start the SSM report
+13:29 Anthi, try to explain Stav what do you want, because I not understand at all.
+We have SAM page - and we need to do some changes - what changes we need to do?
+Stav 13:30 ok let's take it one by one so 1)
+Initial item will be called Vision and it must be filled in
+13:31so it will be created in any situation when page loaded?
+Stav 13:31 so I think, when we create the SSM we just ask the user to fill in first item (= circle) and we have to label this Vision
+Anthi 13:31 NO
+Stav 13:31only on new creation
+Anthi 13:32 the user does NOT fill in the text of the Vision . He has filled it in at Step 0. we should copy it from Vision Text box
+Stav 13:32 ok, yes, that;s even better
+13:32 I mean page SSM - when user create new SSM we will create first item automatically?
+Anthi 13:32 yes
+Stav 13:32 yes, thats the point - we will create it autmatically default test is = with the vision of step 0
+13:33I understand, and if he try to create SSM we will ask him first fill text?
+Stav 13:33 no need just copy the text from Vision (from step 0)and create first item (circle) automatically
+13:34 I mean if he not filled Vision text field we ask him to fill Vision field first
+Stav 13:34well, it's always going to be filled now
+Anthi 13:34 he can't go to SSM if not first finish
+Step 013:35 ok, yes he even not open SSM, Anthi right
+Stav 13:36ok so now 2)
+Anthi 13:36before 2
+Stav 13:36sorry , for 1) the default colour will be blue
+Anthi 13:37yes
+Stav 13:37for that first item
+Anthi 13:37and we should write it also at the bottom corner that blue = vision
+Stav 13:37ok@Mikhail the colours are essentially GroupIds so we need to add a Group called Vision and make
+it blue let's make it a little different that the other blue because there already is a blue one I think
+13:38 wait 1 min, I will show on screen
+Stav 13:38 ok @Anthi if we leave it as is then the Vision item will be editable (and thus the user will be able to change it)
+are we ok with that?
+
+          """image1"""
+word vision will be at this place?
+
+the colour will be Blue because you will select group "Vision"
+13:41"Vision" will be in red square?
+
+          """"image2""""
+
+we want them to use the text of the Vision text box of Step 0. Let them edit it if they want
+Stav 13:42That's the group the red square will have part of the vision text
+13:42ok, I understand about groups
+Stav 13:42and it will show in the circle (the whole vision text)
+13:43thats all clear
+Stav 13:43okso step 2when you add a new item
+13:43 text well be not editable
+Stav 13:43 instead of "Question" label
+Anthi 13:43ok
+Stav 13:43needs to change to:
+  "identify the key elements of your current reality that can be increased or decreased"
+13:44 ok You mean placeholder?
+Stav 13:44 label "action" we will call "key element of current reality" yes placeholder
+13:44ok
+Stav 13:45I will add the arrows to the graph@Mikhail please make sure that we have a new php file ssm1.php
+13:46 I do not know how to add arrows
+Stav 13:46 you need to load this in the iframe
+13:46 I did new php file for ssm
+Stav 13:46 not the one that you are loading now ok cool yes I will do the arrow inside this new file which one is it?
+13:47I do not know how to add arrows in this library
+Stav 13:47@Anthi for all items connection lines will be directed to the parent item
+13:47ok
+Stav 13:47not Item 1
+Anthi 13:48yes
+Stav 13:48all second level items will direct to item 1 all third level items will direct to their parent item
+Anthi 13:48yes, sorry, this is what I meant
+Stav 13:48 cool ok I think we are on the same page@Mikhail please give me the filename you are loading in the SSM iframe
+13:49I will send file now, sow as all code is local you can`t load from internet, or I can give you link to github, 2 min
+no probs send me anything you have
+13:51header('X-Frame-Options: ALLOWALL'); - ONLY for local version so as I use different local domain names
+Stav 13:51ok
+13:52mskorok/olbackhttps://github.com
+Stav 13:52thanks
+13:53send me file after changingSo thats all we need to do?
+Anthi 14:06there is a little bit more, let's wait for
+Stavro14:06ok
+Anthi 14:18oh! AND 2 drop down menus with only 2 options at the beginning and at the end of each arrow2 options: Less or More
+14:20not understand what do you mean - what dropdown?
+Anthi 14:20let's wait for @Stav to finish and come back
+14:20ok
+Stav 14:21 sorry, on a call will come back here as soon as possible 15-20 mins
+14:21ok
+Anthi 14:21 ok do you want to talk about changes in the SAM while we wait?
+14:26yes, let go
+Anthi 14:26 ok 21. at the modal window that opens when the user clicks the + sign, the field "question" must be automatically filled in.
+To fill it in we write "Why didn't + parent item text"
+14:29ok
+Anthi 14:302. the first item of the SAM should be the layer 3 (green) items of the SSM
+(but they should be able to also chose "other" and fill in a different text)
+14:30parent item question text or answer text?
+Anthi 14:32answer text filled in at the field "action" of the modal window which is also the text that is put into the parent circle ok
+the first item of the SAM should be the layer 3 (green) items of the SSM (but they should be able to also chose "other" and fill
+in a different text) what do you mean?SAM and SSM 2 different not related models what do you mean layer 3?
+Anthi 14:34after the current reality circles (coloured red), Stavros will tell you about what happens when the user clicks
+the + sign of a red item, we get another layer of items which we colour green) and are the intervention projects in the SSM
+14:35no comment - not understand at all
+Anthi 14:35okwe need to take text that is filled in at the SSM and automatically make it the first item of a SAM
+14:36SSM and SAM not related. You can`t do this
+Anthi 14:37why not? For SSM we take text of Step 0 (vision)
+14:37yes - but this text related to process, not SAM - SSM related to process
+Anthi 14:38what do you mean "not SAM-SSM related to process"? SSM and SAM are steps of the process, no?
+14:39SSM related to process model, not to SAM - there no relation with SAM
+Anthi 14:40we just need to copy the text that the user fills in nothing else
+14:41we can use only related data, if you haven`t any relation you can`t get data
+Anthi 14:42hhmmm, let's wait for @Stav
+14:42ok
+Anthi 14:48the whole process is processing data from Step 0 to Step 3, we can't not relate data from SSM to the SAMso we should establish a relation
+14:55SSM and SAM is models that related to Process, so we have one to many relation in one Process - many SAM and one Process - many SSM.
+relation SAM -> SSM only via Process model, so you have Many to Many relations
+Anthi 14:56in one process only 1 SSM many SAM yes
+14:57Where it was declared? I see code with relations - there no limitations. We can limit it only on subscription level
+Anthi 14:57ok we can limit it only at subscription level you see code with no limitations because you see the copy of the SAM code
+ that is not limited, SSM had not be written if we limit it at subscription level, will it work?
+15:00In previous version of SSM no limitation too
+Anthi 15:01the previous version is Stav's new experts SSM module
+15:01one moment - you said that may be subscription without SSM limitation
+Anthi 15:01no, not for version 1SAM no limitation
+15:02 I mean limitation for SSM
+Anthi 15:02no, there should be always 1 SSM per process for Version 1 in the free subscription and in the paid subscriptions
+15:03 so we can just use data from first SSM
+Anthi 15:03 limitation of max 10 SAM at the free subscription (not of SSM)
+15:04 I propose to wait @Stav, not to create misunderstanding, ok?
+Anthi 15:04ok
+Stav 15:04Will be with you shortly
+15:04Hi Stav, there one new problem!!!!!!about texts - Vision, CR and Shared is this text the one for process or
+it will different for each user ?
+Now this text is located in Process model, but I understand now that we need to do it different for different users
+Anthi 15:07no wait the VS and the CRS are different text per user BUT the Shared Vision text box and the Current reality
+text box is one per process filled in by the process administrator
+15:09ok, so what text we will fill in the first item of SSM - text created by admin?
+Anthi 15:09 yes ok, solved Stav, we wait you
+Stav 15:11 ok I'm ready what's the problem
+15:11 we solved
+Stav 15:11ok
+Anthi 15:12please go ahead with the SSM you were at point 2
+Stav 15:12 ok so point 2 I think we mentioned now
+Anthi 15:12 only colours (red)red (sorry for this image I have no idea how it got there
+15:13???
+Anthi 15:14items of layer 2 should be coloured red
+15:14what do you mean layer?we have items
+Anthi 15:15items with parent item, item 1
+15:16so for SSM child item of first item always will be with red color?
+Anthi 15:16yes
+15:16can user change it?
+Anthi 15:16no
+15:17it will be new color or we use color from existent groups?
+Anthi 15:19Stav?this I don't know what to answer, I am waiting for @Stav's opinion
+15:20ok
+15:28the first item of the SAM should be the layer 3 (green)
+Anthi 15:28 then children of children always green
+15:28 may be you meat third item ? next question - now in SAM first item may have many children - how it will be in SSM?
+Anthi 15:30 same
+15:30so there may be many third level items
+Anthi 15:30 yes these items we call "intervention projects"
+15:31so how you identify third item wich will be used to create first item in SAM?
+Anthi 15:32 user choses at the beginning of each SAM from a drop down menu perhaps?
+15:33 thats all not 'little changes' - its again rewrite from scratch
+Anthi 15:33:( thats why I was not optimistic about how long time it take
+Anthi 15:35what is your estimation about time?
+15:36may be week
+Stav 15:36...
+15:36 do not know, without estimation
+Anthi 15:36ok@Stav there is one question above about colour red and then can you continue with the SSM please?
+15:39red color will be new or from some current variant?
+Anthi 15:47new
+15:48ok
+Anthi 15:51@Stav?
+15:54@Anthi you can explain me now about SSM report
+Anthi 15:54okdo you want me to finish with SSM first?
+15:54ok
+Anthi 15:54ok so you got 2 right? (about red items)children of item 1
+15:55yes
+Anthi 15:57ok so now 3. children of children of item 1 should be all green. At the "question" label you replace
+it with "identify intervention projects" and label "action" you replace with "intervention projects"of
+the modal window
+15:58one moment - in SAM user can choose group. And color depend from group.
+Is there will be group dropdown or no?
+Anthi 15:58no need colours in SSM will be standard central item = blue, children items = red, children of children items = green
+16:00next - placeholders (labels) - please write again for all items
+Anthi 16:01 ok for children items placeholder named in SAM "question" should write now "identify key elements of the current reality
+that can increase or decrease" and label "action" should write now "key element".
+For green items the question label should write now "identify intervention projects" and the "action label should write
+"intervention projects"
+16:06no, please 1 item(color blue) : question - "", answer: - ""; 2 item (red) : question - "" , answer - "";
+3 item (green) : question - "", answer - ""; to prevent misunderstanding
+Anthi 16:07ok1 item no labels as it is written automatically, right?
+16:08there 2 fields - answer and question - answer we will take from Vision text But what about question?
+Anthi 16:09Identify your vision
+16:09ok
+Anthi 16:102 items (coloured red) question: "identify the key elements of current reality that can be increased or decreased"
+   answer: "key element"3 items (coloured green) question: "identify intervention projects" answer "intervention projects"
+16:11ok thats clear
+     the answers are going into the circles as text
+16:11ok
+Anthi 16:12 4. change lines into arrows (Stav) said will do it5. place two drop down menus at the beginning and at the end of each arrow.
+The drop downs have only 2 choices: Less/ More
+16:13????what do you mean arrows there?
+Anthi 16:14@Stav here we really need your wisdom about how to do this
+16:14you mean to add dropdown to image with balls?
+Anthi 16:145 is the last change yes except if @Stav has any better idea of how to do this
+16:16I can`t to do it in any case it may some years to rewrite this js library :)
+Anthi 16:16 then we need to think another way to signify Less or More
+16:17what will do less or More?
+Anthi 16:17will be used at the report
+16:17how?
+Anthi 16:18 each arrow, one sentence: "Less/More of Item 2 results in Less/More of Item 1"so that the user can figure out what projects to do
+16:20we can`t do anything at image with balls, forget it.
+ If Stav add arrows instead lines it will be great result . No more.
+Think in categories - items, not arrows.
+Anthi 16:21ok the same if we think about items we want to find out and write at the report that
+ "More/Less of Item 2 results in More/Less of
+item 1"
+16:22so we can just open dropdown. How it will be opened?Now I not understand sence of More and Less
+Anthi 16:23 example:my vision = to make OL science accessible to all my current reality item red 2: not enough scientific
+literature my intervention project item green 3: research so now I should find out if I should do MORE or LESS of research in order to
+achieve my vision so more research results in more accessible OL science for all
+16:26;(
+Anthi 16:26ha ha haI am sorry we need @Stav here
+16:27we have dropdown with 2 fields - more and less for each type of items?
+Anthi 16:28for each item
+16:28for each item we have one dropdown?
+Anthi 16:28yes, I think so@Stav we need you!!!!
+16:29and if we choose one of 2 value - what we will do with this value?we have question, answer and value of dropdown
+ - what we will do with this?
+Anthi 16:31the value of the dropdown will be used in the report. 1 sentence per item (since we don't think in arrows)no
+real need to signify it on the image we just want it to make the sentences for the report
+16:32ok, I will open report now 1 min
+Anthi 16:33ok
+16:34 More [OR “Less” depending on ......] of ....variable/stock..... results in more of .........variable/stock....try
+to explaine
+Anthi 16:34variable/stock is item
+16:34we have 3 text string
+Anthi 16:34 forget "depending on"
+16:351. question, 1. answer, 3. value how it will be combined?
+Anthi 16:37the question and answer are part of the modal window in order to create the map.
+ The value should be filled AFTER creating
+the map and we will use it only in the report by forming one sentence per item "More/Less of (answer of item 2)
+results in More/Less of answer of item 1 text"question is used only to for the user to find and fill in the answer
+16:39 ok, I understand so depth of items will be 3, but we can give ability to create unlimited amount of items of 2 and 3 lavel?
+Anthi 16:41yes
+16:42after creating items user will estimate (more/less) ?
+Anthi 16:42yes
+so this dropdown will appear after item created?
+Anthi 16:43it needs to be filled in after all 3 levels of items have been created
+16:44okso main unsolved question - where locate dropdown - I think Stav has some ideas.
+Anthi 16:44ok, great about the report (to finish with this as well) only complexity to form the sentences with More/less
+that I told you about . All the rest is standard text
+16:47i understand.one more question - if we have 3 type subscription - answers will be shown to all users or user can see
+only own answers?
+Anthi 16:50answers will be show to all users
+16:50ok, so we wait @Stav
+Stav 16:51how can I help?
+16:52about more/less dropdown - do you have any ideas where it will be located?
+Stav 16:53I think it must be in the dialog that appears and you simply edit it if you want to change it
+16:55wait - more/less will appiar when 3 green item will be created
+Stav 16:55hmmm yes
+16:56maybe we will add checkbox to item with more and less fields?
+Stav 16:56yes
+Anthi 16:56that's a great idea!
+16:56and store results id separate model - ssm Report for each user@Anthi - question - ssm report will be single (for one user) ?
+Anthi 16:58no in 3 type of subscription
+17:00 so if every user will estimate - how can we create group report? we can calculate olset index,
+   but more/les is not calculatable!
+   Anthi 17:02no need for OLSET Index this is calculated at the Evaluation report.
+   What do you mean more/less is not calculable. We ASSUME that the 12 users will provide the same value for the same items.
+   If there is a difference let's ask the administrator to decide less or more this report does not have numbers and statistics,
+    just sentences
+17:03not understand!!!!!!each user can set more and less
+Anthi 17:03:(
+17:04you have 12 users so for 1 item you need or calculate some median data or give data for all users
+Anthi 17:05we assume that all 12 users put the same value at the same item so we use the common value
+17:05but more/less will be different
+Anthi 17:06IF it is different, then we use the value assigned by the administrator
+17:06okwill user in 3 type subscription have single report?
+Anthi 17:07no
+17:07ok thats all
+Anthi 17:07ok
+Anthi 17:40@Mikhail, I forgot to mention that when you take the text from the green items to put it as the first item in SAM you should add
+ the words "why didn't " at the beginning of the text please
+ 17:44okAnthi
+ 17:44thank you
+
+
+
+
+Dear @Mikhail I hope that you are very well.
+Dear @Mikhail and @Stav I know that this is not the right time for work but you can read it and reply when you can.
+I hope that at least one of you has an idea regarding how to signify the different values of Item 1 of the SSM
+as this is an item that will have as many values as the items in layer 2 of SSM items.
+all other items have only one value (either more or less) but Item 1 has many values actually the critical
+thing is not really to signify it but to differentiate between the items and their corresponding value
+for the SSM Report18:44@Anthi do you want to rewrite project once more?
+Anthi 19:27Hi @Mikhail. I hope you are very well. rewrite project? What do you mean?
+19:28Yes, you need to change structure, its led rewriting of all SSM block
+Anthi 19:29for the different values of item 1?you remember we said that each item has a question,
+an answer and a value?19:30Item now has only 1 value
+Anthi 19:30yes, ok , very good, this is correct
+we just need to figure out a way to write inside the report (when Item 1 is used) which item of layer 2 it is related
+with and that item will tell us what value (Less or More) to put before the item 1 while writing the report
+19:34Not understand what do you mean
+Anthi 19:34ok in SSM, each item has 1 value, this is correct but this is because you instructed me to think
+regarding items rather than regarding arrows. this means that ok for every item corresponds 1 value
+BUT not in the case of Item 1 because Item 1 has many children not just one and for each child
+Item 1 might have different value. We don't need to see this in any way but we need to separate the different
+values when we write about Item 1 inside the report maybe @Stav knows a simple way to do this
+19:41Try to explain it to Stav. Main problem is to understand what do you want
+Anthi 19:42ok, yes, I will explain it to @Stav when he gets in Skype. I am sure he has been thinking about this already
+are you all right with your health?
+19:45No i need some time to reabilitation, but I try to finish this project
+Anthi 19:45oh, is there any way that I could help?
+
+
+
+
+ok, thank you for being so courageous and focused professional who wants to finish the project at hand regardless
+of other circomstances!how many days do you think are needed to finish the project?19:49I do not know.
+I think that we can estimate at the end of next week
+Anthi 19:51ok, thank youHave a nice night!
+19:54Have a good night!Anthi 15:21@Stav, we need your help
+Stav 12:15@Mikhail Hi, I'm in a call, when I finish it, I'll come back here.
+Anthi 12:23Good morning @Mikhail. I asked @Stav to call me so that I can explain him in Greek as we said
+13:31Ok
+Stav 14:05ok I understand now what the problem is@Mikhail do you use the systemic_structure_map_chain table?
+Anthi 14:21Hi @Mikhail. I told you I am sure that @Stav has already thought about it!
+15:00Of course, this table create relation betwean items
+Anthi 15:14@Stav?
+Stav 16:52hello yes exactly in there you can add two field sand the GUI can save these values in thereI think it is
+ self explanatory once you see the table
+ 16:53What will be in fields?
+ Stav 16:54lets make these fields integer1=more
+2=lessor enum[more,less]
+16:56Ok
+Stav 16:56two feilds from_value, to_value or from_weight, to_weight
+16:58Ok
+Stav 17:06based on this, when do you think this can be ready?
+Anthi 17:29Hi @Mikhail, when do you estimate that we will deploy project?
+19:10I can't estimate, I do not know can I work even 1 hour a day.
+
+Anthi 7:46Good morning @Mikhail. What tasks are still left to be done?
+10:01Ssm and report Sam need to be rewrited accoarding with new ideas
+Anthi 10:03SAM?
+10:05Yes, last time you changed spesification for Sam creation, so this functionality must to be rewrited
+Anthi 10:07we just want to connect layer 3 items of SSM to Item 1 of SAM. Is there anything else that we changed in SAM?
+oh yes and text at the label of question in the modal window.
+2 changes, how much time do you estimate for these 2 changes? Maybe @Stav could help?
+10:12Yes, so we need to remove part of frontend and bpart of backend and create new functionality.
+How Stav can help if in any case this part must be rewrited. If you change specification you must understand
+- new specification need new code.
+Stav 10:12ok one seclet me understand exactly what's neededand I'll tell you specific steps
+10:14We need to add mechanism of creation of first item in backend and frontend
+
+
+
+
+yes let me think about it for a few mins
+Anthi 10:17in other words (so you can think) we want each item of Layer 3 of SSM to become one Item 1 of SAM
+(but the paying subscribers can also edit Item 1 of SAM thus do more projects that those of layer 3 items of SSM)
+Stav 10:17wait
+Stav 10:45Ok I have all the information about the project
+Stav 10:551) When adding 2nd level items in SSM
+
+- the question must be: "What elements of your current reality can be increased or decreased."
+
+2) When adding 3rd level items in SSM:
+
+- the question must be: "Identify intervention projects."
+- a new SAM must be created with a level 1 item with question text based on the 3rd SSM item.
+
+3) In SSM we must:
+- add more/less fields to the chain table and provide CRUD functions to add/edit these values. Also add these fields in the creation & edit dialog.
+- In the items listed under the tree, add the two more/less values leftmost and rightmost in the list item
+   (i.e. the two bottom corners)4) The SSM report
+10:56Stav, we discuss about sam, not ssm In current code first item created by user
+Stav 10:57As far as I know, the chages n SAM are very small. The first time must still be abe to be created by user
+10:57So this code must to be changed
+Stav 10:58the difference in in item 2) above:
+
+2) When adding 3rd level items in SSM:
+
+- the question must be: "Identify intervention projects."
+- a new SAM must be created with a level 1 item with question text based on the 3rd SSM item.10:58We need to rewrite controllerStav 10:58when a new 3rd level SSM item is created, then a new SAM is created with a default item10:58So as now all items created by the same codeStav 10:58there already is code to create a SAMthere will be two ways to create a SAM:
+1) As it is now, by user
+2) When a 3rd level item is created in SSM
+11:01 Yes, we need to add new code for first item and remove all frontend part for first item creation,
+ then we need to rewrite controller at frontend no more.
+ So its mean to rewrite current functionality
+Stav 11:12why remove all parts for creation? the user will still be able to create SAMs in the way they can now
+Ok, I did not know about this, so not remove old - add additional functionality
+Stav 11:36yes
+Anthi 11:37and we forgot to mention: add text in question label of SAM modal window "Why didn't we +parent item text"
+11:39I want to clarify one moment - about first item of sam - its the one item or may be several ?
+Anthi 11:41 maximum 10 for the free version and unlimited for the paid subscription. Is this what you mean "several"?
+11:42I mean sam item of first level not sam
+Anthi 11:43only one
+in first level
+11:44Ok, so user can't create new item of first level - only choose from dropdown?
+Anthi 11:45I would answer YES but if the user uses the old way of editing he/she can create another SAM.
+ But always only one item at level one
+11:47What do you mean old way of editing?
+Anthi 11:48sorry, I should had written old way of creating item 1with the old way of creating item 1
+ (which is needed only in the two paid subscriptions) the user can create a SAM's first item that is not in the drop down
+ but always only one item at level one
+ 11:51So he can choose to create from dropdown or create new?
+ Anthi 11:52yes (only the paid subscription users). The free version users can use only the first 10 items of the drop down
+ 11:56Ok, Anthi all this details I need to know BEFORE starting coding, not AFTER code created.
+  In other case we will finish in 2020 New Year :)
+Anthi 12:01YES you are absolutely right!!!! :( BUT as you said "the programmer is the translator of the thought into
+code and if the thought is not clear, then the code doesn't work".
+The truth is that all these details come up in my thought as we move to the creation of each task.
+@Stav with the previous team did a miracle as my thought was very unclear.
+So now as we work together at each task, all these details come up.
+I am sorry for this. But I assure you that there is no other detail that will come up since
+I think that just now with this last detail we have all specifications for the conclusion of the project.
+12:05I think that we will have some such moments, it will be in any case. The biggest problem is my illness,
+ it make work much slow.
+ Anthi 12:06how many days do you need for recovery?
+ 12:07I do not know. I have problem will vessels of brain. All diagnostic will be finidhed in Friday.
+ Anthi 12:08oh I am so sorry. I hope everything will go great with your health. It is ok if you work slower.
+  What can we do? These things happen to human beings
+
+
+
+
+Thats why I said that can estimate time at the end of week
+Anthi 12:09ok we are humans thus we have to accept our limitations and vulnerabilities.
+ We just have to keep on trying for the best possible
+ 12:14I hope I can solve this problem
+ Anthi 12:15my best wishes are with you
+ 12:15Thank you!
+ Anthi 12:18Thank you for having the courage to work despite this!
+ Stav 12:23hope you get well soon @Mikhail!!!
+ 12:24Thank you!
+ Anthi 12:30but regarding what is left to be done for this project, everything is clear?
+ Stav 12:30the only thing I forgot to mention is the Question that is item 1 in the SAM
+ which should be the compy of the SSM 3rd level item plus something
+ Anthi 12:31no no every question of SAM (including item 1) should be "why didn't we + parent item text"
+ Stav 12:33the first item is created automatically so that should be:
+Why didn;t we + level 3 item from SSM
+Anthi 12:33not plus something at the end, plus something at the beginning , yes, sorry
+Stav 12:33the rest f the item in SAM, at the moment are free text...yes, sorry that;s what I meant
+Anthi 12:34ok sorry I didn't understand correctly
+
+
+
+
+Hi @Stav! we have structural problem. @Anthi says that subscription will allow 1 SSM and 10 SAM.
+In our structure SAM and SSM related to process (many to one).
+So if you allow one SSM it will be related only to one process.
+If you want to use data from SSM in SAM you can use SSM and SAM related to the same process.
+But if we allow 1 SSM amd 10 SAM - some SAM will be related to another process as SSM.
+ So we can`t use information from SSM. pls clarify this moment.
+ Stav 10:07 hi that's correct I think we should NOT have a limitation to the SAM
+10:09limitation to SSM you mean?
+Stav 10:09because if you do, then it is the same as not allowing full usage of ONE SSM
+lets wait until @Anthi comessh must decide after we explain
+Anthi 10:10Good morning @Mikhail and @Stav
+10:10I`m think so, if we add limitation to SSM system will not work
+Anthi 10:10exactly! at the free version it is like not allowing full use of SSM since most probably there will
+be more than 10 items at the 3rd level so we give 10 projects (SAMs) for free but if they want to use more SAMs
+they will have to buy a subscriptionI didn't really understand the structural problem.
+Can you explain me please?10:13@Stav pls explain @Anthi in Greek, so as this is technical problem
+and she not understand what I mean
+Anthi 10:14yes please @Stav call me in Skype (BTW FYI again I am not receiving any notifications....)
+Stav 10:15Ι ςιλλ βε ψαλλινγ υοθ ιν αππροχ 1¨30 ηοθρσI will be calling you in approx 1:30 hours
+10:18And one more question - how much SAM will be for one process - one or many?
+Anthi 10:18 many at the free version maximum 10at the paid versions unlimited
+10:21if we have limitation in SAM and one process can have many SAM so we need to create mechanosm to calculate
+ how much process we can create. So as if we not have this inspection we may create process without ability to create SAM
+ Anthi 10:23"how much process we can create" ? What do you mean?
+ 10:27I mean if you limited SAM you need limited creation of process.
+ And this amount must be calculated depend of how much SAM will be created for one process.
+  So we need to change code in process creation - add inspections on amount of SAM and processes
+  Anthi 10:28does it take a lot of time to create this inspection mechanism?
+
+
+
+
+@Anthi, I will not estimate time at all, because each new step lead to rewriting project.
+I do not know what new problems will appear. If we will work so as we do now - every time rewrite current functionality
+- I believe that we will finish to 2020 New Year
+Anthi 10:38ok, no we don't want that what happens without these inspections?
+10:42just it will not work - we need to do åll chånges in åny case. Ånd I såid you thåt I wås not optimistic åbout SÅM.
+Anthi 10:42:(
+10:43just be patient
+Anthi 10:43ok
+And HAPPY NAME DAY! It is a big celebration of the Archangels Mikhail and Gabriil today here
+(and also Angel's which is the name of my son)
+10:45Спасибо!
+Anthi 10:46:)I know that much Russian as my mother was born in Taskendi, Russiais your health better?
+10:49Thanks, I will have result of diagnostic tomorrow, so I`m not work before results,
+but I try to clarify all questions not to do unnecessary work
+Anthi 10:50ok, great, thank you Inspections will be only for SAM number?
+10:54yes, but this moment we need to clarify before starting.
+So as one process can have some SAM - we must deny creation of project if we created all allowed SAM
+By the way - Tashkent is not Russia, its Uzbekistan and one of beatifull ancients cities.
+Anthi 10:57:) (It was when she was born and living there, it changed to Uzbekistan after she had moved back
+to Greece)ok@Stav will explain me more as I can't say that I have understand completely
+11:00ok, I wait your decision - so now thats all questions, but not the last
+Anthi 11:01ok :)
+Anthi 11:45but, now that I am thinking about it, and as far I understand before @Stav explains me,
+there is no decision to take since if we don't do this inspection the process will not work, right?this is what you said, right?
+11:49@Stav proposed to limit SSM so as SAM - if we have 10 SAM we will have 10 SSM - its good decision.
+ But I think that we must add next limitation - one process - 1 SSM and 1 SAM
+ its will solve some problems - we will not need any inspections
+ Anthi 11:50but we had said that yes we do limit SSM to one per process, no?why if we have 10 SAMs we will have also 10 SSMs?
+ 11:53in any case there must be more then one SSM in subscription, at least 1 for process
+ Anthi 11:53in any case, for the paid subscriptions we must give unlimited SAMs yes SSM 1 per process always
+
+
+
+
+ok, so we solved this question - 1 SSM per process not per subscription
+Anthi 11:54yes 1 SSM per process always no, per process
+Anthi 14:01Hi @Mikhail, after this clarification, is there any other question to solve or no?
+14:02now any questions
+Anthi 14:03Should @Stav still explain me what you were saying before about inspectors of amount of SAMs per process?
+14:03no
+Anthi 14:04a ok, thank you
+
+
+
+
+Good morning @Mikhail and @Stav. I was going through the testing process in my mind as the group version testing
+will be done with my workshop team. I would be the administrator.
+It came up that there must be a way for the administrator to notify the managers/users about which part
+of the process they need to work on. Perhaps for the initial we can skip creating a functionality
+as the administrator will send an email to the managers that the process started and they must go in the software to fill it in.
+Then SSM ok, they continue the process.
+But for SAM me (the administrator) want to indicate to the managers WHICH SAM I want them to work on. How do we do this?
+Anthi 8:02do I send them a link perhaps?
+Anthi 8:09I don't want to add more coding/time please, let's find something easy
+9:26@Anthi, I think you want to hire programmer full time and pay for all your ideas in this case you can rewrite code
+last infinity
+Anthi 9:27no, I don't want to add more time PLEASE
+I want something that will just work for the first version, for the second version we will have a chat and everything.
+I think this notification that I am talking about is something that @Stav has predicted for already
+and yes I told you that I would like to hire you part time at the beginning and then full time to create the second version.
+But this is for later on. Now we must finish version 1 as soon as possible
+9:35Now I work for free and lost mach time and lost much money - you must understand that I pay for flat rent,
+ for food, for medicine and more, more , more .
+And I pay real money, every your idea -its my lost money by the way.
+I promised to Stav to finish this project, but I see that its impossible becфuse every time will be new ideas.
+Anthi 9:40I am losing a lot of money too due to the continuous delay due to new ideas.
+Believe me I am more in hurry than you to finish this project!
+I am at a state that I have borrowed money to pay for my medicine for 1 more week.
+After that I don't know what I will do as the only income I wait for is from this software.
+But this idea can be something as simple as adding the text to the instructions
+"The administrator at this point should send a kind email to its managers explaining which SAM he wants the managers
+to fill in at this point in time." , no need to add coding and thus timeI have saved for your payment,
+don't worry about that of courseI have to leave for a while but I will be back.
+Please we don't want to add more time and coding with this new idea,
+we can just add the above sentence in the already existing instructions text!
+Anthi 12:17Hello @Mikhail and @Stav. I am back
+Stav 12:46hello
+Anthi 12:48hello @Stav please read today's posts by me and @Mikhail above
+Anthi 12:55I remember @Stav's idea about this was to have a list at the dashboard
+BUT we can save this for version 2 as this needs time. For now, can we just copy-paste the above sentence
+in the existing instructions @Mikhail ?
+Anthi 13:04@Mikhail, @Stav, are you there?
+Stav 13:04hi yes sorry guys I m having to answer constant queries and phone calls got about 20 people
+who need me at any time
+Anthi 13:05you really need to use OLSET @Stav! :)
+Stav 13:05hahahaI think we can do that. the copy/paste of the instructions
+Anthi 13:07ok, if we can do this it will be great@Mikhail, do you think we can do this?
+13:12I think wed did final instruction 2 weeks ago
+Anthi 13:15you had asked me about "how many times will the instructions change?" and I told you about twice.
+It was when you also asked me about "how many times will help section" change and I told you that I will be changing
+it through the WP functionality. Are we talking about the same "instructions"?by instructions I mean the "i"
+("info") field on the menu next to the "back" button that you created
+we don't want to add any task, PLEASE we want to finish as fast as possible
+Anthi 13:32@Mikhail, do you remember us having this conversation?
+Do you remember the task of moving text from Help to the "info" button?
+Anthi 13:38I hope YES. now, in the text of the SAM's "i" ("info) button please just copy/paste one more sentence.
+This doesn't take time, right?no? it needs time??Is there a way that I can have direct access to change the "info"
+myself?@Mikhail, are you there?
+Anthi 14:36:(Stav 14:37I will be offline for about 2 hours or longer, if you need anything please post and I will answer later
+Anthi 14:42I would like to talk with @Mikhail to clarify
+16:16Hi @Anthi, sorry I had to leave for several hours in the hospital. I did all work with info button as was in Trelo
+and our conversation, we can add any text, not a problem. I think we will do it after deploy.
+I mean no more any principal changes.
+Anthi 16:18yes, NO MORE CHANGES PLEASE
+and yes it is much wiser to do it after testing because during testing I think I will improve a lot these texts
+16:19yes
+Anthi 16:19ok, great, thank you!
+
+
+
+
+Hi, sorry
+I mean when you finish SSM let us know by writing that you finished it so that
+I can take courage that we are close to finishing
+14:36We will be close to finish after deploy
+Anthi 14:36correct indeed still, we are 3 steps away from deployment, so please when you finish each step just write it here.
+It will really make me feel that we are progressing 3 steps I mean:
+SSM, SSM Report, SAM
+Anthi 8:07Good morning @Mikhail. I am sorry to bother you all the time but I am really extremely anxious about
+finishing this project. Please can you tell me where you are today and how many days you estimate
+that are still needed to reach deploy please?
+9:12I'm in hospital today
+Anthi 9:16OK, I hope your day there will go smoothly! But until yesterday, in terms of the six tasks list that @Stav wrote,
+ have you finished any of these six tasks?
+9:18What list?
+Anthi 9:21Do you remember 2 weeks ago that @Stav wrote you a list of 5 tasks that remain to be done and then we also
+ added one more task (we had talked about it already when @Stav came back to complete
+the list of tasks)it is here above in our conversation practically @Stav broke down the 3 steps into six tasks
+ 9:25Sam, report, ssm and part of subscriptions,
+(I rewrited subscription functionality because new ideas about sam and ssm)
+Anthi 9:25 yes so you categorised it into 4 tasks, that's great, OK. And you finished task number 4 (part of subscriptions),
+this is what you say, did I understand correctly?
+9:27Yes
+Anthi 9:29ok, great. So now 3 tasks remain (SAM, SSM Report and SSM).
+Can you estimate how many days are needed to finish these 3 tasks?
+@Stav says that with 4 hours of work per day, it will take about 7 days
+9:32You not understand at all, I have VERY big problems with health, I refused 2 projects where clients pay money for work.
+I try fo finish this in dangerous condition. What estimate do you want?
+Anthi 9:36@Mikhail I am really sorry that you are going through this. I understand you because I also have
+VERY big health problems. And as I wrote you yesterday, I don't have any more money to pay for my next week's medicine!
+So just tell me honestly how much you can really work per day?
+9:38This week I worked only 2 hours.In previous time i worked more than 400 hours
+Anthi 9:50Yes @Mikhail, I know that before you entered the hospital you have worked very much and very well!
+I deeply appreciate this and this is why as I told you I want to continue working with you for the next projects too.
+And we agreed that after you deliver the project you will get 1K and maximum 30 days later another 1K.
+This is a sum of 2K for your work. But in order for me to take money and give also to you your money,
+ the project must be finished. If I knew programming I would do it myself.
+But I don't know so I need you and @Stav to finish the project so that we can ALL GET PAID PLEASE!!!
+According to @Stav another 28 hours of programming are needed
+9:53Just wait. i am not shure about 28. I will finish in any case.
+Anthi 9:56ok
+Anthi 11:19@Mikhail, I am sorry to bother you again but I reread our conversation and just a wail ago you said that it is
+dangerous for you to work. Consequently (no matter how much I appreciate your determination to finish the project)
+ I am wondering if you can work next week? If it is dangerous you can't , right?
+ Stav 13:11My estimate was 40 to 56 hours, not 28. Sorry for the mistake.
+ Anthi 13:15ok, sorry for the mistake too
+ Anthi 14:26To be specific @Stav estimated 7 working days
+ Anthi 15:01but, @Stav you were also counting the time to change part of subscription which @Mikhail already did
+ so according to this estimation, now the project can reach deployment stage at about 5 working days
+ Anthi 15:20the whole point now is if @Mikhail's health allows him to work these remaining 5 days
+
+
+
+
+
+
+
